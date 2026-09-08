@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.venv-e2e/
+
+# Test / tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Editors and OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Local runtime artifacts from the relay and the demos
+*.log
+relay-token.txt
+*.local
+
+# Captured model output. Recorded runs that ship are already embedded inside
+# the demo HTML files. Nothing belongs in a captures directory here.
+captures/
