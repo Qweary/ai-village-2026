@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Swarms That Fight and Fix Each Other in a Cage</title>
+
+<!--
+  Slide deck for "Swarms That Fight and Fix Each Other in a Cage".
+  AI Village, September 2026. One hour, village room, practitioner audience.
+
+  HOW TO OPEN IT
+    Double-click this file. That is the whole thing. reveal.js 5.1.0 sits in
+    lib/ beside it, the CSS sits in css/ beside it, and both typefaces are
+    base64 data URIs inside the CSS. No server, no build step, no network.
+
+  HOW IT IS DRIVEN
+    Arrow keys or a clicker. Slides do not auto-advance and there are no
+    fragment reveals, so one press is always one slide.
+      b or .   black the screen. Use this when you tab over to a demo.
+      f        fullscreen
+      n        scanline overlay on and off
+      c        darker background, matches the cage and loop pages
+      h        show the key list
+      g        jump to a slide by name, then Enter
+
+  BACK-POCKET SLIDES
+    Four slides sit after the close and are NOT reachable by pressing forward
+    from it. Reach them with g, or with the URL hash:
+      factory-recap    the factory demo wedged
+      cage-recap       the cage demo wedged
+      loop-recap       the loop demo wedged
+      withdrawn        for "your slide says the measurement and you just said
+                       you have no measurement"
+
+  WHAT IS ON THESE SLIDES AND WHAT IS NOT
+    Two passages are spoken close to verbatim and both are on the run sheet in
+    SPEAKER-NOTES.md: the recorded-demo disclosure at 0:25 and the collapse
+    failure mode at 0:42. The slides behind both are deliberately quiet. The
+    disclosure in particular should have nothing moving on screen behind it.
+
+    There is no score figure, no delta and no dispersion constant anywhere in
+    this deck, on purpose. Every number this talk used to carry was withdrawn
+    for having no primary source, and that withdrawal is itself material at
+    0:48. Do not put one back on a slide.
+-->
+
+<link rel="stylesheet" href="lib/reveal.js/dist/reset.css">
+<link rel="stylesheet" href="lib/reveal.js/dist/reveal.css">
+<link rel="stylesheet" href="css/deck.css">
+</head>
+<body>
+
+<div id="hud">
+  <span class="hk"><b>b</b>=black</span>
+  <span class="hk"><b>f</b>=full</span>
+  <span class="hk"><b>g</b>=goto</span>
+  <span class="hk"><b>n</b>=scanline</span>
+  <span class="hk"><b>c</b>=bg</span>
+  <span class="hk"><b>h</b>=help</span>
+</div>
+
+<div id="goto">goto: <input id="goto-input" type="text" placeholder="cage-recap"></div>
+
+<div class="reveal">
+<div class="slides">
+
+<!-- ===================================================================
+     S1. Title card. 0:00, cold open.
+     The notes say open on the cage with both panes empty. This card is a
+     backdrop, not a reference. Do not read it out.
+     =================================================================== -->
+<section id="s1-title" data-slide="S1">
+  <div class="slide s1 center">
+    <div class="anchor">open</div>
+    <div style="text-align:center">
+      <div class="title">SWARMS THAT FIGHT<br>AND FIX EACH OTHER<br>IN A CAGE</div>
+      <div class="sub">two swarms go in. the talk is what happens after.</div>
+      <div class="venue">AI VILLAGE &middot; 2026</div>
+    </div>
+    <div class="brand">swarms-in-a-cage.deck</div>
+  </div>
+</section>
+
+<!-- ===================================================================
+     S2. The honesty frame. 0:03.
+     Job one of this beat is not optional. The written description says
+     "live models calling live models", which is what makes the disclosure
+     at 0:25 load-bearing. Get ahead of it here.
+     One verbatim line goes with this slide. It is in the notes.
+     =================================================================== -->
+<section id="s2-live" data-slide="S2">
+  <div class="slide dense">
+    <div class="anchor">open &middot; what is live</div>
+    <div class="tb">0:03</div>
+    <div class="h hot">WHAT IS LIVE TODAY</div>
+    <div class="sub2">three demos. two of them are calling a model while you watch.</div>
+    <div class="frame-rows">
+      <div class="frow live">
+        <div class="fname">FACTORY</div>
+        <div class="fwhat">a plain-language brief goes in, a set of agents comes out</div>
+        <div class="fstate">LIVE</div>
+      </div>
+      <div class="frow live">
+        <div class="fname">CAGE</div>
+        <div class="fwhat">the kill-chain exercise. red swarm against blue swarm</div>
+        <div class="fstate">LIVE</div>
+      </div>
+      <div class="frow rec">
+        <div class="fname">CAGE</div>
+        <div class="fwhat">the model-poisoning exercise</div>
+        <div class="fstate">RECORDING</div>
+      </div>
+    </div>
+    <div class="punch" style="margin-top:26px">i will tell you which one at the moment it comes up,<br>and i will tell you why.</div>
+    <div class="brand">swarms-in-a-cage.deck</div>
+  </div>
+</section>
+
+<!-- ===================================================================
+     S3. Factory chapter divider. 0:06.
+     Run the audience brief picked in the previous beat. It has to be
+     finished by 0:50, so start it here and talk over it.
+     =================================================================== -->
+<section id="s3-factory" data-slide="S3">
+  <div class="slide divider d-factory">
+    <div class="anchor">factory &middot; build</div>
+    <div class="tb">0:06</div>
+    <div class="chapter">FACTORY<span class="cur blink"></span></div>
+    <div class="rule">/// ONE SENTENCE IN, A SWARM OUT ///</div>
+    <div class="tag">describe the domain. it decides how many agents, and where the seams go.</div>
+    <div class="brand">swarms-in-a-cage.deck</div>
+  </div>
+</section>
+
+<!-- ===================================================================
+     S4. The rails. 0:06 to 0:16, while the factory runs.
+     Paragraph three of the published description promises these, so they
+     get paid while the factory is on screen. All four are real and all
+     four are readable in the artifacts.
+     Rail three is the one this room cares about and it is the same rail
+     that produces the recording two beats from now. Plant it here.
+     =================================================================== -->
+<section id="s4-rails" data-slide="S4">
+  <div class="slide dense">
+    <div class="anchor">factory &middot; the rails it will not cross</div>
+    <div class="tb">0:06</div>
+    <div class="h hot">THE RAILS</div>
+    <div class="sub2">four of them. all four are in the artifacts you can open.</div>
+    <div class="rails">
+      <div class="rail">
+        <div class="rnum">1</div>
+        <div class="rtext">No offensive package without a separate role whose only job is verifying authorization and clearing each phase. That role gets built first, before the agents that do the work. <b>Build the gate before the gun.</b></div>
+      </div>
+      <div class="rail">
+        <div class="rnum">2</div>
+        <div class="rtext">Everything it generates points at synthetic address space. An offline lab or a fictional range. <b>The scenario says so in front of the model, in the prompt.</b></div>
+      </div>
+      <div class="rail">
+        <div class="rnum">3</div>
+        <div class="rtext">It will not argue with a refusal. There was a long framing block in front of these models once, the kind that pre-answers every objection. It got deleted. <b>Pre-answering objections is the literal shape of a jailbreak.</b> Short factual grounding, or nothing.</div>
+      </div>
+      <div class="rail">
+        <div class="rnum">4</div>
+        <div class="rtext">The improvement loop will not push a rewritten prompt into a role it does not match. <b>It checks, and it refuses.</b></div>
+      </div>
+    </div>
+    <div class="brand">swarms-in-a-cage.deck</div>
+  </div>
+</section>
+
+<!-- ===================================================================
+     S5. Cage chapter divider. 0:16.
+     Same defending swarm, two threat models. The labels match what is on
+     the demo tab the operator switches to.
+     =================================================================== -->
+<section id="s5-cage" data-slide="S5">
+  <div class="slide divider d-cage tight">
+    <div class="anchor">cage &middot; fight</div>
+    <div class="tb">0:16</div>
+    <div class="chapter">CAGE<span class="cur blink"></span></div>
+    <div class="rule">/// RED AGAINST BLUE ///</div>
+    <div class="same-line">same defending swarm &middot; two threat models</div>
+    <div class="scenarios">
+      <div class="scenario solid">
+        <div class="stitle">IRONCLAD</div>
+        <div class="stag">AUTHORIZED &middot; ENTERPRISE COMPROMISE</div>
+        <div class="sbody">A kill chain through a synthetic estate. The defending side is in scope and knows it. The question is how cleanly it works.</div>
+      </div>
+      <div class="scenario dashed">
+        <div class="stitle">PHANTOM FEED</div>
+        <div class="stag">UNAUTHORIZED &middot; POISONED UPSTREAM MODEL</div>
+        <div class="sbody">A poisoned upstream model. The defending side is not in scope. It has to work out that it is being attacked at all.</div>
+      </div>
+    </div>
+    <div class="brand">swarms-in-a-cage.deck</div>
+  </div>
+</section>
+
+<!-- ===================================================================
+     S6. Where the scorecard comes from. 0:16 to 0:25.
+     VOLUNTEER THIS. Do not get caught on it.
+     The published description does not claim pre-registration, so nothing
+     is broken, but the fight the room just watched does not have a
+     pre-registered scorecard and somebody will read the source.
+     =================================================================== -->
+<section id="s6-scorecard" data-slide="S6">
+  <div class="slide tight">
+    <div class="anchor">cage &middot; who says who won</div>
+    <div class="tb">0:20</div>
+    <div class="h">WHERE THE SCORECARD COMES FROM</div>
+    <div class="sub2">it depends which path you are on, and the honest answer is the less flattering one.</div>
+    <div class="split">
+      <div class="pane good">
+        <div class="ptitle">ON THE CUSTOM-BRIEF PATH</div>
+        <div class="pbody">A separate role writes the scorecard <b>before</b> the round runs, and the round is judged against it. That role never sees the fight.</div>
+      </div>
+      <div class="pane bad">
+        <div class="ptitle">ON THE FIGHT YOU JUST WATCHED</div>
+        <div class="pbody">That role does not fire at all. The scoring template lives inside the scorer's own instructions. <b>The scorecard was not fixed in advance for this fight.</b></div>
+      </div>
+    </div>
+    <div class="punch" style="margin-top:30px">wiring the first into the second is on the list.<br>it is not done, so i am not claiming it.</div>
+    <div class="brand">swarms-in-a-cage.deck</div>
+  </div>
+</section>
+
+<!-- ===================================================================
+     S7. The disclosure. 0:25. VERBATIM in the notes.
+     STAGING: have the scenario selected and the run NOT started. Nothing
+     should be moving on screen while this is said. The disclosure goes
+     before the playback, not after it and not over it.
+     Deliver it flat. One disclosure, then get on with it.
+     =================================================================== -->
+<section id="s7-recording" data-slide="S7">
+  <div class="slide center">
+    <div class="anchor">cage &middot; stop here</div>
+    <div class="tb">0:25</div>
+    <div style="text-align:left;max-width:1300px">
+      <div class="h warn" style="font-size:58px">THIS ONE IS A RECORDING</div>
+      <div class="quote warn" style="margin-top:38px">
+        it is not calling a model right now.<br>
+        the kill chain you just watched was live.<br>
+        this one is not, and i would rather you hear that from me<br>
+        than find it in the source afterward.
+      </div>
+    </div>
+    <div class="brand">swarms-in-a-cage.deck</div>
+  </div>
+</section>
+
+<!-- ===================================================================
+     S8. Why it is a recording. 0:26.
+     The reason is the talk's own thesis showing up inside its own demo.
+     Do not apologise twice. Say it once, flat, then start the playback.
+     =================================================================== -->
+<section id="s8-refusal" data-slide="S8">
+  <div class="slide tight">
+    <div class="anchor">cage &middot; why</div>
+    <div class="tb">0:26</div>
+    <div class="h warn">WHY IT IS A RECORDING</div>
+    <div class="split" style="margin-top:20px">
+      <div class="pane bad">
+        <div class="ptitle">THE ATTACKING SIDE REFUSED</div>
+        <div class="pbody">Phase after phase. Recon, access, the poisoning step, the deployment step. Framed as an offline lab, framed as an authorized exercise, framed as a conference demo. Still no.</div>
+      </div>
+      <div class="pane bad">
+        <div class="ptitle">SO DID THE DEFENDING SIDE</div>
+        <div class="pbody">I used to tell rooms the defender had never refused me. Then I read the capture. Three flat refusals out of five. <b>Refusal does not track the role. It tracks the topic.</b></div>
+      </div>
+    </div>
+    <div class="quote warn" style="margin-top:30px;font-size:26px">
+      one of those refusals declined by citing the three declines<br>
+      that came before it in the same conversation.
+      <span class="attrib">the same request in a fresh window is a different request</span>
+    </div>
+    <div class="punch warn" style="margin-top:26px">i could have written a better wrapper until it went through.<br>at that point i am not demonstrating a security system. i am jailbreaking one.</div>
+    <div class="brand">swarms-in-a-cage.deck</div>
+  </div>
+</section>
+
+<!-- ===================================================================
+     S9. Teardown divider. 0:30. The centre of the talk.
+     Switch to the loop with the transcript from the fight loaded.
+     =================================================================== -->
+<section id="s9-teardown" data-slide="S9">
+  <div class="slide divider d-loop">
+    <div class="anchor">teardown &middot; the actual talk</div>
+    <div class="tb">0:30</div>
+    <div class="chapter">TEARDOWN<span class="cur blink"></span></div>
+    <div class="rule">/// AGENTS THAT WERE NEVER IN THE FIGHT ///</div>
+    <div class="tag">the fight is the part everybody films. it is the part that proves the least.</div>
+    <div class="brand">swarms-in-a-cage.deck</div>
+  </div>
+</section>
+
+<!-- ===================================================================
+     S10. The five roles. 0:30 to 0:34.
+     Say the count out loud and say which of them actually ran, because
+     those are two different numbers and both are on this screen.
+     Describe them by what they do. Never by name, even though the names
+     are readable in the source for anyone looking.
+     =================================================================== -->
+<section id="s10-roles" data-slide="S10">
+  <div class="slide dense">
+    <div class="anchor">teardown &middot; who reads the transcript</div>
+    <div class="tb">0:31</div>
+    <div class="h cool">FIVE ROLES. NONE OF THEM WERE IN THE FIGHT.</div>
+    <div class="roles">
+      <div class="role-row skip">
+        <div class="rn">1</div>
+        <div class="rd">designs the challenge and writes the scorecard it will be judged against</div>
+        <div class="rw">CUSTOM BRIEFS ONLY</div>
+      </div>
+      <div class="role-row ran">
+        <div class="rn">2</div>
+        <div class="rd">reads the transcript, scores it, names a root cause</div>
+        <div class="rw">RAN</div>
+      </div>
+      <div class="role-row ran">
+        <div class="rn">3</div>
+        <div class="rd">rewrites a single system prompt to address that cause</div>
+        <div class="rw">RAN</div>
+      </div>
+      <div class="role-row ran">
+        <div class="rn">4</div>
+        <div class="rd">re-tests and returns the verdict</div>
+        <div class="rw">RAN</div>
+      </div>
+      <div class="role-row ran">
+        <div class="rn">5</div>
+        <div class="rd">scores the before and the after blind, as A and B, in an order drawn fresh every run</div>
+        <div class="rw">LIVE ONLY</div>
+      </div>
+    </div>
+    <div class="counts">
+      <span><b>5</b>defined</span>
+      <span><b>4</b>ran on the live fight</span>
+      <span><b>3</b>in a recording of it</span>
+    </div>
+    <div class="note" style="margin-top:16px">In a recording the blind score does not run, and the box on screen says so instead of putting a number there. If you counted four in a recording, you counted the box that says the measurement was not taken, and you were right to count it.</div>
+    <div class="brand">swarms-in-a-cage.deck</div>
+  </div>
+</section>
+
+<!-- ===================================================================
+     S11. Where the separation stops. 0:34 to 0:38.
+     Verbatim line first, then the practitioner version, then the honest
+     half in the same breath. The honest half sets up the failure mode.
+     =================================================================== -->
+<section id="s11-separation" data-slide="S11">
+  <div class="slide tight">
+    <div class="anchor">teardown &middot; separation of duties</div>
+    <div class="tb">0:34</div>
+    <div class="quote cool" style="font-size:34px;margin-top:0">
+      the scorer is not the rewriter,<br>
+      because a scorer with a stake in the fix is not a scorer.
+    </div>
+    <div class="split" style="margin-top:34px">
+      <div class="pane good">
+        <div class="ptitle">WHERE IT HOLDS</div>
+        <div class="pbody">The agent that decides how bad it was does not get to be the agent that fixes it. Same reason you do not let the person who wrote the control write the audit finding about the control.</div>
+      </div>
+      <div class="pane bad">
+        <div class="ptitle">WHERE IT STOPS</div>
+        <div class="pbody">The re-test role writes the revised transcript and then scores the transcript it just wrote. One call. <b>That is still true of it.</b> A blind paired score now runs after it, so the self-grading is no longer the last word on the screen.</div>
+      </div>
+    </div>
+    <div class="punch cool" style="margin-top:30px">what a blind score cannot repair is what it is being handed.</div>
+    <div class="brand">swarms-in-a-cage.deck</div>
+  </div>
+</section>
+
+<!-- ===================================================================
+     S12. One agent, one prompt, one cycle. 0:38.
+     "One agent, one prompt, one cycle" is written into the published
+     description, so it is a promise. DO NOT say "the loser's" and do not
+     put it on this slide. The rewrite lands on the single weakest agent
+     scored across BOTH sides, so it is not necessarily on the losing one.
+     =================================================================== -->
+<section id="s12-granularity" data-slide="S12">
+  <div class="slide center">
+    <div class="anchor">teardown &middot; granularity</div>
+    <div class="tb">0:38</div>
+    <div style="text-align:left;max-width:1400px">
+      <div class="h cool" style="font-size:60px">ONE AGENT.<br>ONE PROMPT.<br>ONE CYCLE.</div>
+      <div class="note" style="margin-top:34px;font-size:21px;color:var(--w)">
+        The loop names exactly one weakest agent per round. Never two. It is instructed to never name two.
+      </div>
+      <div class="note" style="margin-top:18px;font-size:21px;color:var(--w)">
+        And it scores across <b style="color:var(--p)">both sides</b>. So the weakest performer in a round red won can be a red agent, and red gets rewritten anyway.
+      </div>
+      <div class="punch" style="margin-top:34px">rewrite two prompts and you cannot attribute the score change to either.</div>
+    </div>
+    <div class="brand">swarms-in-a-cage.deck</div>
+  </div>
+</section>
+
+<!-- ===================================================================
+     S13. What is held still. 0:40.
+     This beat exists because the fixed exercise reads as an omission and
+     it is a control. Say the cost honestly in the same breath.
+     =================================================================== -->
+<section id="s13-heldconstant" data-slide="S13">
+  <div class="slide tight">
+    <div class="anchor">teardown &middot; the control</div>
+    <div class="tb">0:40</div>
+    <div class="h">WHAT IS HELD STILL</div>
+    <div class="sub2">there is no co-evolution anywhere in this thing, on purpose.</div>
+    <div class="const-rows">
+      <div class="crow2 fixed"><span class="clabel">the exercise</span><span class="cstate">SAME EVERY ROUND</span></div>
+      <div class="crow2 fixed"><span class="clabel">the opposing side</span><span class="cstate">NEVER SWAPPED</span></div>
+      <div class="crow2 fixed"><span class="clabel">the scoring instrument</span><span class="cstate">SAME EVERY ROUND</span></div>
+      <div class="crow2 moves"><span class="clabel">one prompt, on one agent</span><span class="cstate">THE ONLY THING THAT MOVES</span></div>
+    </div>
+    <div class="punch" style="margin-top:32px">if the score moves, the rewrite is the only thing that could have moved it.</div>
+    <div class="note" style="margin-top:20px">A live rematch every round would look far better on stage and would prove far less. You would not be able to tell a better defender from a differently unlucky fight.</div>
+    <div class="brand">swarms-in-a-cage.deck</div>
+  </div>
+</section>
+
+<!-- ===================================================================
+     S14. What the blind score bought. 0:41.
+     Say both halves in the same breath or do not say the first half.
+     NO FIGURE ON THIS SLIDE. NO DELTA. There is no measured improvement
+     number that survives checking, and the withdrawal is material at 0:48.
+     =================================================================== -->
+<section id="s14-blind" data-slide="S14">
+  <div class="slide tight">
+    <div class="anchor">teardown &middot; the blind score</div>
+    <div class="tb">0:41</div>
+    <div class="h cool">WHAT THE BLIND SCORE BOUGHT</div>
+    <div class="split" style="margin-top:22px">
+      <div class="pane good">
+        <div class="ptitle">IT BOUGHT THIS</div>
+        <div class="pbody">The self-grading is gone. A separate call, shown the two transcripts as A and B, with the order drawn fresh every run. <b>All three of those are readable in the source and none of them needs a sample.</b></div>
+      </div>
+      <div class="pane bad">
+        <div class="ptitle">IT DID NOT BUY THIS</div>
+        <div class="pbody">The before side is a fixture somebody wrote to fail. The after side is not the rewritten agent running, it is a simulation of what that agent would produce.</div>
+      </div>
+    </div>
+    <div class="punch warn" style="margin-top:30px">
+      a blind judge handed a deliberately broken thing next to a picture of success<br>
+      correctly reports a large improvement, and that improvement carries no information<br>
+      about whether rewriting prompts works.
+    </div>
+    <div class="brand">swarms-in-a-cage.deck</div>
+  </div>
+</section>
+
+<!-- ===================================================================
+     S15. The failure mode divider. 0:42.
+     This is the passage the published description promised in writing and
+     does not spell out. It is the least defended claim in the abstract
+     until this is said. NEVER CUT.
+     =================================================================== -->
+<section id="s15-sp1" data-slide="S15">
+  <div class="slide divider d-quiet">
+    <div class="anchor">the part i owe you</div>
+    <div class="tb">0:42</div>
+    <div class="chapter" style="font-size:74px">THE FAILURE MODE<br>THAT WORRIES ME MOST</div>
+    <div class="rule">/// AND WHY YOUR DASHBOARD CANNOT SEE IT ///</div>
+    <div class="brand">swarms-in-a-cage.deck</div>
+  </div>
+</section>
+
+<!-- ===================================================================
+     S16. The answer key. 0:43 to 0:46.
+     The rising line IS the visual argument. There are deliberately no
+     values on these bars. The point is the shape and the verdict column,
+     not a score.
+     =================================================================== -->
+<section id="s16-answerkey" data-slide="S16">
+  <div class="slide dense">
+    <div class="anchor">collapse &middot; the dashboard</div>
+    <div class="tb">0:44</div>
+    <div class="h warn">TEN ROUNDS IN</div>
+    <div class="dash-two">
+      <div>
+        <div class="chart">
+          <div class="bar" style="height:22%"><span class="bl">r1</span></div>
+          <div class="bar" style="height:31%"><span class="bl">r2</span></div>
+          <div class="bar" style="height:39%"><span class="bl">r3</span></div>
+          <div class="bar" style="height:46%"><span class="bl">r4</span></div>
+          <div class="bar" style="height:54%"><span class="bl">r5</span></div>
+          <div class="bar" style="height:61%"><span class="bl">r6</span></div>
+          <div class="bar" style="height:70%"><span class="bl">r7</span></div>
+          <div class="bar" style="height:78%"><span class="bl">r8</span></div>
+          <div class="bar" style="height:87%"><span class="bl">r9</span></div>
+          <div class="bar" style="height:95%"><span class="bl">r10</span></div>
+        </div>
+        <div class="verdicts">verdict: improved, improved, improved, improved, improved,<br>improved, improved, improved, improved, improved</div>
+        <div class="verdicts" style="color:var(--g)">regressions: none</div>
+        <!-- No axis and no values, on purpose. The shape is the argument. If
+             anyone in the room reads this as measured data, say it is not. -->
+        <div class="note" style="margin-top:14px;font-size:15px;color:#5a5a82">the shape of a run, drawn to make the point. no axis, no values, not my data.</div>
+      </div>
+      <div>
+        <div class="note" style="font-size:20px;color:var(--w);line-height:1.65">
+          Every round, the loop finds the next weakest thing and adds a rule for it. A command sequence it missed. A correlation window tuned to the timing in this transcript.
+        </div>
+        <div class="note" style="margin-top:20px;font-size:20px;color:var(--w);line-height:1.65">
+          What accumulated in that prompt is a list of things that happened in a recording.
+        </div>
+        <div class="punch warn" style="margin-top:28px;font-size:32px">that is not a defender.<br>that is an answer key.</div>
+        <div class="note" style="margin-top:26px;font-size:19px">Then let it breed. Export the improved agent, load it into the next exercise, a few times over, and every agent you run descends from one winner. The population has one idea in it. It still wins, because the thing it wins against never changed either.</div>
+      </div>
+    </div>
+    <div class="punch warn" style="margin-top:22px">that is a picture of a healthy system. it is also the exact picture of the collapsed one.</div>
+    <div class="brand">swarms-in-a-cage.deck</div>
+  </div>
+</section>
+
+<!-- ===================================================================
+     S17. What to instrument instead. 0:46.
+     Five things, none of them hard. Instrument five is the one to do
+     first, because it costs an afternoon and nothing else.
+     =================================================================== -->
+<section id="s17-instruments" data-slide="S17">
+  <div class="slide dense">
+    <div class="anchor">collapse &middot; what i would instrument instead</div>
+    <div class="tb">0:46</div>
+    <div class="h">FIVE THINGS. NONE OF THEM ARE HARD.</div>
+    <div class="instr">
+      <div class="ins">
+        <div class="iname">HOLDOUT</div>
+        <div class="ibody">Keep at least one exercise the loop never gets to tune against, and score every rewrite on it too. The score on the exercise you tuned on is training loss. Only the holdout gets to say the word improved.</div>
+      </div>
+      <div class="ins">
+        <div class="iname">REGRESSION RATE</div>
+        <div class="ibody">Count the fraction of rounds that come back worse. A scorer that has never once returned a negative result has not been shown to work. <b>Alarm on the absence.</b></div>
+      </div>
+      <div class="ins">
+        <div class="iname">LINEAGE</div>
+        <div class="ibody">Log which ancestor every surviving prompt came from. When every survivor traces back to one, you have one agent wearing several name tags. Trivially measurable, and nobody measures it.</div>
+      </div>
+      <div class="ins">
+        <div class="iname">NOVELTY</div>
+        <div class="ibody">Count the distinct techniques attempted per round. When that falls, the fight is narrowing, and a narrowing fight pushes the score up for a reason that has nothing to do with anybody getting better.</div>
+      </div>
+      <div class="ins">
+        <div class="iname">NOISE FLOOR</div>
+        <div class="ibody">Score the same fixed exercise several times without changing a character, and look at the spread. That distance is your noise floor. <b>An improvement smaller than it is not a result yet.</b> Do this one first.</div>
+      </div>
+    </div>
+    <div class="punch" style="margin-top:20px">none of that is in the architecture by default. you have to go and add it.</div>
+    <div class="brand">swarms-in-a-cage.deck</div>
+  </div>
+</section>
+
+<!-- ===================================================================
+     S18. The specimen. 0:48.
+     This turns the failure mode from a warning into a first-person
+     report. Do not soften it and do not let it come out as an apology.
+     It is the reason to trust everything else said in the hour.
+     =================================================================== -->
+<section id="s18-specimen" data-slide="S18">
+  <div class="slide tight">
+    <div class="anchor">collapse &middot; i found one in my own loop</div>
+    <div class="tb">0:48</div>
+    <div class="h warn">I AM NOT WARNING YOU ABOUT A THING I READ SOMEWHERE</div>
+    <div class="quote warn" style="margin-top:26px;font-size:26px">
+      the agent that decides whether a rewrite helped had a line in its own instructions<br>
+      telling it what range of improvement to report, before it evaluated anything.<br>
+      and a fallback that added a fixed number when it could not parse a result.
+      <span class="attrib">so it reported improvement. it reported improvement because that is what it was told to report.</span>
+    </div>
+    <div class="split" style="margin-top:28px">
+      <div class="pane bad">
+        <div class="ptitle">RUNNING IT COULD NEVER HAVE CAUGHT THIS</div>
+        <div class="pbody">Running the system produced exactly the output it was instructed to produce.</div>
+      </div>
+      <div class="pane good">
+        <div class="ptitle">READING THE SOURCE AGAINST THE CLAIM DID</div>
+        <div class="pbody">In about a minute.</div>
+      </div>
+    </div>
+    <div class="punch" style="margin-top:28px">taking it out did not hand me a working measurement.<br>it gave me a clear view of what was underneath it.</div>
+    <div class="brand">swarms-in-a-cage.deck</div>
+  </div>
+</section>
+
+<!-- ===================================================================
+     S19. The briefs, both outcomes. 0:50 to 0:57.
+     The closing sentence of the published description commits the talk to
+     showing the briefs the factory does well on AND the ones where it
+     fails. THE FAILURE HAS TO BE AS AVAILABLE AS THE SUCCESS, which means
+     it is staged, not hoped for. Stage these before you travel.
+     =================================================================== -->
+<section id="s19-briefs" data-slide="S19">
+  <div class="slide dense">
+    <div class="anchor">briefs &middot; both outcomes</div>
+    <div class="tb">0:50</div>
+    <div class="h">THE ONES IT HANDLES, AND THE ONES THAT BREAK IT</div>
+    <div class="sub2">the failure is the more useful half, so it is staged rather than hoped for.</div>
+    <div class="fails">
+      <div class="fail" style="border-left-color:var(--g)">
+        <div class="ftitle" style="color:var(--g)">DIES AT THE RAILS</div>
+        <div class="fbody">A brief that names a real third-party target. The factory refuses. A refusal working correctly is the safest failure to show and it costs well under a minute.</div>
+      </div>
+      <div class="fail">
+        <div class="ftitle">NO SCORING SIGNAL</div>
+        <div class="fbody">A domain where nobody can say what a good outcome looks like. It will happily produce a set of agents and there is no way to tell whether they are any good. <b>It fails quietly here, and quiet failure is worse than a refusal.</b></div>
+      </div>
+      <div class="fail">
+        <div class="ftitle">NO SUCCESS CRITERIA</div>
+        <div class="fbody">A one-sentence brief with nothing to aim at. Watch it produce something generic. The most common real failure and the least dramatic, so keep it short.</div>
+      </div>
+      <div class="fail">
+        <div class="ftitle">A RECORDED FAILURE RUN</div>
+        <div class="fbody">Insurance, on disk before you travel. If the network dies, or nobody hands you a brief that breaks anything, you still show a failure.</div>
+      </div>
+    </div>
+    <div class="punch" style="margin-top:22px">nobody handed me one that breaks it, so here is one i know breaks it.<br><span style="color:var(--gr);font-size:19px">that is a better moment than a lucky one.</span></div>
+    <div class="brand">swarms-in-a-cage.deck</div>
+  </div>
+</section>
+
+<!-- ===================================================================
+     S20. Close. 0:57 to 1:00.
+     DO NOT PUT A PRICE ON ANYTHING. No cost, no provider, no tier.
+     Hand off to the hallway rather than to a question block if the room
+     is still going.
+     =================================================================== -->
+<section id="s20-close" data-slide="S20">
+  <div class="slide s-close center">
+    <div class="anchor">close</div>
+    <div class="tb">0:57</div>
+    <div style="text-align:left;max-width:1400px">
+      <div class="close-title">swarms that fight<br>and fix each other.</div>
+      <div class="close-lines">
+        <span class="l">the cage is the easiest place to watch this, not the only place it runs.</span>
+        <span class="l">it is a single file on a laptop. you can open it in a text editor.</span>
+        <span class="l">nothing is hiding.</span>
+      </div>
+      <div class="close-tag">bring me the brief that breaks it.<span class="cur"></span></div>
+    </div>
+    <div class="brand">swarms-in-a-cage.deck</div>
+  </div>
+</section>
+
+<!-- ===================================================================
+     BACK-POCKET. These four sit after the close and are NOT reachable by
+     pressing forward from it. Reach them with the g chord or the URL hash.
+     =================================================================== -->
+
+<section id="factory-recap" data-slide="BP-FACTORY">
+  <div class="slide recap tight">
+    <div class="anchor">back-pocket &middot; the factory wedged</div>
+    <div class="recap-title">FACTORY, SPOKEN</div>
+    <div class="recap-sub">what the demo would have shown</div>
+    <div class="pbar">
+      <div class="pcell named"><span class="pn">1</span>READ THE<br>BRIEF</div>
+      <div class="pcell named"><span class="pn">2</span>DECIDE THE<br>SEAMS</div>
+      <div class="pcell"><span class="pn">3</span></div>
+      <div class="pcell named"><span class="pn">4</span>WRITE EACH<br>AGENT</div>
+      <div class="pcell"><span class="pn">5</span></div>
+      <div class="pcell named"><span class="pn">6</span>WIRE THE<br>SHARED FILES</div>
+      <div class="pcell"><span class="pn">7</span></div>
+      <div class="pcell named"><span class="pn">8</span>PACKAGE<br>EMITTED</div>
+    </div>
+    <div class="artifact-pill">[ agents &middot; the files they coordinate through &middot; the commands that drive them ]</div>
+    <div class="note" style="margin-top:26px">The interesting decision is the decomposition. How many agents, and where the seams go. Point at one seam and say why it is there. The authorization role is built first, before anything that does the work.</div>
+    <div class="brand">swarms-in-a-cage.deck &middot; back-pocket</div>
+  </div>
+</section>
+
+<section id="cage-recap" data-slide="BP-CAGE">
+  <div class="slide recap tight">
+    <div class="anchor">back-pocket &middot; the cage wedged</div>
+    <div class="recap-title">CAGE, SPOKEN</div>
+    <div class="recap-sub">two swarms &middot; six phases a side &middot; scored per stage, not once at the end</div>
+    <div class="cphases">
+      <div class="crow red">
+        <div class="pcell"><span class="pn">R1</span>RECON</div>
+        <div class="pcell"><span class="pn">R2</span>ACCESS</div>
+        <div class="pcell"><span class="pn">R3</span>PRIVESC</div>
+        <div class="pcell"><span class="pn">R4</span>CRED</div>
+        <div class="pcell"><span class="pn">R5</span>LATERAL</div>
+        <div class="pcell"><span class="pn">R6</span>OBJECTIVE</div>
+      </div>
+      <div class="vdiv"></div>
+      <div class="crow blue">
+        <div class="pcell"><span class="pn">B1</span>TELEMETRY</div>
+        <div class="pcell"><span class="pn">B2</span>DETECT</div>
+        <div class="pcell"><span class="pn">B3</span>ISOLATE</div>
+        <div class="pcell"><span class="pn">B4</span>RESPOND</div>
+        <div class="pcell"><span class="pn">B5</span>ROOT CAUSE</div>
+        <div class="pcell"><span class="pn">B6</span>REPORT</div>
+      </div>
+    </div>
+    <div class="note" style="margin-top:26px">Each side is several agents, each with one phase and one job. Red moves, blue sees it or does not, and the scoreboard runs per stage rather than one number at the end. The stage where blue missed is what the teardown works on.</div>
+    <div class="note" style="margin-top:16px;color:var(--w)"><b>The attacking side's per-stage outcome is a fixed value, not a computed one.</b> Say that before the table goes up. Nothing downstream reads it, so it moves no score and reaches no model. The attacker is held still on purpose, which is the same reason there is no co-evolution.</div>
+    <div class="brand">swarms-in-a-cage.deck &middot; back-pocket</div>
+  </div>
+</section>
+
+<section id="loop-recap" data-slide="BP-LOOP">
+  <div class="slide recap tight">
+    <div class="anchor">back-pocket &middot; the loop wedged</div>
+    <div class="recap-title">LOOP, SPOKEN</div>
+    <div class="recap-sub">read the transcript &middot; score it &middot; rewrite one prompt &middot; re-test &middot; score both blind</div>
+    <div class="pbar">
+      <div class="pcell named"><span class="pn">1</span>SCORE THE<br>TRANSCRIPT</div>
+      <div class="pcell named"><span class="pn">2</span>NAME ONE<br>ROOT CAUSE</div>
+      <div class="pcell named"><span class="pn">3</span>REWRITE ONE<br>PROMPT</div>
+      <div class="pcell named"><span class="pn">4</span>RE-TEST AND<br>VERDICT</div>
+      <div class="pcell named"><span class="pn">5</span>BLIND PAIRED<br>SCORE</div>
+    </div>
+    <div class="artifact-pill">[ one weakest agent, across both sides, per round. never two. ]</div>
+    <div class="note" style="margin-top:26px">Step four still grades its own output: it writes the revised transcript and scores the transcript it just wrote, in one call. Step five is a separate call that is told nothing about which version is which. In a recording, step five does not run and the box says so rather than substituting a number.</div>
+    <div class="brand">swarms-in-a-cage.deck &middot; back-pocket</div>
+  </div>
+</section>
+
+<!-- Back-pocket for the sharpest question this talk invites, and it is
+     invited by the deck's own screen. See SPEAKER-NOTES.md, question X1. -->
+<section id="withdrawn" data-slide="BP-WITHDRAWN">
+  <div class="slide recap tight">
+    <div class="anchor">back-pocket &middot; the numbers that came off this talk</div>
+    <div class="recap-title">WHY THERE IS NO FIGURE ON ANY OF THESE SLIDES</div>
+    <div class="instr" style="margin-top:26px">
+      <div class="ins" style="border-left-color:var(--r-cage)">
+        <div class="iname" style="color:var(--r-cage)">NO SOURCE</div>
+        <div class="ibody">I went back for the run transcripts behind my dispersion figures. The directory they write to is ignored by default and nothing had ever committed one. The only place those figures existed was a sentence I had written about them.</div>
+      </div>
+      <div class="ins" style="border-left-color:var(--r-cage)">
+        <div class="iname" style="color:var(--r-cage)">A GAP QUOTED<br>AS A FINDING</div>
+        <div class="ibody">One of the three was the arithmetic difference of the other two. I had scored a thing twice, taken the gap between the two scores, and quoted the gap as a third result.</div>
+      </div>
+      <div class="ins" style="border-left-color:var(--r-cage)">
+        <div class="iname" style="color:var(--r-cage)">A DIRECTION<br>RESTING ON IT</div>
+        <div class="ibody">I pulled the size first. Then I noticed the direction I had left standing was resting on the same two runs, so I pulled that too. A comparison that cannot tell you how much cannot tell you whether.</div>
+      </div>
+      <div class="ins" style="border-left-color:var(--g)">
+        <div class="iname" style="color:var(--g)">WHAT SURVIVES</div>
+        <div class="ibody">Identical input scores differently. Blinding removed the self-grading, and that half is structural: a separate call, two transcripts as A and B, the order drawn fresh every run. All three readable in the source, none of them needing a sample.</div>
+      </div>
+    </div>
+    <div class="punch" style="margin-top:24px">take home the procedure, not my number.<br>run a fixed input several times on your own system and look at the spread.</div>
+    <div class="brand">swarms-in-a-cage.deck &middot; back-pocket</div>
+  </div>
+</section>
+
+</div>
+</div>
+
+<script src="lib/reveal.js/dist/reveal.js"></script>
+<script>
+  // ==================================================================
+  // reveal.js config
+  //   transition none, so every change is an instant cut
+  //   no auto-advance, no fragments: one press is always one slide
+  //   16:9 at 1920x1080 base, scaled to whatever the room projector is
+  // ==================================================================
+  Reveal.initialize({
+    width: 1920,
+    height: 1080,
+    margin: 0,
+    minScale: 0.2,
+    maxScale: 2.0,
+    transition: 'none',
+    backgroundTransition: 'none',
+    controls: true,
+    controlsTutorial: false,
+    progress: false,
+    slideNumber: 'c/t',
+    showSlideNumber: 'speaker',
+    hash: true,
+    history: false,
+    keyboard: true,
+    overview: false,          // ESC overview would expose the back-pocket
+    touch: true,
+    fragments: false,
+    navigationMode: 'linear',
+    plugins: []
+  });
+
+  // ==================================================================
+  // Forward-arrow lockdown. The four back-pocket slides live in the DOM
+  // after the close but must not be reachable by pressing forward from
+  // it. They stay reachable by the g chord and by the URL hash.
+  // ==================================================================
+  var LAST_VISIBLE = 's20-close';
+  var BLOCK_FORWARD = ['ArrowRight', 'PageDown', 'Space', ' '];
+
+  document.addEventListener('keydown', function (e) {
+    var cur = Reveal.getCurrentSlide();
+    if (!cur || cur.id !== LAST_VISIBLE) return;
+    if (BLOCK_FORWARD.indexOf(e.key) !== -1) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    }
+  }, true);   // capture phase, so it runs before reveal's own listener
+
+  // ==================================================================
+  // Operator key chords
+  // ==================================================================
+  var hud = document.getElementById('hud');
+  var gotoEl = document.getElementById('goto');
+  var gotoInput = document.getElementById('goto-input');
+  var hudTimer = null;
+
+  function flashHud(ms) {
+    hud.classList.add('show');
+    if (hudTimer) clearTimeout(hudTimer);
+    hudTimer = setTimeout(function () { hud.classList.remove('show'); }, ms || 2500);
+  }
+
+  Reveal.on('ready', function () { flashHud(1600); });
+  Reveal.on('slidechanged', function () { flashHud(1100); });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.target === gotoInput) return;
+
+    if (e.key === 'h' || e.key === 'H') {
+      if (hud.classList.contains('show')) hud.classList.remove('show');
+      else flashHud(60000);
+      e.preventDefault();
+    }
+    if (e.key === 'n' || e.key === 'N') {
+      document.body.classList.toggle('no-scanline');
+      e.preventDefault();
+      e.stopImmediatePropagation();   // 'n' is also reveal's next
+    }
+    if (e.key === 'c' || e.key === 'C') {
+      document.body.classList.toggle('bg-cage');
+      e.preventDefault();
+    }
+    if (e.key === 'f' || e.key === 'F') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+      e.preventDefault();
+    }
+    if (e.key === 'g' || e.key === 'G') {
+      gotoEl.classList.add('show');
+      gotoInput.value = '';
+      gotoInput.focus();
+      e.preventDefault();
+    }
+    if (e.key === 'Escape' && gotoEl.classList.contains('show')) {
+      gotoEl.classList.remove('show');
+      e.preventDefault();
+    }
+  }, false);
+
+  gotoInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+      var id = gotoInput.value.trim().replace(/^#\/?/, '');
+      gotoEl.classList.remove('show');
+      if (id) {
+        var target = document.getElementById(id);
+        if (target) {
+          var slides = Array.prototype.slice.call(
+            document.querySelectorAll('.reveal .slides > section'));
+          var idx = slides.indexOf(target);
+          if (idx >= 0) Reveal.slide(idx);
+        } else {
+          window.location.hash = '#/' + id;
+        }
+      }
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (e.key === 'Escape') {
+      gotoEl.classList.remove('show');
+      e.preventDefault();
+    }
+  });
+</script>
+</body>
+</html>
