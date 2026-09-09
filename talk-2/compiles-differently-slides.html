@@ -330,6 +330,16 @@ html.blanked #cardsheet *{color:#000 !important}
    this deck's mono body already carries no tracking, as ruling R7 predicted.
    NO CELL REACHED RUNG 4. Nothing falls back to the system stack; the identity
    is intact on every surface. Nothing was taken below the 20px floor.
+
+   COPY PASS, 2026-09-08. Question five was rewritten on every surface it
+   appears on and the rewrite is shorter, so slide 9 no longer sits against the
+   ladder's ceiling. Re-measured in a real browser at 1600x900, deepest
+   descendant bottom edge: slide 9 now 844.70 (was 888.72). The four rules
+   below are LEFT IN PLACE. They cost nothing, and slide 9 is one line of copy
+   away from needing them again. The figures in the table above are the
+   measurements taken when the ladder was applied and are not restated here as
+   a current-state claim; the table's row labels 16 and 17 are the pre-W10
+   numbering of the surfaces the rules address as 20 and 21.
    ==========================================================================*/
 section[data-i="9"] .live .hint, section[data-i="9"] td.cc, section[data-i="9"] td.cm,
 section[data-i="9"] .cq .a, section[data-i="9"] .card-hd li,
@@ -461,7 +471,8 @@ pre.code .acc{color:var(--a)}
 
 <!-- 1 -->
 <section class="slide" data-i="1">
-  <div class="kicker">FROM A PUBLISHED INCIDENT REPORT</div>
+  <div class="kicker" style="margin-bottom:16px">FROM A PUBLISHED INCIDENT REPORT</div>
+  <h2>Same bug. Different language.</h2>
   <div class="grow"></div>
   <div class="q-block">
     <div class="q-label">THE INTEGRATION TEST</div>
@@ -474,23 +485,23 @@ pre.code .acc{color:var(--a)}
   </div>
   <div class="grow"></div>
   <div class="rule" style="margin-bottom:18px"></div>
-  <div class="small" style="margin-bottom:8px">Let's Encrypt, on their own software. Both sentences are theirs, word for word, and both are in comment 1. Open it now.</div>
+  <div class="small" style="margin-bottom:8px">Let's Encrypt, on their own software. Both sentences are theirs, word for word. Open it now.</div>
   <div class="src">Mozilla bug tracker, bug 1619047, comment 1 &nbsp;&middot;&nbsp; bugzilla.mozilla.org/show_bug.cgi?id=1619047</div>
 </section>
 
 <!-- 2 -->
 <section class="slide" data-i="2">
-  <h1>The same input, three instruments.</h1>
+  <h1>It compiles differently. Here is the spread.</h1>
   <div class="meas">
     <div class="m-row">
       <div class="m-cap">BYTE-IDENTICAL TEXT, SCORED BLIND</div>
       <div class="m-num">Two different scores.</div>
-      <div class="m-n">no n<span class="m-note" style="display:inline;margin-left:22px">&nbsp; observation only. No size and no direction. The record does not fix a count.</span></div>
+      <div class="m-n">no n<span class="m-note" style="display:inline;margin-left:22px">&nbsp; observation only. No size and no direction.</span></div>
     </div>
     <div class="m-row">
       <div class="m-cap">FIXED IDENTICAL INPUT, SCORED UNBLINDED</div>
       <div class="m-num">One call wrote it, scored it, and passed its own verdict.</div>
-      <div class="m-n">no figure<span class="m-note" style="display:inline;margin-left:22px">&nbsp; the scores that stood here are withdrawn. No transcript of those runs was ever committed. The structure is in the source.</span></div>
+      <div class="m-n">no figure<span class="m-note" style="display:inline;margin-left:22px">&nbsp; those scores are withdrawn: no transcript was ever committed.</span></div>
     </div>
     <div class="m-row">
       <div class="m-cap">SAME THREE-WORD BRIEF, RUN TWICE</div>
@@ -505,7 +516,8 @@ pre.code .acc{color:var(--a)}
 <!-- 3 -->
 <section class="slide" data-i="3">
   <div class="kicker">THE SHAPE, RECONSTRUCTED. NOT THE ORIGINAL LINE.</div>
-  <h2 style="margin-bottom:26px">A check that could not fail.</h2>
+  <h2 style="margin-bottom:18px">A check that could not fail.</h2>
+  <div class="sub" style="margin-bottom:22px">The checking in an AI system is ordinary code wrapped around the model. This one swept a list of files and reported on them, and it was green every run.</div>
 <pre class="code">verify "$f"                        <span class="cmt"># the only check</span>
 echo "checked $(basename "$f")"    <span class="cmt"># $? is now echo's</span>
 
@@ -520,8 +532,8 @@ exit $?                            <span class="cmt"># always 0</span></pre>
   <ul class="rules">
     <li>The one you actually trust, not the one you should have picked.</li>
     <li>One control, not a pipeline. If an answer needs the word "and," you named two. Keep the one that does the stopping.</li>
-    <li>Answers are nouns, months, and numbers. If you are writing a sentence with "because" in it, you are arguing with the card. The card does not care.</li>
-    <li>Every question asks what you can retrieve. Somebody in this room has your control and a different answer, and the difference is what they can get at.</li>
+    <li>Answers are nouns, actions, months, and numbers. If you are writing a sentence with "because" in it, you are arguing with the card. The card does not care.</li>
+    <li>Every question asks what you can retrieve. Two people with the same control and different access will get different verdicts. That is the instrument working.</li>
   </ul>
   <div class="grow"></div>
   <div class="bigask">
@@ -534,7 +546,7 @@ exit $?                            <span class="cmt"># always 0</span></pre>
 <section class="slide" data-i="5">
   <ul class="rules tight">
     <li>One control, not a pipeline.</li>
-    <li>Answers are nouns, months, and numbers.</li>
+    <li>Answers are nouns, actions, months, and numbers.</li>
     <li>This measures what you can retrieve, not what is true.</li>
   </ul>
   <div class="grow"></div>
@@ -550,7 +562,7 @@ exit $?                            <span class="cmt"># always 0</span></pre>
 <section class="slide" data-i="6">
   <ul class="rules tight">
     <li>One control, not a pipeline.</li>
-    <li>Answers are nouns, months, and numbers.</li>
+    <li>Answers are nouns, actions, months, and numbers.</li>
     <li>This measures what you can retrieve, not what is true.</li>
   </ul>
   <div class="stubs">
@@ -569,7 +581,7 @@ exit $?                            <span class="cmt"># always 0</span></pre>
 <section class="slide" data-i="7">
   <ul class="rules tight">
     <li>One control, not a pipeline.</li>
-    <li>Answers are nouns, months, and numbers.</li>
+    <li>Answers are nouns, actions, months, and numbers.</li>
     <li>This measures what you can retrieve, not what is true.</li>
   </ul>
   <div class="stubs">
@@ -590,7 +602,7 @@ exit $?                            <span class="cmt"># always 0</span></pre>
 <section class="slide" data-i="8">
   <ul class="rules tight">
     <li>One control, not a pipeline.</li>
-    <li>Answers are nouns, months, and numbers.</li>
+    <li>Answers are nouns, actions, months, and numbers.</li>
     <li>This measures what you can retrieve, not what is true.</li>
   </ul>
   <div class="stubs">
@@ -621,9 +633,9 @@ exit $?                            <span class="cmt"># always 0</span></pre>
   <div class="grow"></div>
   <div class="live">
     <div class="num">5</div>
-    <div class="ask sm">Name the flag, then count it.</div>
-    <div class="hint">Someone wants past it today, on purpose, and they are allowed to be in the building. Write what they type, click, or say. Then write how many people went through it last quarter. If you write "they can't," write next to it the last time somebody tried.</div>
-    <div class="chip">a flag and a number, or "they can't" and a date</div>
+    <div class="ask sm">Name the way past it. Then count it.</div>
+    <div class="hint">Somebody who is allowed to be here needs to get past it today, on purpose. Write what they type, click, or say. Then write how many people did that last quarter. If there is no way past, write the last time somebody tried.</div>
+    <div class="chip">a way past and a number, or "there is none" and a date</div>
   </div>
 </section>
 
@@ -659,7 +671,7 @@ exit $?                            <span class="cmt"># always 0</span></pre>
       <td class="cn">5</td>
       <td class="cc">Q1 through Q4 all clean.</td>
       <td class="cv">MECHANISM</td>
-      <td class="cm">It fires without you, and you would know if it stopped. <b>That is all this says. It is a verdict about architecture, not about correctness</b>, because nothing here asked whether it checks what you think it checks. Now go find the door.</td>
+      <td class="cm">It fires without you, and you would know if it stopped. <b>That is all this says. It is a verdict about architecture, not about correctness</b>, because nothing here asked whether it checks what you think it checks. Now go and count the way past it.</td>
     </tr>
   </table>
 </section>
@@ -690,7 +702,7 @@ exit $?                            <span class="cmt"># always 0</span></pre>
   </div>
 
   <div class="band" style="margin-bottom:0">
-    <div class="band-h">THE ONE THAT FOOLS PEOPLE</div>
+    <div class="band-h">A PRACTICE WITH A MACHINE ATTACHED</div>
     <div class="flow3">
       <div class="node">a schedule</div><div class="arw"></div>
       <div class="node">the scanner runs</div><div class="arw"></div>
@@ -700,12 +712,13 @@ exit $?                            <span class="cmt"># always 0</span></pre>
       <div class="bkwrap" style="grid-column:3"><div class="bk"></div><div class="bklab">THE MACHINE</div></div>
       <div class="bkwrap" style="grid-column:7"><div class="bk"></div><div class="bklab">THE CONTROL</div></div>
     </div>
+    <div class="band-n">The machine is not the control. The reading is. <b>The day it stops: the report still arrives.</b></div>
   </div>
 </section>
 
 <!-- 12 -->
 <section class="slide" data-i="12">
-  <div class="kicker" style="margin-bottom:22px">WHERE THIS IDEA STARTED, AND WHAT DID NOT SURVIVE IT</div>
+  <h2 style="margin-bottom:20px">No control type tests where the instrument points.</h2>
   <div class="q-label">MY OWN NOTE, QUOTED AS WRITTEN</div>
   <div class="lq">★ That's the real durable, and it's bigger than this bug: our entire control discipline — positive plus null — tests whether the instrument <i>works</i>. It cannot test whether the instrument is <i>pointed at the right thing</i>. We have no control type for that. A bounds control would be a third kind: assert the final block contains no foreign section header, or that block lengths plus preamble equal file length, or flag when the last block is wildly larger than the median.</div>
   <div class="small" style="margin-bottom:12px">I killed the struck ones by measuring them.</div>
@@ -803,12 +816,12 @@ CLIPPED   (correct) : []</pre>
 
 <!-- 17 -->
 <section class="slide" data-i="17">
-  <h2 style="margin-bottom:2px">Eight.</h2>
+  <h2 style="margin-bottom:2px">Eight practices you can run yourself.</h2>
   <ol class="prac">
     <li>The four questions, run on one control. You have already done it.</li>
     <li>Re-run and compare distributions, with n said out loud.</li>
     <li><b>The layered check.</b> Fixtures test the aim you intended. Primary text tests whether that aim was the right one. Downstream use tests whether the class boundary is in the right place.</li>
-    <li>Blind paired comparison in one call, so that call's harshness is common-mode.</li>
+    <li>Compare two outputs blind, in one call, so a harsh grader is harsh on both.</li>
     <li>Make the failure path report a parse failure rather than a number.</li>
     <li>Count the rounds out loud, and know that it is a practice.</li>
     <li>Test a gate against known-positive and known-negative fixtures before you trust it.</li>
@@ -840,16 +853,16 @@ CLIPPED   (correct) : []</pre>
 <section class="slide" data-i="20">
   <ul class="card-hd">
     <li>One control, not a pipeline. The one you actually trust, not the one you should have picked.</li>
-    <li>Answers are nouns, months, and numbers. A sentence with "because" in it is arguing with the card.</li>
-    <li>Every question asks what you can retrieve. The verdict is about that.</li>
+    <li>Answers are nouns, actions, months, and numbers. A sentence with "because" in it is arguing with the card.</li>
+    <li>Every question asks what you can retrieve. Different access, different verdict.</li>
   </ul>
   <div class="cq"><div class="n">1</div><div><div class="t">Name the thing that runs it.</div><div class="a">A job, a hook, a tool, a box. Not the policy, not the team. &nbsp;/&nbsp; one name</div></div></div>
   <div class="cq"><div class="n">2</div><div><div class="t">Who has to remember?</div><div class="a">For it to happen on the next change. &nbsp;/&nbsp; a name, a role, or "nobody"</div></div></div>
   <div class="cq"><div class="n">3</div><div><div class="t">Name the last time it caught something.</div><div class="a">The month, and what it stopped in three words. <b>"It is always green" is not a month.</b> &nbsp;/&nbsp; a month and three words, or "never observed"</div></div></div>
   <div class="cq"><div class="n">4</div><div><div class="t">I delete it tonight. What tells you?</div><div class="a">Silently, and your config looks unchanged. The first thing that tells you, and how long. &nbsp;/&nbsp; one signal and one number, or "nothing"</div></div></div>
-  <div class="cq gate"><div class="n">5</div><div><div class="t">Only if the first four came back clean: name the flag, then count it.</div><div class="a">What they type, click, or say to get past it, and how many went through last quarter. &nbsp;/&nbsp; a flag and a number, or "they can't" and a date</div></div></div>
+  <div class="cq gate"><div class="n">5</div><div><div class="t">Only if the first four came back clean: name the way past it, then count it.</div><div class="a">Somebody who is allowed to be here, going past it on purpose. What they type, click, or say, and how many did that last quarter. &nbsp;/&nbsp; a way past and a number, or "there is none" and a date</div></div></div>
   <div class="grow"></div>
-  <div class="cardfoot">Run it on the second one this week. The second one is where it hurts.</div>
+  <div class="cardfoot">Run it on your second control this week. That is the one where it hurts.</div>
 </section>
 
 <!-- 21 -->
@@ -859,15 +872,15 @@ CLIPPED   (correct) : []</pre>
       <div class="panel-h">THE QUESTIONS</div>
       <ul class="card-hd">
         <li>One control, not a pipeline. The one you actually trust.</li>
-        <li>Answers are nouns, months, and numbers.</li>
+        <li>Answers are nouns, actions, months, and numbers.</li>
         <li>Every question asks what you can retrieve.</li>
       </ul>
       <div class="cq"><div class="n">1</div><div><div class="t">Name the thing that runs it.</div><div class="a">A job, a hook, a tool, a box. One name.</div></div></div>
       <div class="cq"><div class="n">2</div><div><div class="t">Who has to remember?</div><div class="a">A name, a role, or "nobody."</div></div></div>
       <div class="cq"><div class="n">3</div><div><div class="t">Name the last time it caught something.</div><div class="a">A month and three words, or "never observed." <b>"It is always green" is not a month.</b></div></div></div>
       <div class="cq"><div class="n">4</div><div><div class="t">I delete it tonight. What tells you?</div><div class="a">One signal and one number, or "nothing."</div></div></div>
-      <div class="cq gate"><div class="n">5</div><div><div class="t">Only if the first four are clean: name the flag, then count it.</div><div class="a">A flag and a number, or "they can't" and a date.</div></div></div>
-      <div class="cardfoot">Run it on the second one this week.</div>
+      <div class="cq gate"><div class="n">5</div><div><div class="t">Only if the first four are clean: name the way past it, then count it.</div><div class="a">A way past and a number, or "there is none" and a date.</div></div></div>
+      <div class="cardfoot">Run it on your second control this week.</div>
     </div>
     <div>
       <div class="panel-h">FIRST HIT WINS</div>
@@ -876,10 +889,13 @@ CLIPPED   (correct) : []</pre>
         <tr><td class="cn">2</td><td class="cv">PRACTICE</td><td class="cm">Q2 is a person. It fires when somebody chooses. As reliable as that person on their worst day.</td></tr>
         <tr><td class="cn">3</td><td class="cv">UNEXERCISED</td><td class="cm">Q3 has no month. It runs, and you cannot produce one occasion on which it told a bad case from a good one.</td></tr>
         <tr><td class="cn">4</td><td class="cv">UNWITNESSED</td><td class="cm">Q4 is "nothing," or somebody choosing to go and look. You would not know the day it stopped.</td></tr>
-        <tr><td class="cn">5</td><td class="cv">MECHANISM</td><td class="cm">All four clean. It fires without you and you would know if it stopped. Now go find the door.</td></tr>
+        <tr><td class="cn">5</td><td class="cv">MECHANISM</td><td class="cm">All four clean. It fires without you and you would know if it stopped. Now go and count the way past it.</td></tr>
       </table>
       <div class="inv" style="margin-top:16px;font-size:20px">
-        MECHANISM does not mean the control is right. Nothing on this card asked whether it checks what you think it checks. A check can run on schedule, report green for months, and certify a property its own body never touches.
+        MECHANISM does not mean the control is right. Nothing here asked whether it checks what you think it checks.
+      </div>
+      <div class="inv" style="margin-top:12px;font-size:20px">
+        Every failure in this talk was caught. The ones that were not caught are absent from it by construction.
       </div>
     </div>
   </div>
@@ -991,8 +1007,8 @@ CLIPPED   (correct) : []</pre>
     '<div class="pc">'+
       '<div class="pc-hd">'+
         '<p><b>One control.</b> The one you actually trust, not the one you should have picked. Not a pipeline: if an answer needs the word "and," you named two. Keep the one that does the stopping.</p>'+
-        '<p><b>Answers are nouns, months, and numbers.</b> If you are writing a sentence with "because" in it, you are arguing with the card. The card does not care.</p>'+
-        '<p><b>Every question asks what you can retrieve.</b> Somebody in this room has your control and a different answer, and the difference is what they can get at.</p>'+
+        '<p><b>Answers are nouns, actions, months, and numbers.</b> If you are writing a sentence with "because" in it, you are arguing with the card. The card does not care.</p>'+
+        '<p><b>Every question asks what you can retrieve.</b> Two people with the same control and different access will get different verdicts. That is the instrument working.</p>'+
       '</div>'+
       '<div class="nameline">Its name:<div class="wl"></div></div>'+
       '<div class="pq"><div class="pt">1. Name the thing that runs it.</div>'+
@@ -1008,10 +1024,10 @@ CLIPPED   (correct) : []</pre>
       '<div class="pq"><div class="pt">4. I delete it tonight. What tells you?</div>'+
         '<div class="ph">Silently. Your config looks unchanged. The first thing that tells you it is gone, and how long that takes.</div>'+
         '<div class="pa">one signal and one number, or "nothing"</div><div class="wl"></div></div>'+
-      '<div class="pq"><div class="pt">5. Only if 1 to 4 came back clean: name the flag, then count it.</div>'+
-        '<div class="ph">Someone wants past it today, on purpose, and they are allowed to be in the building. What do they type, click, or say? Then: how many people went through it last quarter. If "they can\'t," write the last time somebody tried.</div>'+
-        '<div class="pa">a flag and a number, or "they can\'t" and a date</div><div class="wl"></div></div>'+
-      '<div class="pc-ft">Verdict on the back. Run it on the second one this week. The second one is where it hurts.</div>'+
+      '<div class="pq"><div class="pt">5. Only if 1 to 4 are clean: name the way past it, then count it.</div>'+
+        '<div class="ph">Somebody who is allowed to be here needs to get past it today, on purpose. What do they type, click, or say? Then: how many people did that last quarter. If there is no way past, write the last time somebody tried.</div>'+
+        '<div class="pa">a way past and a number, or "there is none" and a date</div><div class="wl"></div></div>'+
+      '<div class="pc-ft">Verdict on the back. Run it on your second control this week. That is the one where it hurts.</div>'+
     '</div>';
 
   var CARD_BACK =
@@ -1022,7 +1038,7 @@ CLIPPED   (correct) : []</pre>
         '<tr><td class="k">2</td><td class="v">PRACTICE</td><td>Q2 names a person or a role. Anything that is not the word "nobody." It fires when a person chooses, and it is exactly as reliable as that person on their worst day, in their worst week, under their worst deadline. That may be fine. It is not what you called it.</td></tr>'+
         '<tr><td class="k">3</td><td class="v">UNEXERCISED</td><td>Q3 has no month in it. It runs, and you cannot produce one occasion on which it told a bad case from a good one. Either nothing ever asked it a question it could get wrong, or something did and you cannot get at it. From where you are sitting those are the same thing. You know it is green. You do not know it discriminates.</td></tr>'+
         '<tr><td class="k">4</td><td class="v">UNWITNESSED</td><td>Q4 says "nothing," or the signal named is somebody choosing to go and look. An audit. A review. A quarterly. It runs, it has caught things, and you would not know the day it stopped. Everything you believe about it is a fact about its past.</td></tr>'+
-        '<tr><td class="k">5</td><td class="v">MECHANISM</td><td>Q1 to Q4 all clean. It fires without you, and you would know if it stopped. That is the whole of what this says. Now go find the door, and find out how many people walked through it last quarter.</td></tr>'+
+        '<tr><td class="k">5</td><td class="v">MECHANISM</td><td>Q1 to Q4 all clean. It fires without you, and you would know if it stopped. That is the whole of what this says. Now go and count the way past it: how many people used it last quarter.</td></tr>'+
       '</table>'+
       '<div class="warn">MECHANISM does not mean the control is right. Nothing on this card asked whether it checks what you think it checks. A check can run on schedule, report green for months, and certify a property its own body never touches.</div>'+
       '<div class="pc-ft">A scanner that produces a report somebody has to read is a practice with a machine attached. The machine is not the control. The reading is the control, and the reading is a choice.</div>'+
