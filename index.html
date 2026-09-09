@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Village 2026 — two talks and a workshop</title>
+<style>
+/* Self contained. No network fetch of any kind: no CDN, no webfont, no build
+   step. This page is meant to be opened straight off the file system. Fonts
+   are system stacks so the page renders identically offline. */
+:root{
+  --bg:#050508; --panel:#0a0a12; --panel2:#0d0d18;
+  --edge:#1b1b2e; --edge2:#2a2a45;
+  --amber:#f0a500; --amber-d:#b07800;
+  --green:#00e676; --red:#ff5252; --blue:#4fc3f7; --violet:#ce93d8;
+  --text:#d6d6e6; --dim:#8686aa;
+  --mono:'Share Tech Mono','DejaVu Sans Mono','Consolas','Courier New',monospace;
+  --disp:'Orbitron','Impact','Haettenschweiler','DejaVu Sans Condensed',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg)}
+body{
+  background:var(--bg); color:var(--text);
+  font-family:var(--mono); font-size:14px; line-height:1.6;
+  display:flex; flex-direction:column; min-height:100vh;
+}
+a{color:var(--amber); text-decoration:none}
+a:hover{text-decoration:underline}
+code{font-family:var(--mono); background:#000; border:1px solid var(--edge);
+     padding:1px 5px; color:var(--green); font-size:.92em; white-space:nowrap}
+
+.strip{background:var(--amber); color:#000; text-align:center;
+  font-family:var(--disp); font-weight:900; font-size:11px;
+  letter-spacing:3px; padding:5px 8px}
+
+header{padding:24px 22px 18px; border-bottom:1px solid var(--edge2);
+  background:linear-gradient(180deg,rgba(240,165,0,.055),transparent)}
+header .wrap{max-width:1060px; margin:0 auto;
+  display:flex; justify-content:space-between; align-items:flex-end;
+  gap:20px; flex-wrap:wrap}
+h1{font-family:var(--disp); font-weight:900; font-size:26px;
+  letter-spacing:3px; color:var(--amber); line-height:1.15}
+header .sub{color:var(--dim); font-size:12px; letter-spacing:1.5px; margin-top:6px}
+
+#status{border:1px solid var(--edge2); background:var(--panel);
+  padding:8px 12px; font-size:11px; line-height:1.65; min-width:250px}
+#status .lbl{color:var(--dim); letter-spacing:1px}
+#status .val{color:var(--green)}
+#status .val.off{color:var(--dim)}
+#status .hint{color:var(--dim); font-size:10.5px}
+
+main{flex:1; width:100%; max-width:1060px; margin:0 auto;
+  padding:26px 22px 40px; display:flex; flex-direction:column; gap:30px}
+
+section > h2{font-family:var(--disp); font-weight:700; font-size:13px;
+  letter-spacing:3px; color:var(--amber-d); padding-bottom:7px;
+  border-bottom:1px solid var(--edge); margin-bottom:14px}
+section > p.lede{color:var(--dim); font-size:12.5px; margin:-6px 0 14px}
+
+.grid{display:grid; gap:14px}
+.grid.two{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.grid.three{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+
+.card{display:flex; flex-direction:column; border:1px solid var(--edge2);
+  background:var(--panel); padding:15px 16px 14px; gap:8px;
+  transition:border-color .12s, background .12s}
+.card:hover{border-color:var(--amber-d); background:var(--panel2)}
+.card .tag{font-size:9.5px; letter-spacing:2.5px; color:var(--dim)}
+.card .name{font-family:var(--disp); font-weight:700; font-size:16px;
+  letter-spacing:1.5px; color:var(--amber); line-height:1.25}
+.card .role{font-size:11px; letter-spacing:1.5px; color:var(--dim);
+  text-transform:uppercase}
+.card p{font-size:12.5px; color:var(--text); flex:1}
+.card .links{display:flex; flex-wrap:wrap; gap:6px 14px; font-size:11.5px;
+  padding-top:8px; border-top:1px solid var(--edge)}
+.card.t1 .name{color:var(--red)}
+.card.t1:hover{border-color:var(--red)}
+.card.t2 .name{color:var(--violet)}
+.card.t2:hover{border-color:var(--violet)}
+.card.d1 .name{color:var(--amber)}
+.card.d2 .name{color:var(--red)}
+.card.d3 .name{color:var(--green)}
+
+.rows{border:1px solid var(--edge2); background:var(--panel)}
+.rows .row{display:flex; gap:14px; padding:11px 15px; align-items:baseline;
+  border-top:1px solid var(--edge); flex-wrap:wrap}
+.rows .row:first-child{border-top:none}
+.rows .row .k{min-width:150px; color:var(--blue); font-size:12px;
+  letter-spacing:1px}
+.rows .row .v{flex:1; min-width:220px; font-size:12.5px; color:var(--text)}
+
+.box{border:1px solid var(--edge2); background:var(--panel); padding:15px 17px}
+.box h3{font-family:var(--disp); font-weight:700; font-size:11.5px;
+  letter-spacing:2px; color:var(--amber-d); margin-bottom:9px}
+.box ol,.box ul{margin-left:18px; font-size:12.5px}
+.box li{margin-bottom:5px}
+.box li::marker{color:var(--dim)}
+
+footer{border-top:1px solid var(--edge); color:var(--dim); font-size:11px;
+  letter-spacing:1px; text-align:center; padding:16px}
+</style>
+</head>
+<body>
+
+<div class="strip">CYBRHAKCON 2026 &nbsp;·&nbsp; AI VILLAGE TRACK &nbsp;·&nbsp; TWO TALKS AND A WORKSHOP</div>
+
+<header>
+  <div class="wrap">
+    <div>
+      <h1>AI VILLAGE 2026</h1>
+      <div class="sub">everything from both talks and the workshop, in one place</div>
+    </div>
+    <div id="status">
+      <div><span class="lbl">relay</span> &nbsp;<span id="s-relay" class="val off">not connected</span></div>
+      <div><span class="lbl">mode</span> &nbsp;&nbsp;<span id="s-mode" class="val">recorded playback</span></div>
+      <div class="hint" id="s-hint">Recorded playback needs nothing. For live model calls run <code>bin/start.sh</code>.</div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section>
+    <h2>START HERE</h2>
+    <p class="lede">Three things are in this package. Pick the one you came for.</p>
+    <div class="rows">
+      <div class="row">
+        <div class="k">Watching a talk</div>
+        <div class="v">Open a deck below. Each one is a single file that needs nothing else.</div>
+      </div>
+      <div class="row">
+        <div class="k">Presenting a talk</div>
+        <div class="v">Run <code>bin/doctor.sh</code>, then work through <a href="docs/presenter-checklist.md">docs/presenter-checklist.md</a>.</div>
+      </div>
+      <div class="row">
+        <div class="k">Attending the workshop</div>
+        <div class="v">Read <a href="docs/first-run.md">docs/first-run.md</a>, about five minutes, then open a demo below and turn on recorded playback.</div>
+      </div>
+      <div class="row">
+        <div class="k">Running the workshop</div>
+        <div class="v">One command from the repo root: <code>bin/start.sh</code> on macOS and Linux, <code>bin\start.ps1</code> on Windows. It checks the machine, starts the relay, and reopens this page with live mode armed.</div>
+      </div>
+      <div class="row">
+        <div class="k">In a hurry</div>
+        <div class="v">Open the CAGE demo, turn on recorded playback, and press engage. That replays a real captured run. No key, no account, no setup.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>THE TWO TALKS</h2>
+    <div class="grid two">
+
+      <a class="card t1" href="talk-1/slides/index.html">
+        <div class="tag">TALK 1</div>
+        <div class="name">Swarms That Fight and Fix Each Other in a Cage</div>
+        <div class="role">slide deck</div>
+        <p>One swarm of agents plays attacker, another plays defender, and a third loop scores both and rewrites whichever agent did worst. The workshop below is the hands on half of this talk.</p>
+        <div class="links">
+          <span>open the deck &rarr;</span>
+        </div>
+      </a>
+
+      <a class="card t2" href="talk-2/compiles-differently-slides.html">
+        <div class="tag">TALK 2</div>
+        <div class="name">A Language That Compiles Differently Every Time</div>
+        <div class="role">slide deck</div>
+        <p>Twenty one surfaces on what happens when the thing reading your instructions is not a compiler. The last two slides are the handout card, front and back.</p>
+        <div class="links">
+          <span>open the deck &rarr;</span>
+        </div>
+      </a>
+
+    </div>
+    <div class="grid two" style="margin-top:14px">
+      <div class="box">
+        <h3>TALK 1 MATERIALS</h3>
+        <ul>
+          <li><a href="talk-1/README.md">talk-1/README.md</a> — what is in the deck and how to run it</li>
+          <li><a href="talk-1/SPEAKER-NOTES.md">talk-1/SPEAKER-NOTES.md</a> — the notes behind the slides</li>
+          <li>The three demos below are this talk's live material</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3>TALK 2 MATERIALS</h3>
+        <ul>
+          <li><a href="talk-2/unbounded-split/README.md">talk-2/unbounded-split/</a> — a runnable demo of a parser that returns a wrong answer, raises nothing, and exits zero</li>
+          <li>Three files, standard library only, about a minute: <code>python3 talk-2/unbounded-split/split_demo.py</code></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>THE WORKSHOP: THREE DEMOS</h2>
+    <p class="lede">They connect. FACTORY builds swarms, CAGE runs them, LOOP improves them. Each is one self contained HTML file, and each has a recorded playback mode that needs no key.</p>
+    <div class="grid three">
+
+      <a class="card d1" data-relay href="ai-village-workshop/demos/swarm-factory-live.html">
+        <div class="tag">DEMO 1 · BUILD</div>
+        <div class="name">FACTORY</div>
+        <div class="role">swarm factory</div>
+        <p>Describe a domain in plain language. A nine phase pipeline analyzes it, designs a roster of specialized agents, drafts each prompt, and reviews the result.</p>
+        <div class="links"><span>enter factory &rarr;</span></div>
+      </a>
+
+      <a class="card d2" data-relay href="ai-village-workshop/demos/swarm-cage-live.html">
+        <div class="tag">DEMO 2 · FIGHT</div>
+        <div class="name">CAGE</div>
+        <div class="role">red swarm vs blue swarm</div>
+        <p>Two swarms run a six phase adversarial exercise against each other. Same blue team, two different threat models, visibly different outcomes.</p>
+        <div class="links"><span>engage &rarr;</span></div>
+      </a>
+
+      <a class="card d3" data-relay href="ai-village-workshop/demos/improvement-loop-live.html">
+        <div class="tag">DEMO 3 · REFINE</div>
+        <div class="name">LOOP</div>
+        <div class="role">self improvement loop</div>
+        <p>Score the agents, rewrite the weakest one, design a new test, rerun. Import a CAGE result and close the loop on the agent that failed.</p>
+        <div class="links"><span>run a cycle &rarr;</span></div>
+      </a>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>THE WORKSHOP: THREE LABS</h2>
+    <div class="rows">
+      <div class="row">
+        <div class="k"><a href="ai-village-workshop/labs/LAB-1-FACTORY.md">LAB 1 · FACTORY</a></div>
+        <div class="v">About 30 minutes. Design a swarm for something you actually do.</div>
+      </div>
+      <div class="row">
+        <div class="k"><a href="ai-village-workshop/labs/LAB-2-CAGE.md">LAB 2 · CAGE</a></div>
+        <div class="v">About 45 minutes. Run both scenarios and compare what the blue team caught.</div>
+      </div>
+      <div class="row">
+        <div class="k"><a href="ai-village-workshop/labs/LAB-3-LOOP.md">LAB 3 · LOOP</a></div>
+        <div class="v">Stretch. Close the improvement loop on the agent that lost.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>SETUP AND HELP</h2>
+    <div class="grid two">
+      <div class="box">
+        <h3>SETUP</h3>
+        <ul>
+          <li><a href="docs/first-run.md">docs/first-run.md</a> — fifteen minutes, start to finish</li>
+          <li><a href="ai-village-workshop/ATTENDEE-SETUP.md">ATTENDEE-SETUP.md</a> — the three ways to run, side by side</li>
+          <li><a href="ai-village-workshop/CLAUDE-CODE-SETUP.md">CLAUDE-CODE-SETUP.md</a> — use the Claude subscription you already have</li>
+          <li><a href="ai-village-workshop/OLLAMA-SETUP.md">OLLAMA-SETUP.md</a> — a local model, fully offline</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3>WHEN SOMETHING BREAKS</h3>
+        <ul>
+          <li>Run <code>bin/doctor.sh</code>. Every FAIL line carries a fix.</li>
+          <li><a href="ai-village-workshop/WORKSHOP-GUIDE.md">WORKSHOP-GUIDE.md</a> lists the common error messages. It is also written to be pasted into a chat assistant before you ask it a question about this package.</li>
+          <li><a href="docs/presenter-checklist.md">docs/presenter-checklist.md</a> has the in the room recovery order.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Every page here opens off the file system. No CDN, no build step, no account.
+  The relay, when you use it, binds 127.0.0.1 and nothing else.
+</footer>
+
+<script>
+// If bin/start.sh opened this page it appended #relay_token=... to the URL.
+// Carry that token onto the three demo links so live mode works without the
+// attendee copying anything. A URL fragment is never sent to any server, which
+// is why the relay delivers its token this way rather than in a query string.
+(function () {
+  var m = (location.hash || '').match(/[#&]relay_token=([^&]+)/);
+  var token = m ? m[1] : '';
+
+  var relayEl = document.getElementById('s-relay');
+  var modeEl  = document.getElementById('s-mode');
+  var hintEl  = document.getElementById('s-hint');
+
+  if (!token) return;
+
+  document.querySelectorAll('a[data-relay]').forEach(function (a) {
+    a.href = a.getAttribute('href') + '#relay_token=' + token;
+  });
+
+  relayEl.textContent = 'token attached';
+  relayEl.classList.remove('off');
+  modeEl.textContent = 'live calls armed';
+  hintEl.textContent = 'The three demo links below now carry this run’s relay token. '
+    + 'Recorded playback still works and still needs nothing.';
+})();
+</script>
+
+</body>
+</html>
