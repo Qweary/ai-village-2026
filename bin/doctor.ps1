@@ -59,8 +59,16 @@ Say "   root: $root"
 Say ""
 Say "-- Package files"
 
+# The test for membership is: without this file, someone cannot do a thing they
+# need to do on the day. Speaker notes are in the list because a deck without
+# its notes is the exact complaint that started this work, and a presenter
+# discovers it at the lectern. Wrappers over a file already checked are not in
+# the list (docs/first-run.md restates ATTENDEE-SETUP.md; talk-1/README.md
+# restates the back-pocket slides and driving keys that SPEAKER-NOTES.md
+# carries, and talk-2 ships no README at all and presents fine).
 $recordedFiles = @(
   'index.html',
+  'docs/presenter-checklist.md',
   'ai-village-workshop/README.md',
   'ai-village-workshop/ATTENDEE-SETUP.md',
   'ai-village-workshop/WORKSHOP-GUIDE.md',
@@ -70,7 +78,9 @@ $recordedFiles = @(
   'ai-village-workshop/labs/LAB-1-FACTORY.md',
   'ai-village-workshop/labs/LAB-2-CAGE.md',
   'ai-village-workshop/labs/LAB-3-LOOP.md',
-  'talk-2/compiles-differently-slides.html'
+  'talk-1/SPEAKER-NOTES.md',
+  'talk-2/compiles-differently-slides.html',
+  'talk-2/SPEAKER-NOTES.md'
 )
 
 $found = 0; $missing = 0
@@ -105,6 +115,15 @@ if (Test-Path -LiteralPath (Join-Path $root 'talk-2/unbounded-split/split_demo.p
 # ------------------------------------------------------------- python
 Say ""
 Say "-- Live relay (Python)"
+
+# The relay itself. Without it bin\start.ps1 cannot start anything, so its
+# absence belongs to the LIVE RELAY verdict rather than the recorded one.
+if (Test-Path -LiteralPath (Join-Path $root 'ai-village-workshop/relay.py') -PathType Leaf) {
+  Ok "found ai-village-workshop\relay.py"
+} else {
+  Bad "missing ai-village-workshop\relay.py" "re-clone the package; recorded playback still works without it"
+  $script:LiveBad = 1
+}
 
 $py = $null
 foreach ($cand in @('python3', 'python', 'py')) {

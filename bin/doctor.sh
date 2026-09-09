@@ -67,8 +67,16 @@ say "-- Package files"
 
 # Files that must exist for the recorded path. A missing one here means the
 # checkout is incomplete, not that the machine is short of something.
+# The test for membership is: without this file, someone cannot do a thing they
+# need to do on the day. Speaker notes are in the list because a deck without
+# its notes is the exact complaint that started this work, and a presenter
+# discovers it at the lectern. Wrappers over a file already checked are not in
+# the list (docs/first-run.md restates ATTENDEE-SETUP.md; talk-1/README.md
+# restates the back-pocket slides and driving keys that SPEAKER-NOTES.md
+# carries, and talk-2 ships no README at all and presents fine).
 RECORDED_FILES="
 index.html
+docs/presenter-checklist.md
 ai-village-workshop/README.md
 ai-village-workshop/ATTENDEE-SETUP.md
 ai-village-workshop/WORKSHOP-GUIDE.md
@@ -78,7 +86,9 @@ ai-village-workshop/demos/improvement-loop-live.html
 ai-village-workshop/labs/LAB-1-FACTORY.md
 ai-village-workshop/labs/LAB-2-CAGE.md
 ai-village-workshop/labs/LAB-3-LOOP.md
+talk-1/SPEAKER-NOTES.md
 talk-2/compiles-differently-slides.html
+talk-2/SPEAKER-NOTES.md
 "
 
 MISSING=0
@@ -118,6 +128,15 @@ fi
 # ---------------------------------------------------------------- python
 say ""
 say "-- Live relay (Python)"
+
+# The relay itself. Without it bin/start.sh cannot start anything, so its
+# absence belongs to the LIVE RELAY verdict rather than the recorded one.
+if [ -f "$ROOT/ai-village-workshop/relay.py" ]; then
+  ok "found ai-village-workshop/relay.py"
+else
+  bad "missing ai-village-workshop/relay.py" "re-clone the package; recorded playback still works without it"
+  LIVE_BAD=1
+fi
 
 PY=""
 if command -v python3 >/dev/null 2>&1; then
