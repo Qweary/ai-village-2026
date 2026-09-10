@@ -205,6 +205,8 @@ table.buy td{border-top:4px solid var(--rule);padding:18px 26px 18px 0;vertical-
 table.buy td:first-child{color:var(--a);width:430px}
 table.buy td:nth-child(2){width:440px}
 table.buy b{font-weight:400;color:var(--a)}
+table.casc b{font-weight:400;color:var(--a)}
+.live .hint b{font-weight:400;color:var(--a)}
 
 ol.prac{margin-top:14px;padding-left:0;counter-reset:p}
 ol.prac li{list-style:none;counter-increment:p;font-size:28px;line-height:1.55;
@@ -366,6 +368,16 @@ section[data-i="21"] .cq .a, section[data-i="21"] .card-hd li,
 section[data-i="21"] .inv{letter-spacing:0;line-height:1.42}
 /* -1px each, and .card-hd li lands exactly on the 20px floor. */
 section[data-i="21"] .twoup .cq .a, section[data-i="21"] .twoup td.cm{font-size:21px}
+/* COPY PASS 2026-09-09. Question five was rewritten in plain language and its
+   answer line now measures 56 characters against a 55.5-character measure, so it
+   sets to two lines where the other four rows set to one. Measured: 897.08 with
+   the row at two lines. This trims 2px top and 2px bottom from all six rows of
+   BOTH panels. Predicted 24.00px, MEASURED 20.00px, because one row's height is
+   set by the taller column and does not follow. The surface lands at 877.08 with
+   the copy intact and identical to the other surfaces. Same family of move as the slide 17
+   padding trim above: whitespace before type size, and no cell goes below the
+   20px floor because no type size changes here at all. */
+section[data-i="21"] .twoup .cq{padding-top:9px;padding-bottom:8px}
 section[data-i="21"] .twoup .card-hd li{font-size:20px}
 
 /* The eighth practice line costs 75.4px and the slide had 8.22px. Measured: this
@@ -472,7 +484,7 @@ pre.code .acc{color:var(--a)}
 <!-- 1 -->
 <section class="slide" data-i="1">
   <div class="kicker" style="margin-bottom:16px">FROM A PUBLISHED INCIDENT REPORT</div>
-  <h2>Same bug. Different language.</h2>
+  <h2>Misaimed. Same bug. Different language.</h2>
   <div class="grow"></div>
   <div class="q-block">
     <div class="q-label">THE INTEGRATION TEST</div>
@@ -491,8 +503,9 @@ pre.code .acc{color:var(--a)}
 
 <!-- 2 -->
 <section class="slide" data-i="2">
-  <h1>It compiles differently. Here is the spread.</h1>
-  <div class="meas">
+  <h1>AI compiles differently every time.</h1>
+  <div class="sub" style="color:var(--a);margin-top:10px">Even evaluating transcripts.</div>
+  <div class="meas" style="gap:20px;margin-top:8px">
     <div class="m-row">
       <div class="m-cap">BYTE-IDENTICAL TEXT, SCORED BLIND</div>
       <div class="m-num">Two different scores.</div>
@@ -633,9 +646,9 @@ exit $?                            <span class="cmt"># always 0</span></pre>
   <div class="grow"></div>
   <div class="live">
     <div class="num">5</div>
-    <div class="ask sm">Name the way past it. Then count it.</div>
-    <div class="hint">Somebody who is allowed to be here needs to get past it today, on purpose. Write what they type, click, or say. Then write how many people did that last quarter. If there is no way past, write the last time somebody tried.</div>
-    <div class="chip">a way past and a number, or "there is none" and a date</div>
+    <div class="ask sm">How do people skip it, and how many did?</div>
+    <div class="hint">Almost every real control has an official way around it, like a ticket or a break-glass account. If a lot of people used it last quarter, it is not covering that work. If there is none, say when somebody last tried.</div>
+    <div class="chip">a way around and a number, or "there is none" and a date</div>
   </div>
 </section>
 
@@ -645,33 +658,33 @@ exit $?                            <span class="cmt"># always 0</span></pre>
   <table class="casc">
     <tr>
       <td class="cn">1</td>
-      <td class="cc">Q1 names a document. A policy, a standard, a runbook, a wiki page, a training deck.</td>
+      <td class="cc"><b>Q1. Name the thing that runs it.</b> A document. A policy, a standard, a runbook, a wiki page, a training deck.</td>
       <td class="cv">DESCRIPTION</td>
       <td class="cm">It tells people what to do. Nothing happens if they do not. Documents are useful. They are not controls.</td>
     </tr>
     <tr>
       <td class="cn">2</td>
-      <td class="cc">Q2 names a person or a role. Anything that is not the word "nobody."</td>
+      <td class="cc"><b>Q2. Who has to remember?</b> A person or a role. Anything that is not the word "nobody."</td>
       <td class="cv">PRACTICE</td>
       <td class="cm">It fires when a person chooses. Exactly as reliable as that person on their worst day, in their worst week, under their worst deadline.</td>
     </tr>
     <tr>
       <td class="cn">3</td>
-      <td class="cc">Q3 has no month in it. "Never observed." "It is always green." "It catches things all the time."</td>
+      <td class="cc"><b>Q3. Name the last time it caught something.</b> No month in it. "Never observed." "It is always green." "It catches things all the time."</td>
       <td class="cv">UNEXERCISED</td>
       <td class="cm">It runs, and you cannot produce one occasion on which it told a bad case from a good one. Either nothing ever asked it a question it could get wrong, or something did and you cannot get at it. Those are the same thing from where you sit.</td>
     </tr>
     <tr>
       <td class="cn">4</td>
-      <td class="cc">Q4 says "nothing," or the signal named is somebody choosing to go and look. An audit. A review. Opening the config.</td>
+      <td class="cc"><b>Q4. I delete it tonight. What tells you?</b> "Nothing," or somebody choosing to go and look. An audit. A review.</td>
       <td class="cv">UNWITNESSED</td>
       <td class="cm">It runs, it has caught things, and you would not know the day it stopped. Everything you believe about it is a fact about its past.</td>
     </tr>
     <tr>
       <td class="cn">5</td>
-      <td class="cc">Q1 through Q4 all clean.</td>
+      <td class="cc"><b>Q1 to Q4 all clean.</b></td>
       <td class="cv">MECHANISM</td>
-      <td class="cm">It fires without you, and you would know if it stopped. <b>That is all this says. It is a verdict about architecture, not about correctness</b>, because nothing here asked whether it checks what you think it checks. Now go and count the way past it.</td>
+      <td class="cm">It fires without you, and you would know if it stopped. <b>That is all this says. It is a verdict about architecture, not about correctness</b>, because nothing here asked whether it checks what you think it checks.</td>
     </tr>
   </table>
 </section>
@@ -719,9 +732,9 @@ exit $?                            <span class="cmt"># always 0</span></pre>
 <!-- 12 -->
 <section class="slide" data-i="12">
   <h2 style="margin-bottom:20px">No control type tests where the instrument points.</h2>
-  <div class="q-label">MY OWN NOTE, QUOTED AS WRITTEN</div>
+  <div class="q-label">MY SYSTEM'S NOTE ABOUT A REGEX ERROR THAT CUTS TO THE HEART OF IT:</div>
   <div class="lq">★ That's the real durable, and it's bigger than this bug: our entire control discipline — positive plus null — tests whether the instrument <i>works</i>. It cannot test whether the instrument is <i>pointed at the right thing</i>. We have no control type for that. A bounds control would be a third kind: assert the final block contains no foreign section header, or that block lengths plus preamble equal file length, or flag when the last block is wildly larger than the median.</div>
-  <div class="small" style="margin-bottom:12px">I killed the struck ones by measuring them.</div>
+  <div class="small" style="margin-bottom:12px">Quoted as written. It proposed three. I killed the struck ones by measuring them.</div>
   <div class="shp">
     <div class="shp-row">
       <div class="shp-n"><s>Byte conservation</s></div>
@@ -860,7 +873,7 @@ CLIPPED   (correct) : []</pre>
   <div class="cq"><div class="n">2</div><div><div class="t">Who has to remember?</div><div class="a">For it to happen on the next change. &nbsp;/&nbsp; a name, a role, or "nobody"</div></div></div>
   <div class="cq"><div class="n">3</div><div><div class="t">Name the last time it caught something.</div><div class="a">The month, and what it stopped in three words. <b>"It is always green" is not a month.</b> &nbsp;/&nbsp; a month and three words, or "never observed"</div></div></div>
   <div class="cq"><div class="n">4</div><div><div class="t">I delete it tonight. What tells you?</div><div class="a">Silently, and your config looks unchanged. The first thing that tells you, and how long. &nbsp;/&nbsp; one signal and one number, or "nothing"</div></div></div>
-  <div class="cq gate"><div class="n">5</div><div><div class="t">Only if the first four came back clean: name the way past it, then count it.</div><div class="a">Somebody who is allowed to be here, going past it on purpose. What they type, click, or say, and how many did that last quarter. &nbsp;/&nbsp; a way past and a number, or "there is none" and a date</div></div></div>
+  <div class="cq gate"><div class="n">5</div><div><div class="t">Only if the first four are clean: how do people skip it, and how many did?</div><div class="a">Almost every real control has one, like a ticket or a break-glass account. If a lot of people used it, it is not covering that work. &nbsp;/&nbsp; a way around and a number, or "there is none" and a date</div></div></div>
   <div class="grow"></div>
   <div class="cardfoot">Run it on your second control this week. That is the one where it hurts.</div>
 </section>
@@ -879,7 +892,7 @@ CLIPPED   (correct) : []</pre>
       <div class="cq"><div class="n">2</div><div><div class="t">Who has to remember?</div><div class="a">A name, a role, or "nobody."</div></div></div>
       <div class="cq"><div class="n">3</div><div><div class="t">Name the last time it caught something.</div><div class="a">A month and three words, or "never observed." <b>"It is always green" is not a month.</b></div></div></div>
       <div class="cq"><div class="n">4</div><div><div class="t">I delete it tonight. What tells you?</div><div class="a">One signal and one number, or "nothing."</div></div></div>
-      <div class="cq gate"><div class="n">5</div><div><div class="t">Only if the first four are clean: name the way past it, then count it.</div><div class="a">A way past and a number, or "there is none" and a date.</div></div></div>
+      <div class="cq gate"><div class="n">5</div><div><div class="t">Only if 1 to 4 are clean: how do people skip it, and how many did?</div><div class="a">A way around and a number, or "there is none" and a date.</div></div></div>
       <div class="cardfoot">Run it on your second control this week.</div>
     </div>
     <div>
@@ -889,7 +902,7 @@ CLIPPED   (correct) : []</pre>
         <tr><td class="cn">2</td><td class="cv">PRACTICE</td><td class="cm">Q2 is a person. It fires when somebody chooses. As reliable as that person on their worst day.</td></tr>
         <tr><td class="cn">3</td><td class="cv">UNEXERCISED</td><td class="cm">Q3 has no month. It runs, and you cannot produce one occasion on which it told a bad case from a good one.</td></tr>
         <tr><td class="cn">4</td><td class="cv">UNWITNESSED</td><td class="cm">Q4 is "nothing," or somebody choosing to go and look. You would not know the day it stopped.</td></tr>
-        <tr><td class="cn">5</td><td class="cv">MECHANISM</td><td class="cm">All four clean. It fires without you and you would know if it stopped. Now go and count the way past it.</td></tr>
+        <tr><td class="cn">5</td><td class="cv">MECHANISM</td><td class="cm">All four clean. It fires without you and you would know if it stopped.</td></tr>
       </table>
       <div class="inv" style="margin-top:16px;font-size:20px">
         MECHANISM does not mean the control is right. Nothing here asked whether it checks what you think it checks.
@@ -1024,9 +1037,9 @@ CLIPPED   (correct) : []</pre>
       '<div class="pq"><div class="pt">4. I delete it tonight. What tells you?</div>'+
         '<div class="ph">Silently. Your config looks unchanged. The first thing that tells you it is gone, and how long that takes.</div>'+
         '<div class="pa">one signal and one number, or "nothing"</div><div class="wl"></div></div>'+
-      '<div class="pq"><div class="pt">5. Only if 1 to 4 are clean: name the way past it, then count it.</div>'+
-        '<div class="ph">Somebody who is allowed to be here needs to get past it today, on purpose. What do they type, click, or say? Then: how many people did that last quarter. If there is no way past, write the last time somebody tried.</div>'+
-        '<div class="pa">a way past and a number, or "there is none" and a date</div><div class="wl"></div></div>'+
+      '<div class="pq"><div class="pt">5. Only if 1 to 4 are clean: how do people skip it, and how many did?</div>'+
+        '<div class="ph">Almost every real control has an official way around it, like a ticket or a break-glass account. If a lot of people used it last quarter, it is not covering that work. If there is none, say when somebody last tried.</div>'+
+        '<div class="pa">a way around and a number, or "there is none" and a date</div><div class="wl"></div></div>'+
       '<div class="pc-ft">Verdict on the back. Run it on your second control this week. That is the one where it hurts.</div>'+
     '</div>';
 
@@ -1038,7 +1051,7 @@ CLIPPED   (correct) : []</pre>
         '<tr><td class="k">2</td><td class="v">PRACTICE</td><td>Q2 names a person or a role. Anything that is not the word "nobody." It fires when a person chooses, and it is exactly as reliable as that person on their worst day, in their worst week, under their worst deadline. That may be fine. It is not what you called it.</td></tr>'+
         '<tr><td class="k">3</td><td class="v">UNEXERCISED</td><td>Q3 has no month in it. It runs, and you cannot produce one occasion on which it told a bad case from a good one. Either nothing ever asked it a question it could get wrong, or something did and you cannot get at it. From where you are sitting those are the same thing. You know it is green. You do not know it discriminates.</td></tr>'+
         '<tr><td class="k">4</td><td class="v">UNWITNESSED</td><td>Q4 says "nothing," or the signal named is somebody choosing to go and look. An audit. A review. A quarterly. It runs, it has caught things, and you would not know the day it stopped. Everything you believe about it is a fact about its past.</td></tr>'+
-        '<tr><td class="k">5</td><td class="v">MECHANISM</td><td>Q1 to Q4 all clean. It fires without you, and you would know if it stopped. That is the whole of what this says. Now go and count the way past it: how many people used it last quarter.</td></tr>'+
+        '<tr><td class="k">5</td><td class="v">MECHANISM</td><td>Q1 to Q4 all clean. It fires without you, and you would know if it stopped. That is the whole of what this says.</td></tr>'+
       '</table>'+
       '<div class="warn">MECHANISM does not mean the control is right. Nothing on this card asked whether it checks what you think it checks. A check can run on schedule, report green for months, and certify a property its own body never touches.</div>'+
       '<div class="pc-ft">A scanner that produces a report somebody has to read is a practice with a machine attached. The machine is not the control. The reading is the control, and the reading is a choice.</div>'+
