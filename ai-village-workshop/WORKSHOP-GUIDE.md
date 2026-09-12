@@ -60,10 +60,14 @@ Wants everything on their own hardware, or is offline → OLLAMA.
 There is **no third-party gateway option**. Every live path talks either to a
 vendor the attendee chose or to a process on their own machine.
 
-The provider row also carries an `ANTHROPIC` button that posts directly to a
-vendor API with a key the attendee supplies. **It is not one of the three
-supported paths and no part of this workshop uses it.** If an attendee asks,
-say that — do not walk them into it, and do not ask anyone for a key.
+The provider selector is grouped by ACCESS METHOD, not by vendor: the two
+workshop paths (CLAUDE CODE, which is a subscription reached through the local
+relay, and OLLAMA, which is a model on the attendee's own machine) sit together
+and are selectable at full weight. Below them, under a heading reading NOT A
+WORKSHOP PATH, a dimmed `anthropic api key` button posts directly to a vendor
+API with a key the attendee supplies. **It is not one of the three supported
+paths and no part of this workshop uses it.** If an attendee asks, say that. Do
+not walk them into it, and do not ask anyone for a key.
 
 ---
 
@@ -107,7 +111,16 @@ invalidates the old token.
 → The relay can't find the `claude` binary. Install Claude Code (or fix PATH so `which claude` resolves), then restart `relay.py`.
 
 **`UNCLASSIFIED FAILURE` / `Failed to fetch` on the OLLAMA provider**
-→ Ollama is not running. Start it: `ollama serve`.
+→ Two causes look identical here and the browser cannot tell them apart. First,
+Ollama may not be running: start it with `ollama serve`. Second, and more often
+in this workshop, Ollama IS running and refused the page's origin. A demo opened
+by double-clicking the file has the origin `null`, which a default Ollama
+install answers with HTTP 403. Check with `curl http://localhost:11434/api/tags`;
+if that answers, the origin is the cause. Fix it by serving the folder over HTTP
+(`cd ai-village-workshop && python3 -m http.server 8080`, then open
+`http://localhost:8080/demos/swarm-factory-live.html`) or by starting Ollama as
+`OLLAMA_ORIGINS='*' ollama serve`. This affects the OLLAMA path only; the CLAUDE
+CODE relay accepts `null` deliberately.
 
 **"model not found" (OLLAMA)**
 → You haven't pulled the model. Run `ollama pull llama3.2` (or whatever model name you typed).
@@ -119,7 +132,8 @@ invalidates the old token.
 → Some browsers block fetch from file:// origins. Serve locally instead: `cd ai-village-workshop && python3 -m http.server 8080`, then open `http://localhost:8080/demos/swarm-factory-live.html`.
 
 **CORS error in browser console**
-→ Usually solved by the localhost:8080 approach above.
+→ Solved by the localhost:8080 approach above. On the OLLAMA path this is the
+expected result of a `file://` page, not an anomaly.
 
 ---
 
@@ -143,11 +157,14 @@ The factory output from LAB-1 can also be pasted into LOOP's CUSTOM mode to impr
 **CAGE → LOOP:**
 When a CAGE exercise completes, the status bar under the blue pane shows an `[ OPEN IN LOOP DEMO ]` link, and CAGE writes the exercise transcript to `localStorage` under the key `swarmdemo_loop_source`. Open LOOP and click IMPORT MODE; it reads the transcript automatically and shows it ready to load.
 
+**FACTORY → CAGE (automatic):**
+When a factory build finishes it saves the swarm name and the agent codenames it produced. Open the cage demo and the strip at the top names that swarm. Only names and short labels cross over, never generated prose, so nothing the factory wrote can change what the cage asks a model to do.
+
 **FACTORY → LOOP:**
 Copy the fabricated agent output from FACTORY's terminal. In LOOP, select CUSTOM mode and paste the agent system prompt into the input field. Run the improvement cycle on it.
 
 **What persists in localStorage:**
-The three demos share the **provider choice** (`swarmdemo_provider`) and the **Ollama model name** (`swarmdemo_ollama_model`). Nothing else is shared between them. None of the three supported paths asks for a key at all.
+The three demos share the **provider choice** (`swarmdemo_provider`) and the **Ollama model name** (`swarmdemo_ollama_model`). They also share the pipeline hand-off: `swarmdemo_factory_export` (factory to cage), `swarmdemo_loop_source` (cage to loop) and `swarmdemo_loop_export` (loop back to cage). Each demo shows a strip at the top naming which stage it is and what is waiting for it, and each says plainly when nothing upstream has been saved yet. None of the three supported paths asks for a key at all.
 
 ---
 

@@ -186,11 +186,15 @@ token changes every time you restart the relay.
 
 **The page shows `UNCLASSIFIED FAILURE` and the raw message is `Failed to
 fetch` (Chrome) or `NetworkError when attempting to fetch resource` (Firefox).**
-Your browser could not open a connection at all. On the CLAUDE CODE path that
+Your browser could not complete the request. On the CLAUDE CODE path that
 almost always means `relay.py` is not running — start it and try again. On the
-OLLAMA path it means `ollama serve` is not running. The demo deliberately does
-*not* guess a cause it did not observe, which is why it says UNCLASSIFIED rather
-than naming one.
+OLLAMA path there are two causes that look the same from the browser: Ollama is
+not running, or Ollama is running and refused your page's origin. A demo opened
+by double-clicking the file has the origin `null`, and a default Ollama install
+answers `null` with HTTP 403. Run `curl http://localhost:11434/api/tags`; if it
+answers, the origin is the cause, and `OLLAMA-SETUP.md` has the two fixes. The
+demo deliberately does *not* guess a cause it did not observe, which is why it
+says UNCLASSIFIED rather than naming one.
 
 **`INFRASTRUCTURE FAILURE`** — the request got out but never reached a model.
 The demo will name the reason it was told (access limit, sign-in, timeout,
@@ -223,6 +227,8 @@ prefix:
 
 - `swarmdemo_provider` — which path you last selected (shared by all three demos)
 - `swarmdemo_ollama_model` — the local model name you typed
+- `swarmdemo_factory_export` — the hand-off from the factory demo to the cage
+  demo (the swarm name and agent codenames you just built, nothing else)
 - `swarmdemo_loop_source`, `swarmdemo_loop_export` — the hand-off between the
   cage and loop demos
 - `swarmdemo_factory_key`, `swarmdemo_cage_key`, `swarmdemo_loop_key` — present
@@ -238,8 +244,10 @@ the model calls on the path you chose.
 
 ## One button the three paths do not use
 
-The provider selector also has an `ANTHROPIC` button, which posts directly to a
-vendor API with a key you supply. **It is not one of the three paths, no part of
-this workshop uses it, and nothing here asks you for a key.** It is left in
-place for people who already have their own key and prefer it. If that is not
-you, ignore it — the button next to it is already selected.
+Below the two workshop paths, under a heading that says it is not a workshop
+path, sits a dimmed button labelled `anthropic api key` (just `api key` in the
+cage and loop demos). It posts directly to a vendor API with a key you supply.
+**It is not one of the three paths, no part of this workshop uses it, and
+nothing here asks you for a key.** It is left in place for people who already
+have their own key and prefer it. If that is not you, ignore it. The two
+workshop paths are grouped above it, and one of them is already selected.
