@@ -64,13 +64,35 @@
   --gb:0 0 10px rgba(79,195,247,.28);
   --gp:0 0 10px rgba(206,147,216,.28);
   --grr:0 0 10px rgba(255,23,68,.45);
+
+  /* ---- Type scale. One ramp, in 1920x1080 canvas units. --------------
+     Room legibility, not elegance, sets the floor. --fs-5 is that floor:
+     nothing the audience has to read sits below it. The two steps under
+     it are operator furniture and panel micro-tags, which nobody in the
+     back row is being asked to read.
+     The step ratio stays near 1.15 through the body band and widens
+     through display, so the hierarchy survives the lift. ------------- */
+  --fs-0:10px;    /* deck mark, phase-cell ordinal. furniture */
+  --fs-1:11px;    /* // anchor, time budget, slide number. furniture */
+  --fs-2:16px;    /* micro tag inside a panel */
+  --fs-3:19px;    /* small state label, phase cell */
+  --fs-4:24px;    /* secondary label, panel title, caption under a heading */
+  --fs-5:27px;    /* BODY. the floor for anything the room has to read */
+  --fs-6:29px;    /* body, prominent. list ordinals, counts */
+  --fs-7:33px;    /* panel name, recap title, close lines */
+  --fs-8:36px;    /* the one line on the slide doing the work */
+  --fs-9:42px;    /* pull quote, divider rule, scenario title */
+  --fs-10:58px;   /* slide heading */
+  --fs-11:68px;   /* big statement */
+  --fs-12:80px;   /* title card */
+  --fs-13:98px;   /* chapter word */
 }
 
 /* ---------- reveal.js overrides ---------- */
 html, body{background:var(--bg)}
 .reveal{
   font-family:'Share Tech Mono','Courier New',monospace;
-  font-size:24px;
+  font-size:var(--fs-5);
   color:var(--w);
   font-weight:400;
 }
@@ -99,7 +121,7 @@ html, body{background:var(--bg)}
 .reveal .progress span{background:var(--am);box-shadow:none}
 .reveal .slide-number{
   background:transparent;color:#3f3f5e;font-family:'Share Tech Mono',monospace;
-  font-size:11px;letter-spacing:1px;right:14px;bottom:12px;
+  font-size:var(--fs-1);letter-spacing:1px;right:14px;bottom:12px;
 }
 
 /* ---------- Scanline overlay, default on, 'n' toggles it ---------- */
@@ -120,27 +142,45 @@ body.bg-cage,body.bg-cage .reveal{background:var(--bg-cage) !important}
    of every line in the right column. */
 .reveal .slides section .slide,
 .reveal .slides section .slide *{box-sizing:border-box}
+/* Vertical centring is the default, not an opt-in. Every slide's content
+   is shorter than the 1080 canvas, and under flex-start that surplus all
+   piled up below the content: measured 399px to 784px of dead space on
+   every slide that did not carry the .center class, which was 20 of 24.
+   Centring spends it evenly instead.
+   The two justify-content declarations are deliberate. A browser that
+   understands the 'safe' keyword will refuse to centre content taller
+   than the box, which would otherwise push the top of it off the canvas
+   where nothing can scroll it back. A browser that does not understand
+   'safe' keeps the plain centring on the line above rather than falling
+   back to flex-start and losing the fix silently. */
 .slide{
   width:100%;height:100%;padding:64px 72px;
-  display:flex;flex-direction:column;justify-content:flex-start;gap:24px;position:relative;
+  display:flex;flex-direction:column;gap:26px;position:relative;
+  justify-content:center;
+  justify-content:safe center;
 }
-.slide.center{justify-content:center;align-items:center}
-.slide.tight{padding:48px 64px;gap:18px}
-.slide.dense{padding:40px 60px;gap:14px}
+.slide.center{align-items:center}
+.slide.tight{padding:48px 64px;gap:20px}
+.slide.dense{padding:40px 60px;gap:16px}
 
+/* The breadcrumb and the time marker are the only things on a slide whose
+   sole reader is the presenter, so they sit at --fs-3 rather than down with
+   the furniture. At --fs-1 they were decoration: unreadable from a lectern
+   for the same reason 11px body was unreadable from the back row. The deck
+   mark below stays quiet, which keeps the furniture's own hierarchy. */
 .anchor{
-  font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px;
+  font-family:'Share Tech Mono',monospace;font-size:var(--fs-3);letter-spacing:3px;
   color:#5a5a82;position:absolute;top:30px;left:72px;
 }
 .anchor::before{content:'// '}
 .brand{
   position:absolute;bottom:18px;left:72px;font-family:'Share Tech Mono',monospace;
-  font-size:10px;letter-spacing:2.5px;color:#3f3f5e;
+  font-size:var(--fs-0);letter-spacing:2.5px;color:#3f3f5e;
 }
 /* Time budget marker, top right. Operator orientation only. */
 .tb{
   position:absolute;top:30px;right:72px;font-family:'Share Tech Mono',monospace;
-  font-size:11px;letter-spacing:2px;color:#3f3f5e;
+  font-size:var(--fs-3);letter-spacing:2px;color:#3f3f5e;
 }
 
 .cur{
@@ -152,55 +192,55 @@ body.bg-cage,body.bg-cage .reveal{background:var(--bg-cage) !important}
 
 /* Generic heading used on most content slides */
 .h{
-  font-family:'Orbitron',sans-serif;font-weight:900;font-size:46px;letter-spacing:6px;
+  font-family:'Orbitron',sans-serif;font-weight:900;font-size:var(--fs-10);letter-spacing:6px;
   color:var(--am);text-shadow:0 0 10px rgba(208,136,0,.35);line-height:1.1;
 }
 .h.hot{color:var(--a);text-shadow:var(--ga)}
 .h.cool{color:var(--p);text-shadow:var(--gp)}
 .h.warn{color:var(--r-cage);text-shadow:0 0 12px rgba(255,51,85,.5)}
 .sub2{
-  font-family:'Share Tech Mono',monospace;font-size:17px;letter-spacing:2.5px;
+  font-family:'Share Tech Mono',monospace;font-size:var(--fs-4);letter-spacing:2.5px;
   color:var(--gr);margin-top:-10px;
 }
 /* The one line on a slide that is doing the work */
 .punch{
-  font-family:'Share Tech Mono',monospace;font-size:27px;letter-spacing:2px;
-  color:var(--a);text-shadow:var(--ga);line-height:1.5;
+  font-family:'Share Tech Mono',monospace;font-size:var(--fs-8);letter-spacing:2px;
+  color:var(--a);text-shadow:var(--ga);line-height:1.45;
 }
 .punch.cool{color:var(--p);text-shadow:var(--gp)}
 .punch.warn{color:var(--r-cage);text-shadow:0 0 10px rgba(255,51,85,.45)}
 .note{
-  font-family:'Share Tech Mono',monospace;font-size:17px;letter-spacing:1.5px;
-  color:var(--gr);line-height:1.6;
+  font-family:'Share Tech Mono',monospace;font-size:var(--fs-5);letter-spacing:1.5px;
+  color:var(--gr);line-height:1.5;
 }
 
 /* ---------- Title card ---------- */
 .s1 .title{
-  font-family:'Orbitron',sans-serif;font-weight:900;font-size:70px;letter-spacing:6px;
+  font-family:'Orbitron',sans-serif;font-weight:900;font-size:var(--fs-13);letter-spacing:6px;
   color:var(--a);text-shadow:var(--ga);line-height:1.12;
 }
 .s1 .sub{
-  font-family:'Share Tech Mono',monospace;font-size:27px;letter-spacing:2px;
-  color:var(--am);text-shadow:0 0 8px rgba(208,136,0,.35);margin-top:26px;
+  font-family:'Share Tech Mono',monospace;font-size:var(--fs-9);letter-spacing:2px;
+  color:var(--am);text-shadow:0 0 8px rgba(208,136,0,.35);margin-top:30px;
 }
 .s1 .venue{
-  font-family:'Share Tech Mono',monospace;font-size:13px;letter-spacing:5px;
-  color:var(--gr);margin-top:46px;
+  font-family:'Share Tech Mono',monospace;font-size:var(--fs-3);letter-spacing:5px;
+  color:var(--gr);margin-top:50px;
 }
 
 /* ---------- Chapter dividers ---------- */
 .divider{padding:64px 72px}
 .divider .chapter{
-  font-family:'Orbitron',sans-serif;font-weight:900;font-size:98px;letter-spacing:10px;
+  font-family:'Orbitron',sans-serif;font-weight:900;font-size:var(--fs-13);letter-spacing:10px;
   line-height:1.0;display:flex;align-items:center;
 }
 .divider .rule{
-  font-family:'Share Tech Mono',monospace;font-size:30px;letter-spacing:6px;
-  margin-top:30px;color:var(--am);text-shadow:0 0 10px rgba(208,136,0,.40);
+  font-family:'Share Tech Mono',monospace;font-size:var(--fs-9);letter-spacing:6px;
+  margin-top:32px;color:var(--am);text-shadow:0 0 10px rgba(208,136,0,.40);
 }
 .divider .tag{
-  font-family:'Share Tech Mono',monospace;font-size:21px;letter-spacing:3px;
-  color:var(--w);margin-top:34px;
+  font-family:'Share Tech Mono',monospace;font-size:var(--fs-7);letter-spacing:3px;
+  color:var(--w);margin-top:36px;
 }
 .d-factory .chapter{color:var(--a);text-shadow:var(--ga)}
 .d-factory .rule{color:var(--am)}
@@ -212,19 +252,19 @@ body.bg-cage,body.bg-cage .reveal{background:var(--bg-cage) !important}
 .d-quiet .rule{color:var(--gr)}
 
 /* ---------- Honesty frame ---------- */
-.frame-rows{display:flex;flex-direction:column;gap:14px;margin-top:26px;max-width:1300px}
+.frame-rows{display:flex;flex-direction:column;gap:15px;margin-top:26px;max-width:1800px}
 .frow{
   display:flex;align-items:center;gap:24px;padding:18px 26px;
   background:var(--bp);border:1px solid var(--bdr);
   font-family:'Share Tech Mono',monospace;
 }
 .frow .fname{
-  font-family:'Orbitron',sans-serif;font-weight:900;font-size:24px;letter-spacing:4px;
-  min-width:230px;color:var(--am);
+  font-family:'Orbitron',sans-serif;font-weight:900;font-size:var(--fs-7);letter-spacing:4px;
+  min-width:300px;color:var(--am);
 }
-.frow .fwhat{font-size:19px;letter-spacing:1.5px;color:var(--w);flex:1}
+.frow .fwhat{font-size:var(--fs-5);letter-spacing:1.5px;color:var(--w);flex:1}
 .frow .fstate{
-  font-family:'Orbitron',sans-serif;font-weight:700;font-size:16px;letter-spacing:3px;
+  font-family:'Orbitron',sans-serif;font-weight:700;font-size:var(--fs-3);letter-spacing:3px;
   padding:8px 18px;white-space:nowrap;
 }
 .frow.live{border-left:3px solid var(--g)}
@@ -234,62 +274,62 @@ body.bg-cage,body.bg-cage .reveal{background:var(--bg-cage) !important}
 .frow.rec .fname{color:var(--r-cage)}
 
 /* ---------- Rails ---------- */
-.rails{display:flex;flex-direction:column;gap:16px;margin-top:24px;max-width:1420px}
+.rails{display:flex;flex-direction:column;gap:16px;margin-top:24px;max-width:1800px}
 .rail{
   display:flex;gap:22px;padding:16px 24px;background:var(--bp);border-left:3px solid var(--a);
   font-family:'Share Tech Mono',monospace;
 }
 .rail .rnum{
-  font-family:'Orbitron',sans-serif;font-weight:900;font-size:22px;letter-spacing:2px;
-  color:var(--a);min-width:38px;
+  font-family:'Orbitron',sans-serif;font-weight:900;font-size:var(--fs-6);letter-spacing:2px;
+  color:var(--a);min-width:50px;
 }
-.rail .rtext{font-size:19px;letter-spacing:1.2px;color:var(--w);line-height:1.5}
+.rail .rtext{font-size:var(--fs-5);letter-spacing:1.2px;color:var(--w);line-height:1.45}
 .rail .rtext b{color:var(--a);font-weight:400}
 
 /* ---------- Two-scenario grid ---------- */
 .scenarios{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:24px}
 .scenario{padding:24px 28px;background:var(--bp);font-family:'Share Tech Mono',monospace}
 .scenario .stitle{
-  font-family:'Orbitron',sans-serif;font-weight:900;font-size:32px;letter-spacing:5px;
+  font-family:'Orbitron',sans-serif;font-weight:900;font-size:var(--fs-9);letter-spacing:5px;
   color:var(--r-cage);text-shadow:0 0 10px rgba(255,51,85,.45);margin-bottom:10px;
 }
-.scenario .stag{font-size:12px;letter-spacing:3px;color:var(--rm);margin-bottom:14px}
-.scenario .sbody{font-size:16px;letter-spacing:1px;color:var(--w);line-height:1.55}
+.scenario .stag{font-size:var(--fs-2);letter-spacing:3px;color:var(--rm);margin-bottom:14px}
+.scenario .sbody{font-size:var(--fs-5);letter-spacing:1px;color:var(--w);line-height:1.45}
 .scenario.solid{border:2px solid var(--r-cage)}
 .scenario.dashed{border:2px dashed var(--r-cage)}
 .scenario.dashed .stag{color:#ff7090}
 .same-line{
-  font-family:'Share Tech Mono',monospace;font-size:18px;letter-spacing:3px;
-  color:var(--w);margin-top:34px;
+  font-family:'Share Tech Mono',monospace;font-size:var(--fs-5);letter-spacing:3px;
+  color:var(--w);margin-top:30px;
 }
 
 /* ---------- Scorecard panel ---------- */
 .card{
   margin-top:26px;border:1px solid var(--bdr);background:var(--bp);
-  font-family:'Share Tech Mono',monospace;max-width:900px;
+  font-family:'Share Tech Mono',monospace;max-width:1280px;
 }
 .card .chdr{
-  padding:9px 18px;font-family:'Orbitron',sans-serif;font-weight:700;font-size:11px;
+  padding:9px 18px;font-family:'Orbitron',sans-serif;font-weight:700;font-size:var(--fs-1);
   letter-spacing:3px;color:var(--am);background:rgba(240,165,0,.04);
   border-bottom:1px solid var(--bdr);
 }
 .card .row{
   display:flex;justify-content:space-between;align-items:center;padding:12px 22px;
-  border-bottom:1px solid var(--bdr);font-size:17px;letter-spacing:2.5px;color:var(--w);
+  border-bottom:1px solid var(--bdr);font-size:var(--fs-5);letter-spacing:2.5px;color:var(--w);
 }
 .card .row:last-child{border-bottom:none}
 .card .row .cell{
-  color:#5a5a82;font-family:'Orbitron',sans-serif;font-weight:700;font-size:15px;letter-spacing:2px;
+  color:#5a5a82;font-family:'Orbitron',sans-serif;font-weight:700;font-size:var(--fs-3);letter-spacing:2px;
 }
 
 /* Two-column "on this path / on that path" split */
 .split{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:26px}
 .pane{padding:22px 26px;background:var(--bp);border:1px solid var(--bdr);font-family:'Share Tech Mono',monospace}
 .pane .ptitle{
-  font-family:'Orbitron',sans-serif;font-weight:700;font-size:17px;letter-spacing:3px;
+  font-family:'Orbitron',sans-serif;font-weight:700;font-size:var(--fs-4);letter-spacing:3px;
   margin-bottom:14px;color:var(--am);
 }
-.pane .pbody{font-size:18px;letter-spacing:1.2px;color:var(--w);line-height:1.6}
+.pane .pbody{font-size:var(--fs-5);letter-spacing:1.2px;color:var(--w);line-height:1.45}
 .pane.good{border-left:3px solid var(--g)}
 .pane.good .ptitle{color:var(--g)}
 .pane.bad{border-left:3px solid var(--r-cage)}
@@ -298,18 +338,18 @@ body.bg-cage,body.bg-cage .reveal{background:var(--bg-cage) !important}
 .pane.cool .ptitle{color:var(--p)}
 
 /* ---------- The five roles ---------- */
-.roles{display:flex;flex-direction:column;gap:11px;margin-top:20px;max-width:1440px}
+.roles{display:flex;flex-direction:column;gap:12px;margin-top:20px;max-width:1800px}
 .role-row{
   display:flex;align-items:center;gap:20px;padding:13px 22px;
   background:var(--bp);border-left:3px solid var(--p);font-family:'Share Tech Mono',monospace;
 }
 .role-row .rn{
-  font-family:'Orbitron',sans-serif;font-weight:900;font-size:20px;color:var(--p);min-width:34px;
+  font-family:'Orbitron',sans-serif;font-weight:900;font-size:var(--fs-6);color:var(--p);min-width:46px;
 }
-.role-row .rd{font-size:18px;letter-spacing:1.2px;color:var(--w);flex:1;line-height:1.45}
+.role-row .rd{font-size:var(--fs-5);letter-spacing:1.2px;color:var(--w);flex:1;line-height:1.4}
 .role-row .rw{
-  font-family:'Orbitron',sans-serif;font-weight:700;font-size:12px;letter-spacing:2px;
-  padding:6px 12px;white-space:nowrap;min-width:150px;text-align:center;
+  font-family:'Orbitron',sans-serif;font-weight:700;font-size:var(--fs-2);letter-spacing:2px;
+  padding:6px 12px;white-space:nowrap;min-width:200px;text-align:center;
 }
 .role-row.ran .rw{color:var(--g);border:1px solid var(--g);background:rgba(0,230,118,.05)}
 .role-row.skip{border-left-color:#4a4a68}
@@ -317,29 +357,29 @@ body.bg-cage,body.bg-cage .reveal{background:var(--bg-cage) !important}
 .role-row.skip .rw{color:#8080aa;border:1px solid #4a4a68}
 .counts{
   display:flex;gap:44px;margin-top:24px;font-family:'Share Tech Mono',monospace;
-  font-size:21px;letter-spacing:2px;color:var(--w);
+  font-size:var(--fs-6);letter-spacing:2px;color:var(--w);
 }
-.counts b{font-family:'Orbitron',sans-serif;font-weight:900;color:var(--p);font-size:26px;margin-right:10px}
+.counts b{font-family:'Orbitron',sans-serif;font-weight:900;color:var(--p);font-size:var(--fs-7);margin-right:10px}
 
 /* ---------- Quote block ---------- */
 .quote{
-  font-family:'Share Tech Mono',monospace;font-size:31px;letter-spacing:1.5px;
-  color:var(--w);line-height:1.55;margin-top:22px;border-left:3px solid var(--a);padding-left:26px;
+  font-family:'Share Tech Mono',monospace;font-size:var(--fs-9);letter-spacing:1.5px;
+  color:var(--w);line-height:1.45;margin-top:22px;border-left:3px solid var(--a);padding-left:26px;
 }
 .quote.cool{border-left-color:var(--p)}
 .quote.warn{border-left-color:var(--r-cage)}
-.quote .attrib{display:block;margin-top:16px;font-size:16px;letter-spacing:2.5px;color:var(--gr)}
+.quote .attrib{display:block;margin-top:16px;font-size:var(--fs-4);letter-spacing:2.5px;color:var(--gr)}
 
 /* ---------- Held-constant table ---------- */
-.const-rows{display:flex;flex-direction:column;gap:12px;margin-top:26px;max-width:1240px}
+.const-rows{display:flex;flex-direction:column;gap:13px;margin-top:26px;max-width:1740px}
 .crow2{
   display:flex;align-items:center;padding:15px 24px;background:var(--bp);
-  font-family:'Share Tech Mono',monospace;font-size:20px;letter-spacing:1.5px;
+  font-family:'Share Tech Mono',monospace;font-size:var(--fs-6);letter-spacing:1.5px;
 }
 .crow2 .clabel{flex:1;color:var(--w)}
 .crow2 .cstate{
-  font-family:'Orbitron',sans-serif;font-weight:700;font-size:14px;letter-spacing:3px;
-  padding:6px 16px;min-width:180px;text-align:center;
+  font-family:'Orbitron',sans-serif;font-weight:700;font-size:var(--fs-3);letter-spacing:3px;
+  padding:6px 16px;min-width:240px;text-align:center;
 }
 .crow2.fixed{border-left:3px solid var(--b)}
 .crow2.fixed .cstate{color:var(--b);border:1px solid var(--b);background:rgba(79,195,247,.05)}
@@ -349,7 +389,7 @@ body.bg-cage,body.bg-cage .reveal{background:var(--bg-cage) !important}
 /* ---------- The rising line: the SP1 visual argument ---------- */
 .chart{
   margin-top:22px;display:flex;align-items:flex-end;gap:16px;height:290px;
-  padding:22px 30px 0 30px;background:var(--bp);border:1px solid var(--bdr);max-width:1000px;
+  padding:22px 30px 0 30px;background:var(--bp);border:1px solid var(--bdr);max-width:1340px;
 }
 .chart .bar{
   flex:1;background:linear-gradient(180deg,var(--g),rgba(0,230,118,.12));
@@ -357,90 +397,88 @@ body.bg-cage,body.bg-cage .reveal{background:var(--bg-cage) !important}
 }
 .chart .bar .bl{
   position:absolute;bottom:-26px;left:0;right:0;text-align:center;
-  font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:1.5px;color:#5a5a82;
+  font-family:'Share Tech Mono',monospace;font-size:var(--fs-2);letter-spacing:1.5px;color:#5a5a82;
 }
 .verdicts{
-  margin-top:44px;font-family:'Share Tech Mono',monospace;font-size:18px;letter-spacing:2px;
+  margin-top:42px;font-family:'Share Tech Mono',monospace;font-size:var(--fs-5);letter-spacing:2px;
   color:var(--g);
 }
 .dash-two{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:start;margin-top:8px}
 
 /* ---------- Instrument list ---------- */
-.instr{display:flex;flex-direction:column;gap:13px;margin-top:22px;max-width:1440px}
+.instr{display:flex;flex-direction:column;gap:14px;margin-top:22px;max-width:1800px}
 .ins{
   display:flex;gap:22px;padding:14px 24px;background:var(--bp);border-left:3px solid var(--b);
   font-family:'Share Tech Mono',monospace;
 }
 .ins .iname{
-  font-family:'Orbitron',sans-serif;font-weight:900;font-size:18px;letter-spacing:3px;
-  color:var(--b);min-width:230px;
+  font-family:'Orbitron',sans-serif;font-weight:900;font-size:var(--fs-4);letter-spacing:3px;
+  color:var(--b);min-width:300px;
 }
-.ins .ibody{font-size:18px;letter-spacing:1.2px;color:var(--w);line-height:1.45;flex:1}
+.ins .ibody{font-size:var(--fs-5);letter-spacing:1.2px;color:var(--w);line-height:1.4;flex:1}
 
-/* ---------- Staged failures ---------- */
-.fails{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:24px}
-.fail{padding:20px 24px;background:var(--bp);border:1px solid var(--bdr);border-left:3px solid var(--r-cage);font-family:'Share Tech Mono',monospace}
-.fail .ftitle{
-  font-family:'Orbitron',sans-serif;font-weight:700;font-size:17px;letter-spacing:2.5px;
-  color:var(--r-cage);margin-bottom:10px;
-}
-.fail .fbody{font-size:16px;letter-spacing:1.1px;color:var(--w);line-height:1.5}
+/* The .fails / .fail block that lived here styled exactly one slide: the
+   staged both-outcomes grid that sat between the specimen and the close.
+   That slide was removed, these rules had no other user, and dead rules
+   in a deck somebody edits under time pressure are a trap. The beat is
+   unaffected. It runs on the demo tab, and the four staged briefs it
+   needs live in SPEAKER-NOTES.md rather than on a slide. */
 
 /* ---------- Close ---------- */
 .s-close .close-title{
-  font-family:'Orbitron',sans-serif;font-weight:900;font-size:56px;letter-spacing:5px;
+  font-family:'Orbitron',sans-serif;font-weight:900;font-size:var(--fs-12);letter-spacing:5px;
   color:var(--a);text-shadow:var(--ga);text-transform:lowercase;line-height:1.15;
 }
 .s-close .close-lines{
-  margin-top:40px;font-family:'Share Tech Mono',monospace;font-size:25px;letter-spacing:1.5px;
-  color:var(--w);line-height:1.9;
+  margin-top:42px;font-family:'Share Tech Mono',monospace;font-size:var(--fs-8);letter-spacing:1.5px;
+  color:var(--w);line-height:1.8;
 }
 .s-close .close-lines .l{display:block}
 .s-close .close-lines .l::before{content:'> ';color:var(--ad)}
 .s-close .close-tag{
-  margin-top:44px;font-family:'Share Tech Mono',monospace;font-size:26px;letter-spacing:1.5px;
+  margin-top:46px;font-family:'Share Tech Mono',monospace;font-size:var(--fs-9);letter-spacing:1.5px;
   color:var(--a);text-shadow:var(--ga);
 }
 
 /* ---------- Back-pocket recap slides ---------- */
 .recap .recap-title{
-  font-family:'Orbitron',sans-serif;font-weight:900;font-size:30px;letter-spacing:4px;
+  font-family:'Orbitron',sans-serif;font-weight:900;font-size:var(--fs-9);letter-spacing:4px;
   color:var(--a);text-shadow:var(--ga);
 }
 .recap .recap-sub{
-  font-family:'Share Tech Mono',monospace;font-size:14px;letter-spacing:2px;color:var(--am);margin-top:6px;
+  font-family:'Share Tech Mono',monospace;font-size:var(--fs-3);letter-spacing:2px;color:var(--am);margin-top:8px;
 }
 .pbar{display:flex;margin-top:26px;border:1px solid var(--bdr);background:var(--bp)}
 .pbar .pcell{
   flex:1;padding:16px 6px;text-align:center;font-family:'Share Tech Mono',monospace;
-  font-size:14px;letter-spacing:2px;color:#484870;border-right:1px solid var(--bdr);
-  line-height:1.4;min-height:84px;display:flex;flex-direction:column;justify-content:center;
+  font-size:var(--fs-3);letter-spacing:2px;color:#484870;border-right:1px solid var(--bdr);
+  line-height:1.4;min-height:108px;display:flex;flex-direction:column;justify-content:center;
 }
 .pbar .pcell:last-child{border-right:none}
-.pbar .pcell .pn{display:block;font-size:11px;color:#606090;margin-bottom:6px;letter-spacing:1.5px}
+.pbar .pcell .pn{display:block;font-size:var(--fs-1);color:#606090;margin-bottom:6px;letter-spacing:1.5px}
 .pbar .pcell.named{color:var(--a);background:rgba(240,165,0,.025)}
 .pbar .pcell.named .pn{color:var(--ad)}
 .artifact-pill{
   margin-top:32px;display:inline-block;padding:13px 24px;border:1px solid var(--a);
   background:rgba(240,165,0,.05);color:var(--a);font-family:'Share Tech Mono',monospace;
-  font-size:18px;letter-spacing:2.5px;width:max-content;max-width:100%;
+  font-size:var(--fs-5);letter-spacing:2.5px;width:max-content;max-width:100%;
 }
 .cphases{display:flex;flex-direction:column;margin-top:26px;border:1px solid var(--bdr);background:var(--bp)}
 .cphases .crow{display:flex}
 .cphases .crow .pcell{
   flex:1;padding:13px 4px;text-align:center;font-family:'Share Tech Mono',monospace;
-  font-size:14px;letter-spacing:2px;border-right:1px solid var(--bdr);
+  font-size:var(--fs-3);letter-spacing:2px;border-right:1px solid var(--bdr);
 }
 .cphases .crow .pcell:last-child{border-right:none}
 .cphases .crow.red .pcell{color:#c04050;background:rgba(255,51,85,.04)}
 .cphases .crow.blue .pcell{color:var(--blm);background:rgba(26,122,208,.05)}
-.cphases .crow .pn{display:block;font-size:10px;color:#5a5a82;margin-bottom:4px;letter-spacing:1.5px}
+.cphases .crow .pn{display:block;font-size:var(--fs-0);color:#5a5a82;margin-bottom:4px;letter-spacing:1.5px}
 .cphases .vdiv{height:2px;background:linear-gradient(90deg,var(--r-cage),var(--blm));opacity:.5}
 
 /* ---------- Operator HUD ---------- */
 #hud{
   position:fixed;top:14px;right:14px;z-index:10000;display:flex;gap:8px;
-  font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1.5px;
+  font-family:'Share Tech Mono',monospace;font-size:var(--fs-0);letter-spacing:1.5px;
   color:#3f3f5e;pointer-events:none;opacity:0;transition:opacity .15s;
 }
 #hud.show{opacity:1}
@@ -450,7 +488,7 @@ body.bg-cage,body.bg-cage .reveal{background:var(--bg-cage) !important}
 #goto{
   position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:10001;
   padding:10px 18px;background:#0a0a14;border:1px solid var(--am);color:var(--am);
-  font-family:'Share Tech Mono',monospace;font-size:14px;letter-spacing:2px;
+  font-family:'Share Tech Mono',monospace;font-size:var(--fs-3);letter-spacing:2px;
   display:none;box-shadow:var(--ga);
 }
 #goto.show{display:block}

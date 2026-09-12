@@ -42,8 +42,16 @@ gets spent is set out under "Questions cost five to ten minutes".
 | 0:25 to 0:30 | Demo three: the recording, and the disclosure | `s7-recording`, `s8-refusal` | **VERBATIM** |
 | 0:30 to 0:42 | The teardown: who scores, who rewrites, what is held still | `s9` to `s14` | CUE, two verbatim lines |
 | 0:42 to 0:50 | The failure mode that worries me most | `s15` to `s18` | **VERBATIM** |
-| 0:50 to 0:57 | The briefs: the one that worked and the one that broke it | `s19-briefs` | CUE, staged in advance |
+| 0:50 to 0:57 | The briefs: the one that worked and the one that broke it | none. you are on the demo tab | CUE, staged in advance |
 | 0:57 to 1:00 | Close | `s20-close` | CUE |
+
+⚠ **The brief beat at 0:50 has no slide of its own and that is deliberate.** It used to
+have one, listing the four staged failures, and it was removed: the beat is seven minutes
+of live demo, and a slide repeating a list you are already showing on the demo tab is a
+slide competing with you. **Do not advance out of the specimen at 0:50.** Either leave the
+specimen up or press `b` to black the screen while you work the demo tab, and advance to
+the close at 0:57. Pressing forward at 0:50 puts the close on the screen seven minutes
+early, which is the one way to get this wrong.
 
 Questions will arrive during the demos in a village room. Take them. The brief beat at
 0:50 is where the room gets to drive, so questions that come early can be parked there.
@@ -565,7 +573,10 @@ the improvement number on screen is not evidence, and do not display a delta.
 
 ## 0:50 to 0:57. The briefs, both outcomes [CUE, staged]
 
-Slide: `s19-briefs`.
+Slide: none. This beat runs on the demo tab, not on the deck. Leave the specimen up or
+press `b` to black the screen, and do not press forward until 0:57. **The four staged
+failures below are the beat. They live here and nowhere else, so read this section before
+you travel rather than expecting a slide to remind you on the day.**
 
 The closing sentence of the published description commits the talk to showing the briefs
 the factory does well on and the ones where it fails. **The failure has to be as available
@@ -577,7 +588,7 @@ right that you would not have thought of. If the room's brief came out weak, say
 is data too.
 
 **The failure half. Stage these before the talk. Do not improvise this beat.** Four
-things in your pocket, and they are the four on the slide:
+things in your pocket:
 
 1. **A brief that dies at the rails.** Something that names a real third-party target. The
    factory refuses, and you get to show a refusal working correctly. This pays the rails
@@ -840,7 +851,9 @@ you is where the room gets to drive.
       arithmetic difference of the other two. The narrowing direction came off the same
       day, because it rested on the same comparison the figures came from. **Do not let any
       of it back onto the card and do not let it onto a screen.** The card stays numberless.
-- [ ] **Stage the four failure briefs**, including the recorded failure run on disk.
+- [ ] **Stage the four failure briefs**, including the recorded failure run on disk. This
+      beat has no slide behind it, so this checklist item and the 0:50 section are the only
+      place the four are written down.
 - [ ] **Decide the access path and stick to it.** Do not name a provider, a subscription
       tier or a cost from the stage.
 - [ ] **Check the deck opens on the machine you are presenting from.** Double-click

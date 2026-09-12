@@ -20,7 +20,7 @@ verdict is that the rewrite made things worse. That verdict is allowed to stand.
 
 | File | What it is |
 |---|---|
-| `slides/index.html` | The deck. Twenty slides plus four back-pocket slides. |
+| `slides/index.html` | The deck. Nineteen slides plus four back-pocket slides. |
 | `slides/css/deck.css` | Deck styling, with both typefaces embedded inside it. |
 | `slides/lib/reveal.js/` | reveal.js 5.1.0, local copy. Three files. |
 | `SPEAKER-NOTES.md` | The run sheet, the minute budget, the passages that get said as written, the cut order, and the questions this talk invites. |
@@ -88,7 +88,9 @@ is simply gone. It is the longest fixed passage in the hour and it is never cut.
 **The staged failures at 0:50.** The description commits the talk to showing the briefs
 the factory handles and the ones that break it. The failure half does not reliably happen
 on its own, so it is staged in advance rather than hoped for. Four of them, listed in the
-notes, and one of them is a recording on disk as insurance.
+notes, and one of them is a recording on disk as insurance. **This beat has no slide.** It
+is seven minutes on the demo tab, so the notes are the only place the four are written
+down, and the deck stays on the specimen or blacked out until the close at 0:57.
 
 ---
 
