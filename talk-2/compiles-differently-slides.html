@@ -451,10 +451,17 @@ section[data-i="17"] ol.prac li{padding-top:9px;padding-bottom:9px}
 .stail{margin-top:84px;font-size:24px;line-height:1.55;color:var(--a);text-align:center}
 
 /* ---- S10c: the worked example ----
+   ⚠ DELIVERY ORDER CHANGED 2026-09-11. Move 10 now runs the split drawing, then
+   this worked example, then the origin note, so the quotation's "this bug" points
+   at a defect the room has already been shown. The surfaces were renumbered with
+   it: S10b is data-i 12, S10c is data-i 13, S10a is data-i 14. The selector below
+   followed. The deck's scripting keys off DOM order and not off data-i, so the
+   index, the reveal levels and the jump-to-slide box need nothing. Only CSS and
+   this stylesheet's own prose key off the number.
    Two transcribed blocks and NOTHING else: no kicker, no header, no caption,
    no slide index. The 75-character line sets a hard horizontal cap, so the
    surface buys its scale back in whitespace, which is the only lever left. */
-section[data-i="14"]{padding:78px 56px 74px 56px}
+section[data-i="13"]{padding:78px 56px 74px 56px}
 section.slide.nox.on ~ .idx{display:none}
 /* The border drops to the ornament token. The pre.code default border is
    harmless everywhere else because a kicker or a header anchors the eye first;
@@ -646,8 +653,8 @@ exit $?                            <span class="cmt"># always 0</span></pre>
   <div class="grow"></div>
   <div class="live">
     <div class="num">5</div>
-    <div class="ask sm">How do people skip it, and how many did?</div>
-    <div class="hint">Almost every real control has an official way around it, like a ticket or a break-glass account. If a lot of people used it last quarter, it is not covering that work. If there is none, say when somebody last tried.</div>
+    <div class="ask sm">Who or what skips it, and how often?</div>
+    <div class="hint">Almost every real control has an official way around it, like a ticket or a break-glass account. If a lot of traffic went that way last quarter, it is not covering that work. If there is none, say when it was last tried.</div>
     <div class="chip">a way around and a number, or "there is none" and a date</div>
   </div>
 </section>
@@ -660,7 +667,7 @@ exit $?                            <span class="cmt"># always 0</span></pre>
       <td class="cn">1</td>
       <td class="cc"><b>Q1. Name the thing that runs it.</b> A document. A policy, a standard, a runbook, a wiki page, a training deck.</td>
       <td class="cv">DESCRIPTION</td>
-      <td class="cm">It tells people what to do. Nothing happens if they do not. Documents are useful. They are not controls.</td>
+      <td class="cm">It tells people or agents what to do. Nothing happens if they do not. Documents are useful. They are not controls.</td>
     </tr>
     <tr>
       <td class="cn">2</td>
@@ -731,33 +738,6 @@ exit $?                            <span class="cmt"># always 0</span></pre>
 
 <!-- 12 -->
 <section class="slide" data-i="12">
-  <h2 style="margin-bottom:20px">No control type tests where the instrument points.</h2>
-  <div class="q-label">MY SYSTEM'S NOTE ABOUT A REGEX ERROR THAT CUTS TO THE HEART OF IT:</div>
-  <div class="lq">★ That's the real durable, and it's bigger than this bug: our entire control discipline — positive plus null — tests whether the instrument <i>works</i>. It cannot test whether the instrument is <i>pointed at the right thing</i>. We have no control type for that. A bounds control would be a third kind: assert the final block contains no foreign section header, or that block lengths plus preamble equal file length, or flag when the last block is wildly larger than the median.</div>
-  <div class="small" style="margin-bottom:12px">Quoted as written. It proposed three. I killed the struck ones by measuring them.</div>
-  <div class="shp">
-    <div class="shp-row">
-      <div class="shp-n"><s>Byte conservation</s></div>
-      <div class="shp-x">Passes by construction.</div>
-      <div class="shp-t">A bad split misassigns bytes. It does not lose them.</div>
-    </div>
-    <div class="shp-row">
-      <div class="shp-n"><s>Outsized block</s></div>
-      <div class="shp-x">Wrong in either direction.</div>
-      <div class="shp-t">Quiet on real instances of the defect. Loud on something that was not one.</div>
-    </div>
-    <div class="shp-row keep">
-      <div class="shp-n">Foreign section header</div>
-      <div class="shp-x">Survives.</div>
-      <div class="shp-t">The only one that looks at something the splitter does not own.</div>
-    </div>
-  </div>
-  <div class="grow"></div>
-  <div class="inv" style="font-size:25px">The ones that died compute over the split's own output. They share its premises. They are controls.</div>
-</section>
-
-<!-- 13 -->
-<section class="slide" data-i="13">
   <div class="kicker" style="margin-bottom:20px">N HEADERS. N PLUS ONE PIECES.</div>
   <h2 style="margin-bottom:26px">A record's end is never written down.</h2>
   <div class="splitwrap">
@@ -783,8 +763,8 @@ exit $?                            <span class="cmt"># always 0</span></pre>
   </div>
 </section>
 
-<!-- 14 -->
-<section class="slide nox" data-i="14">
+<!-- 13 -->
+<section class="slide nox" data-i="13">
   <div class="grow"></div>
   <pre class="code xc">ITEM-0001: bytes=  51   contains '## Closed'=False
 ITEM-0002: bytes= 124   contains '## Closed'=True      <span class="acc">&lt;- absorbed the tail</span></pre>
@@ -792,6 +772,33 @@ ITEM-0002: bytes= 124   contains '## Closed'=True      <span class="acc">&lt;- a
   <pre class="code xc">UNCLIPPED (the bug) : ['ITEM-0002 [owner]', 'ITEM-0002 [Status:]']
 CLIPPED   (correct) : []</pre>
   <div class="grow"></div>
+</section>
+
+<!-- 14 -->
+<section class="slide" data-i="14">
+  <h2 style="margin-bottom:20px">No control type tests where the instrument points.</h2>
+  <div class="q-label">MY SYSTEM'S NOTE ABOUT THE REGEX ERROR THAT CUTS TO THE HEART OF IT:</div>
+  <div class="lq">★ That's the real durable, and it's bigger than this bug: our entire control discipline — positive plus null — tests whether the instrument <i>works</i>. It cannot test whether the instrument is <i>pointed at the right thing</i>. We have no control type for that. A bounds control would be a third kind: assert the final block contains no foreign section header, or that block lengths plus preamble equal file length, or flag when the last block is wildly larger than the median.</div>
+  <div class="small" style="margin-bottom:12px">Quoted as written. It proposed three. I killed the struck ones by measuring them.</div>
+  <div class="shp">
+    <div class="shp-row">
+      <div class="shp-n"><s>Byte conservation</s></div>
+      <div class="shp-x">Passes by construction.</div>
+      <div class="shp-t">A bad split misassigns bytes. It does not lose them.</div>
+    </div>
+    <div class="shp-row">
+      <div class="shp-n"><s>Outsized block</s></div>
+      <div class="shp-x">Wrong in either direction.</div>
+      <div class="shp-t">Quiet on real instances of the defect. Loud on something that was not one.</div>
+    </div>
+    <div class="shp-row keep">
+      <div class="shp-n">Foreign section header</div>
+      <div class="shp-x">Survives.</div>
+      <div class="shp-t">The only one that looks at something the splitter does not own.</div>
+    </div>
+  </div>
+  <div class="grow"></div>
+  <div class="inv" style="font-size:25px">The ones that died compute over the split's own output. They share its premises. They are controls.</div>
 </section>
 
 <!-- 15 -->
@@ -873,7 +880,7 @@ CLIPPED   (correct) : []</pre>
   <div class="cq"><div class="n">2</div><div><div class="t">Who has to remember?</div><div class="a">For it to happen on the next change. &nbsp;/&nbsp; a name, a role, or "nobody"</div></div></div>
   <div class="cq"><div class="n">3</div><div><div class="t">Name the last time it caught something.</div><div class="a">The month, and what it stopped in three words. <b>"It is always green" is not a month.</b> &nbsp;/&nbsp; a month and three words, or "never observed"</div></div></div>
   <div class="cq"><div class="n">4</div><div><div class="t">I delete it tonight. What tells you?</div><div class="a">Silently, and your config looks unchanged. The first thing that tells you, and how long. &nbsp;/&nbsp; one signal and one number, or "nothing"</div></div></div>
-  <div class="cq gate"><div class="n">5</div><div><div class="t">Only if the first four are clean: how do people skip it, and how many did?</div><div class="a">Almost every real control has one, like a ticket or a break-glass account. If a lot of people used it, it is not covering that work. &nbsp;/&nbsp; a way around and a number, or "there is none" and a date</div></div></div>
+  <div class="cq gate"><div class="n">5</div><div><div class="t">Only if the first four are clean: who or what skips it, and how often?</div><div class="a">Almost every real control has one, like a ticket or a break-glass account. If a lot of traffic went that way, it is not covering that work. &nbsp;/&nbsp; a way around and a number, or "there is none" and a date</div></div></div>
   <div class="grow"></div>
   <div class="cardfoot">Run it on your second control this week. That is the one where it hurts.</div>
 </section>
@@ -892,13 +899,13 @@ CLIPPED   (correct) : []</pre>
       <div class="cq"><div class="n">2</div><div><div class="t">Who has to remember?</div><div class="a">A name, a role, or "nobody."</div></div></div>
       <div class="cq"><div class="n">3</div><div><div class="t">Name the last time it caught something.</div><div class="a">A month and three words, or "never observed." <b>"It is always green" is not a month.</b></div></div></div>
       <div class="cq"><div class="n">4</div><div><div class="t">I delete it tonight. What tells you?</div><div class="a">One signal and one number, or "nothing."</div></div></div>
-      <div class="cq gate"><div class="n">5</div><div><div class="t">Only if 1 to 4 are clean: how do people skip it, and how many did?</div><div class="a">A way around and a number, or "there is none" and a date.</div></div></div>
+      <div class="cq gate"><div class="n">5</div><div><div class="t">Only if 1 to 4 are clean: who or what skips it, and how often?</div><div class="a">A way around and a number, or "there is none" and a date.</div></div></div>
       <div class="cardfoot">Run it on your second control this week.</div>
     </div>
     <div>
       <div class="panel-h">FIRST HIT WINS</div>
       <table class="casc">
-        <tr><td class="cn">1</td><td class="cv">DESCRIPTION</td><td class="cm">Q1 is a document. It tells people what to do. Nothing happens if they do not.</td></tr>
+        <tr><td class="cn">1</td><td class="cv">DESCRIPTION</td><td class="cm">Q1 is a document. It tells people or agents what to do. Nothing happens if they do not.</td></tr>
         <tr><td class="cn">2</td><td class="cv">PRACTICE</td><td class="cm">Q2 is a person. It fires when somebody chooses. As reliable as that person on their worst day.</td></tr>
         <tr><td class="cn">3</td><td class="cv">UNEXERCISED</td><td class="cm">Q3 has no month. It runs, and you cannot produce one occasion on which it told a bad case from a good one.</td></tr>
         <tr><td class="cn">4</td><td class="cv">UNWITNESSED</td><td class="cm">Q4 is "nothing," or somebody choosing to go and look. You would not know the day it stopped.</td></tr>
@@ -1037,8 +1044,8 @@ CLIPPED   (correct) : []</pre>
       '<div class="pq"><div class="pt">4. I delete it tonight. What tells you?</div>'+
         '<div class="ph">Silently. Your config looks unchanged. The first thing that tells you it is gone, and how long that takes.</div>'+
         '<div class="pa">one signal and one number, or "nothing"</div><div class="wl"></div></div>'+
-      '<div class="pq"><div class="pt">5. Only if 1 to 4 are clean: how do people skip it, and how many did?</div>'+
-        '<div class="ph">Almost every real control has an official way around it, like a ticket or a break-glass account. If a lot of people used it last quarter, it is not covering that work. If there is none, say when somebody last tried.</div>'+
+      '<div class="pq"><div class="pt">5. Only if 1 to 4 are clean: who or what skips it, and how often?</div>'+
+        '<div class="ph">Almost every real control has an official way around it, like a ticket or a break-glass account. If a lot of traffic went that way last quarter, it is not covering that work. If there is none, say when it was last tried.</div>'+
         '<div class="pa">a way around and a number, or "there is none" and a date</div><div class="wl"></div></div>'+
       '<div class="pc-ft">Verdict on the back. Run it on your second control this week. That is the one where it hurts.</div>'+
     '</div>';
@@ -1047,7 +1054,7 @@ CLIPPED   (correct) : []</pre>
     '<div class="pc">'+
       '<div class="pc-hd"><p><b>First hit wins. No averaging. No partial credit.</b> Read down and stop at the first line that matches what you wrote.</p></div>'+
       '<table>'+
-        '<tr><td class="k">1</td><td class="v">DESCRIPTION</td><td>Q1 names a document. A policy, a standard, a runbook, a wiki page, a training deck. It tells people what to do. Nothing happens if they do not. Documents are useful. They are not controls.</td></tr>'+
+        '<tr><td class="k">1</td><td class="v">DESCRIPTION</td><td>Q1 names a document. A policy, a standard, a runbook, a wiki page, a training deck. It tells people or agents what to do. Nothing happens if they do not. Documents are useful. They are not controls.</td></tr>'+
         '<tr><td class="k">2</td><td class="v">PRACTICE</td><td>Q2 names a person or a role. Anything that is not the word "nobody." It fires when a person chooses, and it is exactly as reliable as that person on their worst day, in their worst week, under their worst deadline. That may be fine. It is not what you called it.</td></tr>'+
         '<tr><td class="k">3</td><td class="v">UNEXERCISED</td><td>Q3 has no month in it. It runs, and you cannot produce one occasion on which it told a bad case from a good one. Either nothing ever asked it a question it could get wrong, or something did and you cannot get at it. From where you are sitting those are the same thing. You know it is green. You do not know it discriminates.</td></tr>'+
         '<tr><td class="k">4</td><td class="v">UNWITNESSED</td><td>Q4 says "nothing," or the signal named is somebody choosing to go and look. An audit. A review. A quarterly. It runs, it has caught things, and you would not know the day it stopped. Everything you believe about it is a fact about its past.</td></tr>'+
