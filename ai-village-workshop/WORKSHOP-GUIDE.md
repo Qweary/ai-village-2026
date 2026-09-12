@@ -60,14 +60,14 @@ Wants everything on their own hardware, or is offline → OLLAMA.
 There is **no third-party gateway option**. Every live path talks either to a
 vendor the attendee chose or to a process on their own machine.
 
-The provider selector is grouped by ACCESS METHOD, not by vendor: the two
-workshop paths (CLAUDE CODE, which is a subscription reached through the local
-relay, and OLLAMA, which is a model on the attendee's own machine) sit together
-and are selectable at full weight. Below them, under a heading reading NOT A
-WORKSHOP PATH, a dimmed `anthropic api key` button posts directly to a vendor
-API with a key the attendee supplies. **It is not one of the three supported
-paths and no part of this workshop uses it.** If an attendee asks, say that. Do
-not walk them into it, and do not ask anyone for a key.
+The provider selector is grouped by ACCESS METHOD, not by vendor, and offers
+exactly two live paths: CLAUDE CODE, which is a subscription reached through the
+local relay, and OLLAMA, which is a model on the attendee's own machine. Recorded
+mode is the third supported way to run and makes no model call at all.
+**There is no direct-API-key option.** It was removed, along with every key field
+and every stored key. If an attendee asks about using their own vendor key, the
+answer is that this package no longer has that path. Do not ask anyone for a
+key, and do not tell anyone to add one.
 
 ---
 
@@ -84,12 +84,12 @@ Use DEMO MODE to observe the workflow, understand the phases, or present to an a
 
 ## Common Error Messages and Fixes
 
-**"Invalid API key" / "HTTP 401"**
-→ Your key is wrong or expired. Re-paste it, and check that the highlighted provider button is the one you meant.
-
-**"Insufficient credits" / "HTTP 402"**
-→ Reached only on the direct-vendor button, which is not one of the three
-supported paths. Switch to CLAUDE CODE, OLLAMA, or recorded mode.
+**"HTTP 401" / a prompt asking for the relay access token**
+→ On the CLAUDE CODE path this is the relay refusing a request that did not
+present its token. The relay prints the token when it starts, along with a
+ready-made demo link containing it. Open the demo with that link, or paste the
+token when the demo asks. No vendor API key is involved anywhere in this
+package.
 
 **`UNCLASSIFIED FAILURE` with a raw message of `Failed to fetch` (Chrome) or
 `NetworkError when attempting to fetch resource` (Firefox), on the CLAUDE CODE
@@ -170,7 +170,7 @@ The three demos share the **provider choice** (`swarmdemo_provider`) and the **O
 
 ## What to Do When Stuck
 
-1. **Check DEMO MODE first** — if the workflow looks broken, switch to DEMO MODE to confirm the UI works correctly. If demo mode works but live mode doesn't, the issue is your API key or provider.
+1. **Check DEMO MODE first** — if the workflow looks broken, switch to DEMO MODE to confirm the UI works correctly. If demo mode works but live mode doesn't, the issue is the path you picked: the relay is not running, or Ollama is not running or refused the page's origin.
 
 2. **Check the browser console** — press F12 → Console. Error messages there are usually more specific than what the demo UI shows.
 

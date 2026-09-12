@@ -231,23 +231,13 @@ prefix:
   demo (the swarm name and agent codenames you just built, nothing else)
 - `swarmdemo_loop_source`, `swarmdemo_loop_export` — the hand-off between the
   cage and loop demos
-- `swarmdemo_factory_key`, `swarmdemo_cage_key`, `swarmdemo_loop_key` — present
-  only if you typed something into a key field, which none of the three paths
-  above asks you to do
+
+None of the three supported paths asks you for a key, and there is no longer any
+key field to type one into. If you used an earlier build of this package and it
+saved a vendor API key, the demos now delete that key from your browser storage
+the next time you open any of them; you do not have to find it yourself.
 
 **To remove everything:** browser DevTools → Application → Local Storage →
 delete every key beginning with `swarmdemo_`. That is the complete list.
 Nothing is written anywhere else and nothing is sent off your machine except
 the model calls on the path you chose.
-
----
-
-## One button the three paths do not use
-
-Below the two workshop paths, under a heading that says it is not a workshop
-path, sits a dimmed button labelled `anthropic api key` (just `api key` in the
-cage and loop demos). It posts directly to a vendor API with a key you supply.
-**It is not one of the three paths, no part of this workshop uses it, and
-nothing here asks you for a key.** It is left in place for people who already
-have their own key and prefer it. If that is not you, ignore it. The two
-workshop paths are grouped above it, and one of them is already selected.

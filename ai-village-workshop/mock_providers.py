@@ -1,27 +1,45 @@
 """
 mock_providers.py — Playwright page.route() mocks for LIVE-mode flows.
 
-Exercises every provider path (Anthropic direct, CLAUDE CODE
-relay, Ollama) without spending real API budget. The
-mocks intercept the demo's outbound fetch() at the network layer and return
-shape-accurate canned responses — same JSON keys, same SSE frame layout the
-demo's parser actually consumes. If the demo's call shape regresses (e.g.
-forgets `x-api-key` on Anthropic, omits the
-SSE `Accept:` header on CLAUDE CODE), the test that uses the corresponding
-asserter will fail.
+WHAT THIS IS, AND WHAT IT IS NOT
+--------------------------------
+This is a test HELPER, not something you run and not something the demos need.
+Nothing in this package imports it, and the test suite it was written for is
+NOT shipped here: there is no conftest.py, no test_*.py and no runner beside
+it. On its own it does nothing.
+
+To use it you need a checkout that contains those tests, plus `pytest`,
+`pytest-playwright` and an installed Playwright browser. Without
+`pytest-playwright` the `safe_page` and `demo_url` fixtures below do not
+exist and every test that takes one errors at setup.
+
+If you only want to run the demos with no model access, you do not want this
+file. Use the demos' own DEMO MODE button, which is pre-scripted playback and
+makes no network call at all.
+
+WHAT IT DOES
+------------
+Exercises both live provider paths (CLAUDE CODE relay, Ollama) without
+spending real API budget. The mocks intercept the demo's outbound fetch() at
+the network layer and return shape-accurate canned responses — same JSON keys,
+same SSE frame layout the demo's parser actually consumes. If the demo's call
+shape regresses (e.g. omits the SSE `Accept:` header on CLAUDE CODE, or the
+`model` field on Ollama), the test that uses the corresponding asserter fails.
+
+There is no mock for a direct vendor API. That provider path was removed from
+all three demos, along with its button, its key field and its stored key, so
+there is no longer an outbound request of that shape to intercept.
 
 Usage pattern:
 
     from mock_providers import (
-        mock_anthropic, mock_ollama,
-        mock_cc_relay_sse, spawn_relay_with_stub_claude,
+        mock_ollama, mock_cc_relay_sse, spawn_relay_with_stub_claude,
     )
 
-    def test_forge_anthropic_live(safe_page, demo_url):
-        mock_anthropic(safe_page, content="canned forge phase output")
+    def test_forge_cc_live(safe_page, demo_url):
+        mock_cc_relay_sse(safe_page, deltas=["canned ", "forge ", "output"])
         safe_page.goto(demo_url('swarm-factory-live.html'), wait_until='domcontentloaded')
-        safe_page.locator('#prv-ant').click()
-        safe_page.locator('#ak').fill('sk-ant-test')
+        safe_page.locator('#prv-cc').click()
         safe_page.locator('#ibtn').click()
         ...
 
@@ -41,70 +59,6 @@ import textwrap
 import time
 from contextlib import contextmanager
 from pathlib import Path
-
-# ─────────────────────────────────────────────────────────────────────────
-# Anthropic direct (operator's default workflow)
-# ─────────────────────────────────────────────────────────────────────────
-
-def mock_anthropic(page, *, content: str = 'OK', status: int = 200,
-                   capture: list | None = None,
-                   error_message: str | None = None,
-                   malformed: bool = False):
-    """Stub api.anthropic.com/v1/messages.
-
-    The demo's `callAnthropic` reads `(await r.json()).content[0].text`.
-    Our canned response matches that shape. If `capture` is supplied
-    (a list), every intercepted request appends a dict with `url`,
-    `headers` (lower-cased keys), and `body` (parsed JSON or raw bytes).
-
-    `malformed=True` forces a response with no `content[0].text` field
-    so the demo's catch block fires (covered by the "malformed response
-    surfaces recovery banner" test).
-    """
-    def handler(route):
-        req = route.request
-        if capture is not None:
-            try:
-                body = json.loads(req.post_data or '{}')
-            except Exception:
-                body = req.post_data
-            capture.append({
-                'url': req.url,
-                'headers': {k.lower(): v for k, v in (req.headers or {}).items()},
-                'body': body,
-            })
-        if status >= 400:
-            payload = {'error': {'message': error_message or f'HTTP {status}'}}
-            route.fulfill(
-                status=status,
-                content_type='application/json',
-                body=json.dumps(payload),
-            )
-            return
-        if malformed:
-            # No content[] at all — the demo's `(json).content[0].text`
-            # access throws a TypeError caught by the per-phase recovery.
-            route.fulfill(
-                status=200,
-                content_type='application/json',
-                body=json.dumps({'role': 'assistant'}),
-            )
-            return
-        route.fulfill(
-            status=200,
-            content_type='application/json',
-            body=json.dumps({
-                'id': 'msg_mock',
-                'type': 'message',
-                'role': 'assistant',
-                'content': [{'type': 'text', 'text': content}],
-                'model': 'claude-sonnet-4-6',
-                'stop_reason': 'end_turn',
-            }),
-        )
-
-    page.route('**/api.anthropic.com/v1/messages**', handler)
-
 
 # ─────────────────────────────────────────────────────────────────────────
 # Ollama (local fallback)

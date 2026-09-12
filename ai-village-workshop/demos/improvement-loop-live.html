@@ -278,8 +278,6 @@ body.pmode .tier-note{font-size:12px}
 .prv-mini.sel{border-color:var(--amb);color:var(--amb);background:rgba(255,188,0,.06)}
 .prv-mini:hover:not(.sel){border-color:#6060a0;color:#8080c0}
 .prv-axis-i{font-size:8px;color:#5a5a80;letter-spacing:2px;white-space:nowrap}
-.prv-mini-alt{opacity:.5;font-size:9px;text-transform:lowercase}
-.prv-mini-alt:hover,.prv-mini-alt.sel{opacity:1}
 .apifield{background:var(--bi);border:1px solid var(--bdr);color:var(--amb);font-family:'Share Tech Mono',monospace;font-size:11px;padding:5px 9px;outline:none;width:230px}
 .apifield:focus{border-color:var(--gr)}
 .mdl-inp{background:var(--bi);border:1px solid var(--bdr);color:var(--amb);font-family:'Share Tech Mono',monospace;font-size:10px;padding:4px 7px;outline:none;width:200px;display:none}
@@ -621,10 +619,6 @@ body.pmode .ibtn,body.pmode .startbtn,body.pmode .begin-btn{min-height:48px}
     <button class="prv-mini" id="eprv-ollama" onclick="setEvolveProvider('ollama')" title="A model running on this machine. No account and no network needed. This is a workshop path.">OLLAMA</button>
     <span id="eollama-note" class="tier-note" style="display:none;color:#4fc3f7;letter-spacing:1px;font-family:'Share Tech Mono',monospace">⚡ LOCAL</span>
     <input class="mdl-inp" type="text" id="e-ollama-model" placeholder="llama3.2" style="display:none"/>
-    <div class="bsep"></div>
-    <button class="prv-mini prv-mini-alt" id="eprv-ant" onclick="setEvolveProvider('anthropic')" title="A direct vendor API key, billed to you. The workshop does not use this, and you do not need it.">api key</button>
-    <input type="password" class="apifield" id="eak" placeholder="Anthropic API Key (sk-ant-...)"/>
-    <div id="eak-conf" style="display:none"><div class="kconf-btm">KEY CONFIGURED <span class="kc-clear" onclick="clearEvolveKey()" title="Clear saved key">×</span></div></div>
   </div>
   <div class="btm-row btm-actions">
     <button class="startbtn go-btn" id="run-btn" onclick="runImprovementCycle()" disabled>[ ⚛ RUN CYCLE ]</button>
@@ -1292,8 +1286,26 @@ let stepMode = false;
 // could see that it did nothing.
 let evolveProvider = localStorage.getItem('swarmdemo_provider');
 if(evolveProvider==='local'){evolveProvider='cc';localStorage.setItem('swarmdemo_provider','cc');}
-evolveProvider = ['anthropic','cc','ollama'].includes(localStorage.getItem('swarmdemo_provider'))
+evolveProvider = ['cc','ollama'].includes(localStorage.getItem('swarmdemo_provider'))
   ? localStorage.getItem('swarmdemo_provider') : 'cc';
+// An earlier build could store a vendor API key here. That path is gone and no
+// UI remains that could clear it, so it is removed on load rather than left in
+// a viewer's browser storage with no way to get rid of it.
+function purgeRetiredVendorKey(){
+  try{
+    localStorage.removeItem('swarmdemo_loop_key');
+    if(localStorage.getItem('swarmdemo_provider')==='anthropic')
+      localStorage.setItem('swarmdemo_provider','cc');
+  }catch(_){}
+}
+purgeRetiredVendorKey();
+// A reload of the same document can hand the first script a storage snapshot
+// taken before the last write, so one purge at parse time is not enough to
+// guarantee the key is gone. Repeating it once the document has settled is what
+// makes the removal actually reach a returning browser. Measured: the parse-time
+// call alone left a seeded key in place on a same-document reload.
+if(document.readyState!=='complete'){ window.addEventListener('load',purgeRetiredVendorKey); }
+setTimeout(purgeRetiredVendorKey,400); setTimeout(purgeRetiredVendorKey,1600);
 let importData = null;
 
 let exerciseTranscript = '';
@@ -1574,37 +1586,16 @@ RULES:
 function setEvolveProvider(p, init) {
   evolveProvider = p;
   if (!init) localStorage.setItem('swarmdemo_provider', p);
-  document.getElementById('eprv-ant').classList.toggle('sel', p === 'anthropic');
   document.getElementById('eprv-cc').classList.toggle('sel', p === 'cc');
   document.getElementById('eprv-ollama').classList.toggle('sel', p === 'ollama');
   const ollamaMdl = document.getElementById('e-ollama-model');
-  const eak = document.getElementById('eak');
   const ollamaNote = document.getElementById('eollama-note');
-  if (p === 'cc') {
-    if (ollamaMdl) ollamaMdl.style.display = 'none';
-    if (eak) eak.style.display = 'none';
-    document.getElementById('eak-conf').style.display = 'none';
-    if (ollamaNote) ollamaNote.style.display = 'none';
-  } else if (p === 'ollama') {
-    if (ollamaMdl) { ollamaMdl.style.display = 'inline-block'; const saved = localStorage.getItem('swarmdemo_ollama_model'); if (saved) ollamaMdl.value = saved; }
-    if (eak) eak.style.display = 'none';
-    document.getElementById('eak-conf').style.display = 'none';
-    if (ollamaNote) ollamaNote.style.display = '';
-  } else {
-    if (ollamaMdl) ollamaMdl.style.display = 'none';
-    if (ollamaNote) ollamaNote.style.display = 'none';
-    if (eak) eak.placeholder = 'Anthropic API Key (sk-ant-...)';
-    const ak = localStorage.getItem('swarmdemo_loop_key');
-    if (ak) { eak.value = ak; eak.style.display = 'none'; document.getElementById('eak-conf').style.display = 'block'; }
-    else { eak.value = ''; eak.style.display = ''; document.getElementById('eak-conf').style.display = 'none'; }
+  const local = p === 'ollama';
+  if (ollamaMdl) {
+    ollamaMdl.style.display = local ? 'inline-block' : 'none';
+    if (local) { const saved = localStorage.getItem('swarmdemo_ollama_model'); if (saved) ollamaMdl.value = saved; }
   }
-}
-
-function clearEvolveKey() {
-  localStorage.removeItem('swarmdemo_loop_key');
-  const eak = document.getElementById('eak');
-  eak.value = ''; eak.style.display = '';
-  document.getElementById('eak-conf').style.display = 'none';
+  if (ollamaNote) ollamaNote.style.display = local ? '' : 'none';
 }
 
 // ─── Relay failure classification — display half ───
@@ -1799,7 +1790,7 @@ async function callClaudeCode(sys, user, onDelta, opts) {
   if (jb && jb.completed === true) lastCallCompleted = true;
   return jb.content;
 }
-async function evolveCallAPI(sys, user, ak, opts) {
+async function evolveCallAPI(sys, user, opts) {
   // opts threads the recovery banner's "continue waiting" timeout bump through
   // to the relay, the same way the streaming phases already do.
   if (evolveProvider === 'cc') return callClaudeCode(sys, user, undefined, opts);
@@ -1812,14 +1803,8 @@ async function evolveCallAPI(sys, user, ak, opts) {
     if (!r.ok) { let m = `HTTP ${r.status}`; try { const e = await r.json(); m = e.error?.message || e.message || m; } catch (_) {} throw new Error(m); }
     return (await r.json()).choices[0].message.content;
   }
-  const h = { 'Content-Type': 'application/json' };
-  if (ak) { h['x-api-key'] = ak; h['anthropic-version'] = '2023-06-01'; h['anthropic-dangerous-direct-browser-access'] = 'true'; }
-  const r = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST', headers: h,
-    body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1400, system: sys, messages: [{ role: 'user', content: user }] })
-  });
-  if (!r.ok) { let m = `HTTP ${r.status}`; try { const e = await r.json(); m = e.error?.message || m; } catch (_) { } throw new Error(m); }
-  return (await r.json()).content[0].text;
+  // Two paths exist. Anything else is a stale stored value, not a provider.
+  throw new Error('Unknown provider. Pick CLAUDE CODE or OLLAMA.');
 }
 
 // ─── Demo toggle ───
@@ -1829,14 +1814,9 @@ function toggleDemo() {
   btn.classList.toggle('active', demoMode);
   btn.textContent = demoMode ? '[ ◉ DEMO ON ]' : '[ ◉ DEMO ]';
   if (demoMode) {
-    document.getElementById('eak').style.display = 'none';
-    document.getElementById('eak-conf').style.display = 'none';
-    document.getElementById('binfo').textContent = 'DEMO MODE — pre-scripted playback, no API key needed.';
+    document.getElementById('binfo').textContent = 'DEMO MODE — pre-scripted playback, no model call is made.';
     if (evolveMode === 'custom') populateCustomDemoFields();
   } else {
-    const saved = localStorage.getItem('swarmdemo_loop_key');
-    if (saved) { document.getElementById('eak').style.display = 'none'; document.getElementById('eak-conf').style.display = 'block'; }
-    else { document.getElementById('eak').style.display = ''; document.getElementById('eak-conf').style.display = 'none'; }
     document.getElementById('binfo').textContent = 'Select a mode to begin the self-refinement loop.';
   }
 }
@@ -1958,7 +1938,7 @@ function dlEvolveTranscript() {
     `  Mode: ${modeLabel}`,
     `  Weakest Agent: ${weakestAgentName} (cycle ${cycleNum})`,
     `  Score: ${fmtScore(scoreBefore)} → ${fmtScore(scoreAfter)} (delta ${fmtDelta(scoreBefore, scoreAfter)})`,
-    `  Run Mode: ${demoMode ? 'DEMO' : 'LIVE'} | Provider: ${evolveProvider || 'anthropic'}`,
+    `  Run Mode: ${demoMode ? 'DEMO' : 'LIVE'} | Provider: ${evolveProvider || 'cc'}`,
     `-->`, ``,
     `# LOOP CYCLE TRANSCRIPT — ${modeLabel}`, ``,
     `**Generated:** ${ts}  `,
@@ -2326,7 +2306,7 @@ function coinFlipLetter() {
   } catch (_) { return Math.random() < 0.5 ? 'A' : 'B'; }
 }
 
-async function runBlindPairedScore(ak) {
+async function runBlindPairedScore() {
   const pair = stageBlocksForAgent(exerciseTranscript, weakestAgentName);
   const revised = revisedStageOutput(rerunOutput);
   if (!pair.owned) {
@@ -2356,7 +2336,7 @@ async function runBlindPairedScore(ak) {
     + 'rubric, following your output format exactly.';
 
   const out = await callWithRecovery('BLIND SCORER',
-    opts => evolveCallAPI(SYS_BLIND, budget(user, 2000), ak, opts), null);
+    opts => evolveCallAPI(SYS_BLIND, budget(user, 2000), opts), null);
   const sc = readBlindScores(out);
   const revisedScore = revisedLetter === 'A' ? sc.a : sc.b;
   const originalScore = revisedLetter === 'A' ? sc.b : sc.a;
@@ -2463,7 +2443,7 @@ function budget(user, tokens) {
 // the streaming target). In DEMO MODE the caller passes a `demoFetch`
 // callback (returns the canned text); in LIVE non-CC, falls through to
 // evolveCallAPI(). Returns the canonical full text.
-async function streamPhaseText(streamEl, sys, user, ak, demoFetch, opts) {
+async function streamPhaseText(streamEl, sys, user, demoFetch, opts) {
   if (demoMode) {
     const txt = await demoFetch();
     if (streamEl) await twEl(streamEl, txt);
@@ -2480,7 +2460,7 @@ async function streamPhaseText(streamEl, sys, user, ak, demoFetch, opts) {
     await render;
     return res;
   }
-  const res = await evolveCallAPI(sys, user, ak);
+  const res = await evolveCallAPI(sys, user);
   if (streamEl) await twEl(streamEl, res);
   return res;
 }
@@ -2824,8 +2804,6 @@ async function runImprovementCycle() {
   runMode = evolveMode;
   runPreset = evolvePreset;
 
-  const ak = document.getElementById('eak').value.trim();
-  if (!demoMode && evolveProvider !== 'cc' && evolveProvider !== 'ollama' && !ak) { const go = confirm('No API key configured. Switch to DEMO MODE to run without a key, or cancel and enter a key first. Proceed anyway?'); if (!go) { evolveRunning = false; return; } }
 
   hideTokens();
   document.getElementById('run-btn').disabled = true;
@@ -2844,7 +2822,7 @@ async function runImprovementCycle() {
         challengerOut = gx('de-challenger-custom');
       } else {
         try {
-          challengerOut = await evolveCallAPI(SYS_CHALLENGER, budget(buildChallengerPrompt(), 1500), ak);
+          challengerOut = await evolveCallAPI(SYS_CHALLENGER, budget(buildChallengerPrompt(), 1500));
         } catch (e) {
           challengerOut = `[FAULT: CHALLENGER — ${e.message}]`;
         }
@@ -2867,7 +2845,7 @@ async function runImprovementCycle() {
       const arbContent = document.getElementById('arbiter-content');
       arbContent.textContent = '';
       arbiterOutput = await callWithRecovery('ARBITER',
-        opts => streamPhaseText(arbContent, SYS_ARBITER, budget(buildArbiterPrompt(), 1500), ak,
+        opts => streamPhaseText(arbContent, SYS_ARBITER, budget(buildArbiterPrompt(), 1500),
           async () => { await new Promise(r => setTimeout(r, 700)); return gx(arbKey) || gx('de-arbiter-red'); }, opts),
         arbContent);
     }
@@ -2903,7 +2881,7 @@ async function runImprovementCycle() {
         manifestArea.insertBefore(streamPane, document.getElementById('manifest-cards'));
       }
       sculptorOutput = await callWithRecovery('SCULPTOR',
-        opts => streamPhaseText(streamPane, SYS_SCULPTOR, budget(buildSculptorPrompt(weakestAgentName, weakestAgentOriginalPrompt, arbiterOutput), 2000), ak,
+        opts => streamPhaseText(streamPane, SYS_SCULPTOR, budget(buildSculptorPrompt(weakestAgentName, weakestAgentOriginalPrompt, arbiterOutput), 2000),
           async () => { await new Promise(r => setTimeout(r, 900)); return gx(sculKey) || gx('de-sculptor-red'); }, opts),
         streamPane);
       streamPane.remove();
@@ -2940,7 +2918,7 @@ async function runImprovementCycle() {
       afterTerm.appendChild(aBody);
       try {
         rerunOutput = await callWithRecovery('RERUN',
-          opts => streamPhaseText(aBody, SYS_RERUN, budget(buildRerunPrompt(weakestAgentName, refinedPrompt, exerciseTranscript, scoreBefore), 1500), ak,
+          opts => streamPhaseText(aBody, SYS_RERUN, budget(buildRerunPrompt(weakestAgentName, refinedPrompt, exerciseTranscript, scoreBefore), 1500),
             async () => { await new Promise(r => setTimeout(r, 800)); return gx(rerunKey) || gx('de-rerun-red'); }, opts),
           aBody);
         preStreamedBody = true;
@@ -2971,7 +2949,7 @@ async function runImprovementCycle() {
       renderBlindBox(null);
     } else {
       document.getElementById('binfo').textContent = 'Phase 5: BLIND PAIRED SCORE — scoring both stage outputs blind...';
-      blindResult = await runBlindPairedScore(ak);
+      blindResult = await runBlindPairedScore();
       renderBlindBox(blindResult);
       // The two can disagree. That IS a result, and it is said out loud rather
       // than quietly resolved in favour of one of them.
@@ -3085,9 +3063,6 @@ function initEvolve() {
 
   setEvolveProvider(evolveProvider, true);
 
-  document.getElementById('eak').addEventListener('input', e => {
-    localStorage.setItem('swarmdemo_loop_key', e.target.value);
-  });
   document.getElementById('e-ollama-model')?.addEventListener('input', e => {
     localStorage.setItem('swarmdemo_ollama_model', e.target.value);
   });

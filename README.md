@@ -96,8 +96,10 @@ These are alternatives, not tiers. `ai-village-workshop/ATTENDEE-SETUP.md` puts
 all three side by side. `CLAUDE-CODE-SETUP.md` and `OLLAMA-SETUP.md` in the same
 directory carry the detail for the second and third.
 
-`ai-village-workshop/mock_providers.py` holds offline provider stubs if you want
-to exercise the wiring with no model access at all.
+If you want to run with no model access at all, that is recorded playback, the
+first row above. `ai-village-workshop/mock_providers.py` is not it: that file is
+a test helper for the demos' browser test suite, the suite itself is not shipped
+here, it needs `pytest-playwright`, and nothing in the package requires it.
 
 ---
 
@@ -124,7 +126,7 @@ to exercise the wiring with no model access at all.
     ├── OLLAMA-SETUP.md           a local model, fully offline
     ├── WORKSHOP-GUIDE.md         common errors, and paste-into-an-assistant context
     ├── relay.py                  the local helper, 127.0.0.1:3001
-    ├── mock_providers.py         offline provider stubs
+    ├── mock_providers.py         test helper, not needed to run anything
     ├── demos/                    the three single-file demos
     └── labs/                     the three labs
 ```

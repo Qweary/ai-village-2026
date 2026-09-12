@@ -162,8 +162,6 @@ body.pmode .tier-note{font-size:12px}
 .prv-mini.sel{border-color:var(--amb);color:var(--amb);background:rgba(255,188,0,.06)}
 .prv-mini:hover:not(.sel){border-color:#6060a0;color:#8080c0}
 .prv-axis-i{font-size:8px;color:#5a5a80;letter-spacing:2px;white-space:nowrap}
-.prv-mini-alt{opacity:.5;font-size:9px;text-transform:lowercase}
-.prv-mini-alt:hover,.prv-mini-alt.sel{opacity:1}
 .mdl-inp{background:var(--bi);border:1px solid var(--bdr);color:var(--amb);font-family:'Share Tech Mono',monospace;font-size:10px;padding:4px 7px;outline:none;width:200px;display:none}
 .mdl-inp:focus{border-color:var(--gr)}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--gr)}
@@ -387,10 +385,6 @@ body.pmode .ibtn,body.pmode .startbtn,body.pmode .begin-btn{min-height:48px}
     <button class="prv-mini" id="cprv-ollama" onclick="setCombatProvider('ollama')" title="A model running on this machine. No account and no network needed. This is a workshop path.">OLLAMA</button>
     <span id="collama-note" class="tier-note" style="display:none;color:#4fc3f7;letter-spacing:1px;font-family:'Share Tech Mono',monospace">⚡ LOCAL</span>
     <input class="mdl-inp" type="text" id="c-ollama-model" placeholder="llama3.2" style="display:none"/>
-    <div class="bsep"></div>
-    <button class="prv-mini prv-mini-alt" id="cprv-ant" onclick="setCombatProvider('anthropic')" title="A direct vendor API key, billed to you. The workshop does not use this, and you do not need it.">api key</button>
-    <input type="password" class="apifield" id="cak" placeholder="Anthropic API Key (sk-ant-...)"/>
-    <div id="cak-conf" style="display:none"><div class="kconf-btm">KEY CONFIGURED <span class="kc-clear" onclick="clearCombatKey()" title="Clear saved key">×</span></div></div>
     <div class="bsep"></div>
     <span style="color:var(--gr);font-size:9px;letter-spacing:1px;font-family:'Share Tech Mono',monospace">SCENARIO</span>
     <button class="prv-mini sel" id="scen-iron" onclick="setScenario('ironclad')">IRONCLAD</button>
@@ -829,8 +823,26 @@ let currentScenario='ironclad';
 // could see that it did nothing.
 let combatProvider = localStorage.getItem('swarmdemo_provider');
 if(combatProvider==='local'){combatProvider='cc';localStorage.setItem('swarmdemo_provider','cc');}
-combatProvider = ['anthropic','cc','ollama'].includes(localStorage.getItem('swarmdemo_provider'))
+combatProvider = ['cc','ollama'].includes(localStorage.getItem('swarmdemo_provider'))
   ? localStorage.getItem('swarmdemo_provider') : 'cc';
+// An earlier build could store a vendor API key here. That path is gone and no
+// UI remains that could clear it, so it is removed on load rather than left in
+// a viewer's browser storage with no way to get rid of it.
+function purgeRetiredVendorKey(){
+  try{
+    localStorage.removeItem('swarmdemo_cage_key');
+    if(localStorage.getItem('swarmdemo_provider')==='anthropic')
+      localStorage.setItem('swarmdemo_provider','cc');
+  }catch(_){}
+}
+purgeRetiredVendorKey();
+// A reload of the same document can hand the first script a storage snapshot
+// taken before the last write, so one purge at parse time is not enough to
+// guarantee the key is gone. Repeating it once the document has settled is what
+// makes the removal actually reach a returning browser. Measured: the parse-time
+// call alone left a seeded key in place on a same-document reload.
+if(document.readyState!=='complete'){ window.addEventListener('load',purgeRetiredVendorKey); }
+setTimeout(purgeRetiredVendorKey,400); setTimeout(purgeRetiredVendorKey,1600);
 let evolvedAgent = null; // refined agent loaded from evolve demo export
 // The blue roster is the allowlist a carried agent name must match before its
 // prompt is used. It lives at module scope so the check can also run when the
@@ -1363,16 +1375,9 @@ function toggleCombatDemo(){
   const btn=document.getElementById('combat-demo-btn');
   btn.classList.toggle('active',combatDemo);
   btn.textContent=combatDemo?'[ ◉ DEMO ON ]':'[ ◉ DEMO ]';
-  if(combatDemo){
-    document.getElementById('cak').style.display='none';
-    document.getElementById('cak-conf').style.display='none';
-    document.getElementById('binfo').textContent='DEMO MODE — pre-scripted playback, no API key needed.';
-  }else{
-    const ck=localStorage.getItem('swarmdemo_cage_key');
-    if(ck){document.getElementById('cak').style.display='none';document.getElementById('cak-conf').style.display='block';}
-    else{document.getElementById('cak').style.display='';document.getElementById('cak-conf').style.display='none';}
-    document.getElementById('binfo').textContent='Setup vulnerable network, then engage to begin the exercise.';
-  }
+  document.getElementById('binfo').textContent=combatDemo
+    ? 'DEMO MODE — pre-scripted playback, no model call is made.'
+    : 'Setup vulnerable network, then engage to begin the exercise.';
 }
 
 // ─── Synthetic-lab grounding note (consumer-grade provider paths only) ───
@@ -2504,7 +2509,7 @@ function budget(user,tokens){
 // fetches via callAPI and runs the synthetic twEl typewriter. Caller
 // supplies a pre-created element so streaming can begin painting before
 // the call resolves.
-async function streamPhase(el,sys,user,ak,opts){
+async function streamPhase(el,sys,user,opts){
   if(!combatDemo&&combatProvider==='cc'){
     const ref={current:'',done:false};
     resetTokens();
@@ -2517,7 +2522,7 @@ async function streamPhase(el,sys,user,ak,opts){
     await render;
     return res;
   }
-  const res=await callAPI(sys,user,ak);
+  const res=await callAPI(sys,user);
   await twEl(el,res);
   return res;
 }
@@ -2567,7 +2572,7 @@ function showCombatPhaseRecovery(label,msg,err){
     document.getElementById('r-term').scrollTop=1e9;
   });
 }
-async function callAPI(sys,user,ak){
+async function callAPI(sys,user){
   sys=applyAuthPreamble(sys);
   if(combatProvider==='cc')return callClaudeCode(sys,user);
   if(combatProvider==='ollama'){
@@ -2579,14 +2584,8 @@ async function callAPI(sys,user,ak){
     if(!r.ok){let m=`HTTP ${r.status}`;try{const e=await r.json();m=e.error?.message||e.message||m}catch(_){}throw new Error(m);}
     return (await r.json()).choices[0].message.content;
   }
-  const h={'Content-Type':'application/json'};
-  if(ak){h['x-api-key']=ak;h['anthropic-version']='2023-06-01';h['anthropic-dangerous-direct-browser-access']='true';}
-  const r=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',headers:h,
-    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:900,system:sys,messages:[{role:'user',content:user}]})
-  });
-  if(!r.ok){let m=`HTTP ${r.status}`;try{const e=await r.json();m=e.error?.message||m}catch(_){}throw new Error(m);}
-  return (await r.json()).content[0].text;
+  // Two paths exist. Anything else is a stale stored value, not a provider.
+  throw new Error('Unknown provider. Pick CLAUDE CODE or OLLAMA.');
 }
 
 function startTimer(){
@@ -2602,7 +2601,6 @@ function ts(){return new Date().toTimeString().slice(0,8)}
 
 async function setupInfra(){
   const sb=document.getElementById('setup-btn'); if(sb&&sb.disabled)return; if(sb)sb.disabled=true;
-  const ak=document.getElementById('cak').value.trim();
   document.getElementById('setup-btn').textContent='[ BUILDING... ]';
   document.getElementById('binfo').textContent='Infrastructure swarm building vulnerable network...';
   rT(`<div class="ts">Infrastructure swarm online. Building exercise network...</div>`);
@@ -2612,7 +2610,7 @@ async function setupInfra(){
     const scenLabel=currentScenario==='phantom'?'OPERATION PHANTOM FEED':'OPERATION IRONCLAD';
     networkState=combatDemo
       ? await callDemo(currentScenario==='phantom'?CDEMO_PHANTOM_INFRA:'INFRA')
-      : await callAPI(SYS_INFRA,budget('Build the vulnerable exercise network now.',800),ak);
+      : await callAPI(SYS_INFRA,budget('Build the vulnerable exercise network now.',800));
     rT(`<div class="te"><div class="te-hdr">INFRA SWARM — ${scenLabel} READY</div><div class="te-body" id="net-r"></div></div>`);
     await tw('net-r',networkState,true);
     bT(`<div class="te"><div class="te-hdr">NETWORK TOPOLOGY RECEIVED — INITIALIZING SOC</div><div class="te-body" id="net-b">${networkState.slice(0,400)}...</div></div>`);
@@ -2641,8 +2639,6 @@ function hideErrorRecovery(){const b=document.getElementById('error-recovery-ban
 
 async function engage(){
   if(running)return;
-  const ak=document.getElementById('cak').value.trim();
-  if(!combatDemo&&combatProvider!=='cc'&&combatProvider!=='ollama'&&!ak){const go=confirm('No API key configured. Switch to DEMO MODE to run without a key, or cancel and enter a key first. Proceed anyway?');if(!go)return;}
   running=true;
   hideTokens();
   document.getElementById('engage-btn').disabled=true;
@@ -2690,7 +2686,7 @@ async function engage(){
       }else{
         const rEl=document.getElementById(`r-s${i}`);
         rOut=await callWithRecovery(`RED ${st.rLabel}`,
-          opts=>streamPhase(rEl,rSysPrompt,budget(`Produce the OPERATIONAL-LOG artifact for the ${st.rLabel} phase now. Document the exact commands, tools, flags, and expected output as the workshop log entry. Be specific and technical.`,600),ak,opts),rEl);
+          opts=>streamPhase(rEl,rSysPrompt,budget(`Produce the OPERATIONAL-LOG artifact for the ${st.rLabel} phase now. Document the exact commands, tools, flags, and expected output as the workshop log entry. Be specific and technical.`,600),opts),rEl);
       }
       rState=rOut;
       rTermHistory+=`\n\n[${st.rLabel}]\n${rOut}`;
@@ -2715,7 +2711,7 @@ async function engage(){
       }else{
         const bEl=document.getElementById(`b-s${i}`);
         bOut=await callWithRecovery(`BLUE ${st.bLabel}`,
-          opts=>streamPhase(bEl,bSysPrompt,budget(`Respond to red team ${st.rLabel} activity now.`,600),ak,opts),bEl);
+          opts=>streamPhase(bEl,bSysPrompt,budget(`Respond to red team ${st.rLabel} activity now.`,600),opts),bEl);
       }
       bState=bOut;
       bTermHistory+=`\n\n[${st.bLabel}]\n${bOut}`;
@@ -2747,7 +2743,7 @@ async function engage(){
       const hardenSys=currentScenario==='phantom'?SYS_PHANTOM_BLUE_HARDEN(networkState,bTermHistory):SYS_BLUE_HARDEN(networkState,bTermHistory);
       const hEl=document.getElementById('b-final');
       finalRpt=await callWithRecovery('HARDEN',
-        opts=>streamPhase(hEl,hardenSys,budget('Produce the post-exercise hardening report.',1200),ak,opts),hEl);
+        opts=>streamPhase(hEl,hardenSys,budget('Produce the post-exercise hardening report.',1200),opts),hEl);
     }
     document.getElementById('b-term').scrollTop=1e9;
 
@@ -2849,7 +2845,7 @@ function dlCombatTranscript(){
     `  Generated: ${ts}`,
     `  Scenario: ${scen}${evolvedNote}`,
     `  Red Score: ${combatFinalScores.red||'?/10'} | Blue Score: ${combatFinalScores.blue||'?/10'} | Verdict: ${combatFinalScores.verdict||'SEE REPORT'}`,
-    `  Mode: ${combatDemo?'DEMO':'LIVE'} | Provider: ${combatProvider||'anthropic'}`,
+    `  Mode: ${combatDemo?'DEMO':'LIVE'} | Provider: ${combatProvider||'cc'}`,
     `-->`,``,
     `# CAGE EXERCISE TRANSCRIPT — ${scen}`,``,
     `**Generated:** ${ts}  `,
@@ -2879,41 +2875,18 @@ tick2();setInterval(tick2,1000);
 function setCombatProvider(p,init){
   combatProvider=p;
   if(!init)localStorage.setItem('swarmdemo_provider',p);
-  document.getElementById('cprv-ant').classList.toggle('sel',p==='anthropic');
   document.getElementById('cprv-cc').classList.toggle('sel',p==='cc');
   document.getElementById('cprv-ollama').classList.toggle('sel',p==='ollama');
   const ollamaMdl=document.getElementById('c-ollama-model');
-  const cak=document.getElementById('cak');
   const ollamaNote=document.getElementById('collama-note');
-  if(p==='cc'){
-    if(ollamaMdl)ollamaMdl.style.display='none';
-    if(cak){cak.style.display='none';}
-    document.getElementById('cak-conf').style.display='none';
-    if(ollamaNote)ollamaNote.style.display='none';
-  }else if(p==='ollama'){
-    if(ollamaMdl){ollamaMdl.style.display='inline-block';const saved=localStorage.getItem('swarmdemo_ollama_model');if(saved)ollamaMdl.value=saved;}
-    if(cak)cak.style.display='none';
-    document.getElementById('cak-conf').style.display='none';
-    if(ollamaNote)ollamaNote.style.display='';
-  }else{
-    if(ollamaMdl)ollamaMdl.style.display='none';
-    if(ollamaNote)ollamaNote.style.display='none';
-    if(cak)cak.placeholder='Anthropic API Key (sk-ant-...)';
-    const ak=localStorage.getItem('swarmdemo_cage_key');
-    if(ak){cak.value=ak;cak.style.display='none';document.getElementById('cak-conf').style.display='block';}
-    else{cak.value='';cak.style.display='';document.getElementById('cak-conf').style.display='none';}
+  const local = p==='ollama';
+  if(ollamaMdl){
+    ollamaMdl.style.display=local?'inline-block':'none';
+    if(local){const saved=localStorage.getItem('swarmdemo_ollama_model');if(saved)ollamaMdl.value=saved;}
   }
-}
-function clearCombatKey(){
-  localStorage.removeItem('swarmdemo_cage_key');
-  const cak=document.getElementById('cak');
-  cak.value='';cak.style.display='';
-  document.getElementById('cak-conf').style.display='none';
+  if(ollamaNote)ollamaNote.style.display=local?'':'none';
 }
 setCombatProvider(combatProvider,true);
-document.getElementById('cak').addEventListener('input',e=>{
-  localStorage.setItem('swarmdemo_cage_key',e.target.value);
-});
 document.getElementById('c-ollama-model')?.addEventListener('input',e=>{
   localStorage.setItem('swarmdemo_ollama_model',e.target.value);
 });
@@ -3021,7 +2994,7 @@ function dismissEvolveBanner(){
 
 // ============================================================================
 // LIVE MODE — polls the local visualization bridge helper
-// instead of calling the Anthropic API for narrative generation.
+// instead of calling a model for narrative generation.
 // Start the bridge helper before enabling LIVE MODE.
 // ============================================================================
 

@@ -71,7 +71,9 @@ ai-village-workshop/
 ├── WORKSHOP-GUIDE.md     (paste into claude.ai for contextual help)
 ├── relay.py              (Claude Code relay — python3 relay.py; spawns `claude -p` per call;
 │                          prints a per-run access token + a demo link carrying it)
-├── mock_providers.py     (offline provider stubs — run the demos with no model access at all)
+├── mock_providers.py     (test helper for the demos' browser test suite, which is not
+│                          shipped here; needs pytest-playwright. Not needed to run anything.
+│                          To run with no model access, use the demos' DEMO MODE button)
 ├── demos/
 │   ├── swarm-factory-live.html
 │   ├── swarm-cage-live.html

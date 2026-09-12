@@ -103,9 +103,6 @@ textarea{resize:none;height:60px;line-height:1.5}
 .prvbtn.sel{border-color:var(--a);color:var(--a);background:rgba(240,165,0,.07);text-shadow:var(--ga)}
 .prv-axis{font-size:8px;color:#5a5a80;letter-spacing:2px;padding:3px 0 3px}
 .prv-meth{font-size:8.5px;color:#5a5a80;letter-spacing:.5px;text-align:center;padding:0 0 5px}
-.prv-alt{margin-top:5px;padding-top:5px;border-top:1px dashed var(--bdr)}
-.prvbtn-alt{opacity:.5;font-size:9px;letter-spacing:1px;text-transform:lowercase}
-.prvbtn-alt:hover,.prvbtn-alt.sel{opacity:1}
 .mdl-inp{width:100%;background:var(--bi);border:1px solid var(--bdr);border-bottom-color:var(--gr);color:var(--a);font-family:'Share Tech Mono',monospace;font-size:11px;padding:5px 8px;outline:none;margin-top:3px}
 .mdl-inp:focus{border-color:var(--ad)}
 
@@ -1218,14 +1215,8 @@ Region blindness is documented as a known failure mode (30+ AWS regions) with th
       <button class="prvbtn" id="prv-ollama" onclick="setBuildProvider('ollama')" title="A model running on this machine. No account and no network needed. This is a workshop path.">[ OLLAMA ]</button>
     </div>
     <div class="prv-meth">a model on this machine, fully offline</div>
-    <div class="prv-alt">
-      <div class="prv-axis">NOT A WORKSHOP PATH</div>
-      <button class="prvbtn prvbtn-alt" id="prv-ant" onclick="setBuildProvider('anthropic')" title="A direct vendor API key, billed to you. The workshop does not use this, and you do not need it.">anthropic api key</button>
-    </div>
     <div id="ollama-notice" class="tier-note" style="display:none;color:#4fc3f7;letter-spacing:1px;padding:2px 0">⚡ LOCAL — offline capable, model quality varies</div>
     </div>
-    <div id="ak-row"><label id="ak-lbl">API KEY</label><input type="password" id="ak" placeholder="sk-ant-..."/><div class="kh" id="ak-hint">Your own key. Not needed for the workshop paths.</div></div>
-    <div id="ak-conf" style="display:none"><div class="kconf">KEY CONFIGURED <span class="kc-clear" onclick="clearBuildKey()" title="Clear saved key">×</span></div></div>
     <div id="ollama-model-row" style="display:none">
       <label>OLLAMA MODEL</label>
       <input class="mdl-inp" type="text" id="ollama-model-inp" placeholder="llama3.2"/>
@@ -1341,8 +1332,28 @@ let gateResolve = null;
 // could see that it did nothing.
 let buildProvider = localStorage.getItem('swarmdemo_provider');
 if(buildProvider==='local'){buildProvider='cc';localStorage.setItem('swarmdemo_provider','cc');}
-buildProvider = ['anthropic','cc','ollama'].includes(localStorage.getItem('swarmdemo_provider'))
+buildProvider = ['cc','ollama'].includes(localStorage.getItem('swarmdemo_provider'))
   ? localStorage.getItem('swarmdemo_provider') : 'cc';
+// A browser that used an earlier build may still hold a vendor API key, and a
+// stored provider naming the path that key belonged to. That path is gone, so
+// the key can no longer be used by anything here and no UI remains that could
+// clear it. A secret left in a viewer's storage with no way to remove it is the
+// worst of the options, so it is deleted on load.
+function purgeRetiredVendorKey(){
+  try{
+    localStorage.removeItem('swarmdemo_factory_key');
+    if(localStorage.getItem('swarmdemo_provider')==='anthropic')
+      localStorage.setItem('swarmdemo_provider','cc');
+  }catch(_){}
+}
+purgeRetiredVendorKey();
+// A reload of the same document can hand the first script a storage snapshot
+// taken before the last write, so one purge at parse time is not enough to
+// guarantee the key is gone. Repeating it once the document has settled is what
+// makes the removal actually reach a returning browser. Measured: the parse-time
+// call alone left a seeded key in place on a same-document reload.
+if(document.readyState!=='complete'){ window.addEventListener('load',purgeRetiredVendorKey); }
+setTimeout(purgeRetiredVendorKey,400); setTimeout(purgeRetiredVendorKey,1600);
 let demoMode = false;
 
 // Pre-scripted demo content — per swarm type
@@ -1950,17 +1961,7 @@ function skipVectorGate(){
 function tick(){document.getElementById('ts').textContent=new Date().toISOString().replace('T',' ').slice(0,19)+' UTC'}
 tick();setInterval(tick,1000);
 
-// ─── API call (Anthropic direct / local relay / local Ollama) ───
-async function callAnthropic(sys,user,ak){
-  const h={'Content-Type':'application/json'};
-  if(ak){h['x-api-key']=ak;h['anthropic-version']='2023-06-01';h['anthropic-dangerous-direct-browser-access']='true';}
-  const r=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',headers:h,
-    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1800,system:sys,messages:[{role:'user',content:user}]})
-  });
-  if(!r.ok){let m=`HTTP ${r.status}`;try{const e=await r.json();m=e.error?.message||m}catch(_){}throw new Error(m);}
-  return (await r.json()).content[0].text;
-}
+// ─── API call (local relay / local Ollama) ───
 // ─── Relay failure classification — display half ───
 // The local bridge returns failure_class / failure_reason / failure_confidence
 // beside the unchanged `error` string. Absent fields read as UNKNOWN. Every
@@ -2169,11 +2170,11 @@ function budget(user,tokens){
   return user+`\n\nTarget length: ${tokens} tokens. Use tables and bullets where possible. Be precise, not exhaustive.`;
 }
 // Long-output phase renderer: in LIVE+CC, streams via SSE into a tws() pane;
-// in any other mode (DEMO, or LIVE on Anthropic/OR/Ollama), fetches the full
+// in any other mode (DEMO, or LIVE on Ollama), fetches the full
 // content via dc()/call() and runs the synthetic tw() typewriter. The caller
 // passes a pre-created element so that streaming can begin painting before
 // the call resolves. Returns the final canonical content string.
-async function writeInto(el,sys,user,ak,demoKey,opts){
+async function writeInto(el,sys,user,demoKey,opts){
   if(!demoMode&&buildProvider==='cc'){
     const ref={current:'',done:false};
     resetTokens();
@@ -2185,7 +2186,7 @@ async function writeInto(el,sys,user,ak,demoKey,opts){
     await render;
     return res;
   }
-  const res=await dc(sys,user,ak,demoKey);
+  const res=await dc(sys,user,demoKey);
   await tw(el,res);
   return res;
 }
@@ -2252,10 +2253,11 @@ async function callOllama(sys,user){
   if(!r.ok){let m=`HTTP ${r.status}`;try{const e=await r.json();m=e.error?.message||e.message||m}catch(_){}throw new Error(m);}
   return (await r.json()).choices[0].message.content;
 }
-async function call(sys,user,ak){
+async function call(sys,user){
   if(buildProvider==='cc')return callClaudeCode(sys,user);
   if(buildProvider==='ollama')return callOllama(sys,user);
-  return callAnthropic(sys,user,ak);
+  // Two paths exist. Anything else is a stale stored value, not a provider.
+  throw new Error('Unknown provider. Pick CLAUDE CODE or OLLAMA.');
 }
 
 // ─── Main build ───
@@ -2273,8 +2275,6 @@ async function runBuild(){
   if(running)return;
   let brief=SWARMS[selSwarm].brief;
   if(selSwarm==='custom'){brief=document.getElementById('ct').value.trim();if(!brief){document.getElementById('ct').focus();return;}}
-  const ak=document.getElementById('ak').value.trim();
-  if(!demoMode&&buildProvider!=='cc'&&buildProvider!=='ollama'&&!ak){const go=confirm('No API key configured. Switch to DEMO MODE to run without a key, or cancel and enter a key first. Proceed anyway?');if(!go)return;}
   running=true;storeEnabled=false;operatorNotes='';agentCN='AGENT';finalPkg='';
   hideTokens();
   const btn=document.getElementById('ibtn');
@@ -2305,7 +2305,7 @@ async function runBuild(){
       const e1=document.createElement('div');e1.innerHTML=`<div class="tc opp" id="e-opp"></div>`;term().appendChild(e1);
       const el=document.getElementById('e-opp');
       archDoc=await callWithRecovery('ARCHITECT',
-        opts=>writeInto(el,SYS.ARCHITECT,budget(`Domain Brief:\n\n${brief}`,1500),ak,'ARCHITECT',opts),el);
+        opts=>writeInto(el,SYS.ARCHITECT,budget(`Domain Brief:\n\n${brief}`,1500),'ARCHITECT',opts),el);
     }
     dot('o','done');rf(0,'UPDATED ✓','up');rf(1,'UPDATED ✓','up');rf(2,'UPDATED ✓','up');rf(5,'UPDATED ✓','up');
     await sleep(250);
@@ -2320,7 +2320,7 @@ async function runBuild(){
       const e2=document.createElement('div');e2.innerHTML=`<div class="tc lat" id="e-ksf"></div>`;term().appendChild(e2);
       const el=document.getElementById('e-ksf');
       ksfDoc=await callWithRecovery('LIBRARIAN KSF',
-        opts=>writeInto(el,SYS.LIBRARIAN_KSF,budget(`SWARM ARCHITECTURE DOCUMENT:\n\n${archDoc}\n\nDomain Brief:\n\n${brief}`,1200),ak,'LIBRARIAN_KSF',opts),el);
+        opts=>writeInto(el,SYS.LIBRARIAN_KSF,budget(`SWARM ARCHITECTURE DOCUMENT:\n\n${archDoc}\n\nDomain Brief:\n\n${brief}`,1200),'LIBRARIAN_KSF',opts),el);
     }
     dot('l','done');rf(3,'UPDATED ✓','up');
     showKSF(ksfDoc);
@@ -2338,7 +2338,7 @@ async function runBuild(){
       const e3=document.createElement('div');e3.innerHTML=`<div class="tc t2" id="e-t2"></div>`;term().appendChild(e3);
       const el=document.getElementById('e-t2');
       advisorOut=await callWithRecovery(sw.adv,
-        opts=>writeInto(el,advSys,budget(advUser,3000),ak,'ADVISOR',opts),el);
+        opts=>writeInto(el,advSys,budget(advUser,3000),'ADVISOR',opts),el);
       await sleep(250);
     }else{
       // Split domain advisor into two calls so each completes within the relay timeout
@@ -2353,13 +2353,13 @@ async function runBuild(){
       const e3a=document.createElement('div');e3a.innerHTML=`<div class="tc t2" id="e-t2a"></div>`;term().appendChild(e3a);
       const elA=document.getElementById('e-t2a');
       partA=await callWithRecovery(`${sw.adv} (micro-spec)`,
-        opts=>writeInto(elA,sysA,budget(advUser,1500),ak,'ADVISOR',opts),elA);
+        opts=>writeInto(elA,sysA,budget(advUser,1500),'ADVISOR',opts),elA);
       await sleep(120);
       t(`<div class="ts">Micro-Specialization Map authored. Now authoring Library Specification for LIBRARIAN...</div>`);
       const e3b=document.createElement('div');e3b.innerHTML=`<div class="tc t2" id="e-t2b"></div>`;term().appendChild(e3b);
       const elB=document.getElementById('e-t2b');
       partB=await callWithRecovery(`${sw.adv} (library spec)`,
-        opts=>writeInto(elB,sysB,budget(advUser+`\n\nMICRO-SPECIALIZATION MAP (already authored, for context):\n\n${partA}`,1500),ak,'ADVISOR',opts),elB);
+        opts=>writeInto(elB,sysB,budget(advUser+`\n\nMICRO-SPECIALIZATION MAP (already authored, for context):\n\n${partA}`,1500),'ADVISOR',opts),elB);
       await sleep(120);
       advisorOut=partA+`\n\n---\n\n`+partB;
     }
@@ -2374,7 +2374,7 @@ async function runBuild(){
       const e4=document.createElement('div');e4.innerHTML=`<div class="tc lat" id="e-lat"></div>`;term().appendChild(e4);
       const el=document.getElementById('e-lat');
       collDesign=await callWithRecovery('LIBRARIAN Collection Design',
-        opts=>writeInto(el,SYS.LIBRARIAN_COLDESIGN,budget(`DOMAIN LIBRARY SPECIFICATION (from ${sw.adv}):\n\n${advisorOut}\n\nSWARM ARCHITECTURE:\n\n${archDoc}\n\nLIBRARIAN KSF (your prior assessment):\n\n${ksfDoc}`,1500),ak,'COLL_DESIGN',opts),el);
+        opts=>writeInto(el,SYS.LIBRARIAN_COLDESIGN,budget(`DOMAIN LIBRARY SPECIFICATION (from ${sw.adv}):\n\n${advisorOut}\n\nSWARM ARCHITECTURE:\n\n${archDoc}\n\nLIBRARIAN KSF (your prior assessment):\n\n${ksfDoc}`,1500),'COLL_DESIGN',opts),el);
     }
     dot('l','done');
     await sleep(250);
@@ -2403,7 +2403,7 @@ async function runBuild(){
       const e5=document.createElement('div');e5.innerHTML=`<div class="tc cur" id="e-cur"></div>`;term().appendChild(e5);
       const el=document.getElementById('e-cur');
       researchBrief=await callWithRecovery('BRIEFER',
-        opts=>writeInto(el,SYS.BRIEFER,budget(`SWARM ARCHITECTURE:\n\n${archDoc}\n\nMICRO-SPECIALIZATION MAP (${sw.adv}):\n\n${advisorOut}\n\nLIBRARIAN COLLECTION DESIGN:\n\n${collDesign}\n\nProduce BRIEFER Research Briefing for the fabrication priority agent.`,1200),ak,'BRIEFER',opts),el);
+        opts=>writeInto(el,SYS.BRIEFER,budget(`SWARM ARCHITECTURE:\n\n${archDoc}\n\nMICRO-SPECIALIZATION MAP (${sw.adv}):\n\n${advisorOut}\n\nLIBRARIAN COLLECTION DESIGN:\n\n${collDesign}\n\nProduce BRIEFER Research Briefing for the fabrication priority agent.`,1200),'BRIEFER',opts),el);
     }
     dot('c','done');
     await sleep(250);
@@ -2420,7 +2420,7 @@ async function runBuild(){
       const e6=document.createElement('div');e6.innerHTML=`<div class="tah cf2" id="e-fer-h">FABRICATING…</div><div class="tc fer" id="e-fer"></div>`;term().appendChild(e6);
       const el=document.getElementById('e-fer');
       fabricated=await callWithRecovery('BUILDER',
-        opts=>writeInto(el,SYS.BUILDER,budget(builderCtx,2000),ak,'BUILDER',opts),el);
+        opts=>writeInto(el,SYS.BUILDER,budget(builderCtx,2000),'BUILDER',opts),el);
       const cn=fabricated.match(/^#\s+([A-Z][A-Z0-9\-]+)/m);if(cn)agentCN=cn[1];
       const eh=document.getElementById('e-fer-h');if(eh)eh.textContent=`${agentCN} FABRICATED`;
     }
@@ -2436,7 +2436,7 @@ async function runBuild(){
       const e7=document.createElement('div');e7.innerHTML=`<div class="tc gei" id="e-gei"></div>`;term().appendChild(e7);
       const el=document.getElementById('e-gei');
       auditorRpt=await callWithRecovery('AUDITOR',
-        opts=>writeInto(el,SYS.AUDITOR,budget(`SWARM ARCHITECTURE:\n\n${archDoc}\n\nMICRO-SPEC MAP:\n\n${advisorOut}\n\nRESEARCH BRIEFING:\n\n${researchBrief}\n\nCOLLECTION DESIGN:\n\n${collDesign}\n\nFABRICATED AGENT:\n\n${fabricated}\n\nKnowledge-store: ${storeEnabled}`,800),ak,'AUDITOR',opts),el);
+        opts=>writeInto(el,SYS.AUDITOR,budget(`SWARM ARCHITECTURE:\n\n${archDoc}\n\nMICRO-SPEC MAP:\n\n${advisorOut}\n\nRESEARCH BRIEFING:\n\n${researchBrief}\n\nCOLLECTION DESIGN:\n\n${collDesign}\n\nFABRICATED AGENT:\n\n${fabricated}\n\nKnowledge-store: ${storeEnabled}`,800),'AUDITOR',opts),el);
     }
     dot('g','done');rf(5,'UPDATED ✓','up');
     await sleep(250);
@@ -2450,7 +2450,7 @@ async function runBuild(){
       const e8=document.createElement('div');e8.innerHTML=`<div class="tc boh" id="e-boh"></div>`;term().appendChild(e8);
       const el=document.getElementById('e-boh');
       inspectorRpt=await callWithRecovery('INSPECTOR',
-        opts=>writeInto(el,SYS.INSPECTOR,budget(`FABRICATED AGENT PROMPT:\n\n${fabricated}\n\nKnowledge-store: ${storeEnabled}`,800),ak,'INSPECTOR',opts),el);
+        opts=>writeInto(el,SYS.INSPECTOR,budget(`FABRICATED AGENT PROMPT:\n\n${fabricated}\n\nKnowledge-store: ${storeEnabled}`,800),'INSPECTOR',opts),el);
     }
     dot('b','done');
     await sleep(250);
@@ -2516,7 +2516,7 @@ async function runBuild(){
 
   }catch(err){
     t(`<div class="tg"></div><div class="terr">RUN FAULT: ${safeErrText(err.message)}</div>`);
-    t(`<div class="ts">Check API key and network, then retry or switch to DEMO MODE.</div>`);
+    t(`<div class="ts">Check that the relay or Ollama is running, then retry or switch to DEMO MODE.</div>`);
     showErrorRecovery();
     setP(0);
   }finally{
@@ -2549,46 +2549,20 @@ function resetUI(){
 function setBuildProvider(p,init){
   buildProvider=p;
   if(!init)localStorage.setItem('swarmdemo_provider',p);
-  document.getElementById('prv-ant').classList.toggle('sel',p==='anthropic');
   document.getElementById('prv-cc').classList.toggle('sel',p==='cc');
   document.getElementById('prv-ollama').classList.toggle('sel',p==='ollama');
-  const lbl=document.getElementById('ak-lbl');
-  const hint=document.getElementById('ak-hint');
   const ollamaRow=document.getElementById('ollama-model-row');
   const ollamaNotice=document.getElementById('ollama-notice');
-  if(p==='cc'){
-    document.getElementById('ak-row').style.display='none';
-    document.getElementById('ak-conf').style.display='none';
-    if(ollamaRow)ollamaRow.style.display='none';
-    if(ollamaNotice)ollamaNotice.style.display='none';
-  }else if(p==='ollama'){
-    document.getElementById('ak-row').style.display='none';
-    document.getElementById('ak-conf').style.display='none';
-    if(ollamaRow)ollamaRow.style.display='';
-    if(ollamaNotice)ollamaNotice.style.display='';
+  const local = p==='ollama';
+  if(ollamaRow)ollamaRow.style.display=local?'':'none';
+  if(ollamaNotice)ollamaNotice.style.display=local?'':'none';
+  if(local){
     const saved=localStorage.getItem('swarmdemo_ollama_model');
     const mi=document.getElementById('ollama-model-inp');
     if(mi&&saved)mi.value=saved;
-  }else{
-    if(lbl)lbl.textContent='API KEY';
-    if(hint)hint.textContent='Blank = running inside Claude.ai';
-    if(ollamaRow)ollamaRow.style.display='none';
-    if(ollamaNotice)ollamaNotice.style.display='none';
-    const ak=localStorage.getItem('swarmdemo_factory_key');
-    if(ak){document.getElementById('ak').value=ak;document.getElementById('ak-row').style.display='none';document.getElementById('ak-conf').style.display='block';}
-    else{document.getElementById('ak').value='';document.getElementById('ak-row').style.display='';document.getElementById('ak-conf').style.display='none';}
   }
 }
-function clearBuildKey(){
-  if(buildProvider!=='cc'&&buildProvider!=='ollama')localStorage.removeItem('swarmdemo_factory_key');
-  document.getElementById('ak').value='';
-  document.getElementById('ak-row').style.display='';
-  document.getElementById('ak-conf').style.display='none';
-}
 setBuildProvider(buildProvider,true);
-document.getElementById('ak').addEventListener('input',e=>{
-  localStorage.setItem('swarmdemo_factory_key',e.target.value);
-});
 document.getElementById('ollama-model-inp')?.addEventListener('input',e=>{
   localStorage.setItem('swarmdemo_ollama_model',e.target.value);
 });
@@ -2614,22 +2588,17 @@ function toggleDemoMode(){
       document.querySelector('.swb[data-t="red"]').click();
     }
   }
-  if(demoMode){
-    document.getElementById('ak-row').style.display='none';
-    document.getElementById('ak-conf').style.display='none';
-  }else{
-    setBuildProvider(buildProvider,true);
-  }
+  if(!demoMode)setBuildProvider(buildProvider,true);
 }
 
 // Demo-aware call wrapper: returns per-swarm pre-scripted content
-async function dc(sys,user,ak,demoKey){
+async function dc(sys,user,demoKey){
   if(demoMode){
     await sleep(600+Math.random()*500);
     const swarmDemo=DEMO[selSwarm]||DEMO['red'];
     return swarmDemo[demoKey]||DEMO['red'][demoKey]||'[demo content not found]';
   }
-  return call(sys,user,ak);
+  return call(sys,user);
 }
 
 // Step mode — pause between phases for presenter explanation
